@@ -1,0 +1,1 @@
+const kMaxPhotos = 12;

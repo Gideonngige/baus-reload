@@ -1,0 +1,116 @@
+// import 'package:baustaka/api/auth_api.dart';
+import 'package:baustaka/api/transaction_api.dart';
+import 'package:baustaka/helper/util.dart';
+import 'package:baustaka/model/transaction.dart';
+import 'package:baustaka/model/transaction_page.dart';
+import 'package:baustaka/model/user.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+class TransactionsController extends GetxController {
+  var isFetching = false.obs;
+  var isWithdrawing = false.obs;
+  var isDepositing = false.obs;
+
+  RxList<Transaction> transactions = RxList.empty();
+
+  var transactionApi = Get.put(TransactionApi());
+
+  // final _authApi = Get.put(AuthApi());
+
+  TransactionPage? _transactionPage;
+
+  Rx<User?> user = Rx(null);
+
+  TextEditingController amount = TextEditingController();
+  TextEditingController amountToDeposit = TextEditingController();
+
+  @override
+  void onInit() async {
+    super.onInit();
+
+    await fetch(true);
+  }
+
+  fetch(bool refresh) async {
+    if (isFetching.isTrue) return;
+
+    isFetching.value = true;
+
+    if (refresh) {
+      transactions.clear();
+
+      _transactionPage = null;
+    } else if (_transactionPage != null &&
+        (_transactionPage!.page! >= _transactionPage!.pages! ||
+            _transactionPage!.docs!.isEmpty)) {
+      isFetching.value = false;
+      return;
+    }
+
+    try {
+      // if (refresh) user.value = (await _authApi.auth()).data!.user;
+
+      int page = _transactionPage == null ? 1 : _transactionPage!.page! + 1;
+
+      _transactionPage = (await transactionApi
+              .retrieve({'userId': user.value!.id, 'page': page.toString()}))
+          .data!
+          .transactionPage;
+
+      transactions.addAll(_transactionPage!.docs!);
+    } catch (e) {
+      Util.toast(e);
+    }
+
+    isFetching.value = false;
+  }
+
+  withdraw() async {
+    if (isWithdrawing.isTrue) return;
+
+    isWithdrawing.value = true;
+    try {
+      var transaction = (await transactionApi.create({
+        'amount': amount.text,
+        'type': 'withdrawal',
+      }))
+          .data!
+          .transaction;
+
+      if (transaction != null) {
+        Util.toast('We are processing your request');
+
+        await fetch(true);
+      }
+    } catch (e) {
+      Util.toast(e);
+    }
+
+    isWithdrawing.value = false;
+  }
+
+  deposit() async {
+    if (isDepositing.isTrue) return;
+
+    isDepositing.value = true;
+    try {
+      var transaction = (await transactionApi.create({
+        'amount': amountToDeposit.text,
+        'type': 'deposit',
+      }))
+          .data!
+          .transaction;
+
+      if (transaction != null) {
+        Util.toast('We are processing your request');
+
+        await fetch(true);
+      }
+    } catch (e) {
+      Util.toast(e);
+    }
+
+    isDepositing.value = false;
+  }
+}

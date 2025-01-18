@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "190957972509",
+    "project_id": "baus-test-83bcc",
+    "storage_bucket": "baus-test-83bcc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:190957972509:android:a9887ae49a03f7ca9aaaf4",
+        "android_client_info": {
+          "package_name": "test.baus.android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy6ZwooIR1pIqoMzNu5WaiD_m1FJnzoXw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

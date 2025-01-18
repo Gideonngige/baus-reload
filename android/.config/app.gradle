@@ -1,0 +1,12 @@
+ext {
+
+    // application
+    applicationId = "test.baus.android"
+    appName = "Baus Taka"
+
+    // signing
+    keyAlias = "kotlina"
+    keyPassword = "kotlina2020"
+    storeFile = file(".config/kotlina.jks")
+    storePassword = "kotlina2020"
+}

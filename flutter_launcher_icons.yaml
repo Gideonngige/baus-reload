@@ -1,0 +1,14 @@
+flutter_icons:
+  android: true
+  ios: true
+  image_path: ".res/android/play_store_512.png"
+  adaptive_icon_foreground: ".res/android/res/mipmap-xxxhdpi/ic_launcher_foreground.png"
+  adaptive_icon_background: ".res/android/res/mipmap-xxxhdpi/ic_launcher_background.png"
+  remove_alpha_ios: true
+  web:
+    generate: true
+    background_color: "#067435"
+    theme_color: "#067435"
+  windows:
+    generate: true
+    icon_size: 48
