@@ -74,7 +74,7 @@ class HomeWidget extends ResponsiveWidget<HomeController> {
                         ),
                       ),
                       if (controller.user.value != null &&
-                          controller.user.value!.notifications! > 0)
+                          (controller.user.value!.notifications ?? 0) > 0)
                         Positioned(
                           top: 6,
                           right: 6,
@@ -183,11 +183,14 @@ class HomeWidget extends ResponsiveWidget<HomeController> {
                                 color: Colors.black,
                                 fontSize: 18,
                               ),
-                              TitleText(
-                                text: user?.phoneNumber ?? 'Number unavailable',
-                                color: Colors.black,
-                                fontSize: 15,
-                              ),
+
+                              // TitleText(
+                              //   text: user != null && user.phoneNumber != null && user.phoneNumber!.isNotEmpty
+                              //       ? '+254${user.phoneNumber}'
+                              //       : 'Number unavailable',
+                              //   color: Colors.black,
+                              //   fontSize: 15,
+                              // ),
                             ],
                           )
                         ],

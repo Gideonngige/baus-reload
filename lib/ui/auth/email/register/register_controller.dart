@@ -27,10 +27,14 @@ class RegisterController extends GetxController {
       if (isAgreed.isFalse) throw 'Please accept the terms of service';
 
       if (FirebaseAuth.instance.currentUser == null) {
-        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-            email: email!.trim(), password: password!);
-// added the line below
+        UserCredential userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email!.trim(),
+          password: password!,
+        );
         await userCredential.user?.sendEmailVerification();
+        Util.toast(
+            "A verification link has been sent to your email. Please verify before proceeding.");
       }
 
       Get.back(

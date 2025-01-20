@@ -82,6 +82,38 @@ class ProfileWidget extends GetResponsiveView<ProfileController> {
                   horizontal: 16,
                 ),
                 child: Text(
+                  'Phone number',
+                ),
+              ),
+              const SizedBox(
+                height: 8,
+              ),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                child: Obx(() {
+                  final phone = controller.map['phoneNumber'] as String?;
+                  final readOnly = controller.isPhoneUser;
+                  return TextField(
+                    readOnly: readOnly,
+                    decoration: kInputDecoration.copyWith(
+                      hintText: 'Phone number',
+                      prefixIcon: const Icon(Icons.phone),
+                    ),
+                    onChanged: (value) => controller.map['phoneNumber'] = value,
+                    keyboardType: TextInputType.phone,
+                    controller: TextEditingController(text: phone),
+                    textAlignVertical: TextAlignVertical.center,
+                  );
+                }),
+              ),
+              const SizedBox(
+                height: 32,
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                ),
+                child: Text(
                   'Username',
                 ),
               ),
