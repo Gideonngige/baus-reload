@@ -93,7 +93,7 @@ class EventsTabsWidget extends ResponsiveWidget<EventsTabsController> {
                       text: 'Clean ups',
                     ),
                     Tab(
-                      text: 'Mangroove planting',
+                      text: 'Mangrove planting',
                     ),
                     Tab(
                       text: 'Bin donations',
@@ -110,7 +110,7 @@ class EventsTabsWidget extends ResponsiveWidget<EventsTabsController> {
                     tags: 'beach cleanup',
                   ),
                   EventsWidget(
-                    tags: 'mangroove planting',
+                    tags: 'mangrove planting',
                   ),
                   EventsWidget(
                     tags: 'bin donation',
