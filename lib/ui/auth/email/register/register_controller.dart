@@ -24,7 +24,7 @@ class RegisterController extends GetxController {
     try {
       // Replace kBaseApiUrl with your actual server domain, e.g. https://api.yourdomain.com
       final response = await Dio().post(
-        '$kBaseApiUrl/v1/auth/firebase',
+        '${kBaseApiUrl}v1/auth/firebase',
         data: {'idToken': token},
       );
 
@@ -32,12 +32,7 @@ class RegisterController extends GetxController {
       final data = response.data;
       // You could store it in Session if you want:
       // Session.serverUser = data['user'];
-
-      // Or just log it:
-      print('Server user: ${data['user']}');
     } on DioException catch (e) {
-      // Handle server error
-      print('Sync with server failed: ${e.response?.data ?? e.message}');
       // You could still let them continue, or show a toast:
       Util.toast(e.response?.data?['error'] ?? e.message);
     }

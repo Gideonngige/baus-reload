@@ -311,8 +311,12 @@ class HomeWidget extends ResponsiveWidget<HomeController> {
                       }
                     },
                   ),
-                  _drawerListTile(
-                      icon: Icons.logout, label: 'Logout', onTap: () {}),
+                    _drawerListTile(
+                      icon: Icons.logout,
+                      label: 'Logout',
+                      onTap: () async {
+                      await Session.logout();
+                      }),
                 ],
               ),
             ),

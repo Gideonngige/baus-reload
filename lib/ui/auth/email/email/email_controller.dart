@@ -33,7 +33,7 @@ class EmailController extends GetxController {
     try {
       // Replace kBaseApiUrl with your actual server domain, e.g. https://api.yourdomain.com
       final response = await Dio().post(
-        '$kBaseApiUrl/v1/auth/firebase',
+        '${kBaseApiUrl}v1/auth/firebase',
         data: {'idToken': token},
       );
 
@@ -154,26 +154,23 @@ class EmailController extends GetxController {
 
     try {
       var userId = email?.trim();
-
       var userPassword = password?.trim();
 
       if (userId?.isNotEmpty != true) throw 'Enter your email';
-
       if (userPassword?.isNotEmpty != true) throw 'Enter your password';
-
-      // if (userId?.isEmail != true) {
-      //   userId =
-      //       (await _userApi.retrieve({'userId': userId})).data?.user?.email ??
-      //           userId;
-      // }
 
       if (userId == null) throw 'Enter your email';
 
-      await FirebaseAuth.instance
+      final userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: userId, password: userPassword!);
 
-      await syncWithServer();
+      final user = userCredential.user;
+      if (user != null && !user.emailVerified) {
+        await user.sendEmailVerification();
+        throw 'Email not verified. Verification link sent to your email.';
+      }
 
+      await syncWithServer();
       Session.login(splash: true);
     } on FirebaseAuthException catch (e) {
       Util.toast(e.message);

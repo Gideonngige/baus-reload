@@ -128,6 +128,7 @@ class HomeController extends GetxController {
 
         // Option A: Log them out so they must sign in again once verified
         await firebase_auth.FirebaseAuth.instance.signOut();
+        await Session.logout();
         // Then navigate to login screen
         Get.offAllNamed(Routes.kLoginWithEmail);
 
@@ -142,8 +143,6 @@ class HomeController extends GetxController {
           .collection('users')
           .doc(fUser.uid)
           .get();
-
-      print('Here is docSnapshot received from Firebase: $docSnapshot');
 
       // 4) Merge Firestore data with fallback to the FirebaseAuth user object
       String? displayName;
