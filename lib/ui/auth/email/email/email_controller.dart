@@ -10,6 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:dio/dio.dart';
 
 class EmailController extends GetxController {
   var isSigningIn = false.obs;
@@ -22,6 +23,34 @@ class EmailController extends GetxController {
 
   var isSigningInWithGoogle = false.obs;
   var isSigningInWithApple = false.obs;
+
+  Future<void> syncWithServer() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return; // not signed in at all
+
+    final token = await currentUser.getIdToken(); // get the Firebase ID token
+
+    try {
+      // Replace kBaseApiUrl with your actual server domain, e.g. https://api.yourdomain.com
+      final response = await Dio().post(
+        '$kBaseApiUrl/v1/auth/firebase',
+        data: {'idToken': token},
+      );
+
+      // This returns { "user": {...} }
+      final data = response.data;
+      // You could store it in Session if you want:
+      // Session.serverUser = data['user'];
+
+      // Or just log it:
+      print('Server user: ${data['user']}');
+    } on DioException catch (e) {
+      // Handle server error
+      print('Sync with server failed: ${e.response?.data ?? e.message}');
+      // You could still let them continue, or show a toast:
+      Util.toast(e.response?.data?['error'] ?? e.message);
+    }
+  }
 
   signInWithGoogle() async {
     if (isSigningInWithGoogle.isTrue || isSigningInWithApple.isTrue) return;
@@ -41,6 +70,8 @@ class EmailController extends GetxController {
         );
 
         await FirebaseAuth.instance.signInWithCredential(credential);
+
+        await syncWithServer();
 
         Session.login(splash: true);
       }
@@ -90,6 +121,8 @@ class EmailController extends GetxController {
 
       await Session.user?.updateDisplayName(displayName);
 
+      await syncWithServer();
+
       Session.login(splash: true);
     } on FirebaseAuthException catch (e) {
       Util.toast(e.message);
@@ -138,6 +171,8 @@ class EmailController extends GetxController {
 
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: userId, password: userPassword!);
+
+      await syncWithServer();
 
       Session.login(splash: true);
     } on FirebaseAuthException catch (e) {

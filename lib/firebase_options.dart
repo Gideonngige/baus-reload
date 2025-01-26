@@ -56,21 +56,21 @@ class DefaultFirebaseOptions {
     measurementId: 'G-5CP66XB8SK',
   );
 
-  // static const FirebaseOptions android = FirebaseOptions(
-  //   apiKey: 'AIzaSyC4EZVUbOyLSSn5etZ9vhyNjrublcRHJtE',
-  //   appId: '1:350745739273:android:dad59c5b5fecb6feacf8d8',
-  //   messagingSenderId: '350745739273',
-  //   projectId: 'baustaka',
-  //   storageBucket: 'baustaka.appspot.com',
-  // );
-
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAy6ZwooIR1pIqoMzNu5WaiD_m1FJnzoXw',
-    appId: '1:190957972509:android:a9887ae49a03f7ca9aaaf4',
-    messagingSenderId: '190957972509',
-    projectId: 'baus-test-83bcc',
-    storageBucket: 'baus-test-83bcc.firebasestorage.app',
+    apiKey: 'AIzaSyC4EZVUbOyLSSn5etZ9vhyNjrublcRHJtE',
+    appId: '1:350745739273:android:dad59c5b5fecb6feacf8d8',
+    messagingSenderId: '350745739273',
+    projectId: 'baustaka',
+    storageBucket: 'baustaka.appspot.com',
   );
+
+  // static const FirebaseOptions android = FirebaseOptions(
+  //   apiKey: 'AIzaSyAy6ZwooIR1pIqoMzNu5WaiD_m1FJnzoXw',
+  //   appId: '1:190957972509:android:a9887ae49a03f7ca9aaaf4',
+  //   messagingSenderId: '190957972509',
+  //   projectId: 'baus-test-83bcc',
+  //   storageBucket: 'baus-test-83bcc.firebasestorage.app',
+  // );
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDmSwRINnSmdz9c6dBvFQdFb6GxSDQ76v4',

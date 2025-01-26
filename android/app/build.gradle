@@ -27,7 +27,7 @@ def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    namespace "test.baus.android"
+    namespace "ke.co.baustaka.client"
     compileSdkVersion 34
     ndkVersion flutter.ndkVersion
 

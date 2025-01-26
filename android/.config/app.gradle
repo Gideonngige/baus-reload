@@ -1,7 +1,7 @@
 ext {
 
     // application
-    applicationId = "test.baus.android"
+    applicationId = "ke.co.baustaka.client"
     appName = "Baus Taka"
 
     // signing
