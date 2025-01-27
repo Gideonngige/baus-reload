@@ -52,36 +52,89 @@ class EmailController extends GetxController {
     }
   }
 
+  // signInWithGoogle() async {
+  //   if (isSigningInWithGoogle.isTrue || isSigningInWithApple.isTrue) return;
+
+  //   isSigningInWithGoogle.value = true;
+
+  //   try {
+  //     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+  //     final GoogleSignInAuthentication? googleAuth =
+  //         await googleUser?.authentication;
+
+  //     if (googleAuth != null) {
+  //       final credential = GoogleAuthProvider.credential(
+  //         accessToken: googleAuth.accessToken,
+  //         idToken: googleAuth.idToken,
+  //       );
+
+  //       await FirebaseAuth.instance.signInWithCredential(credential);
+
+  //       await syncWithServer();
+
+  //       Session.login(splash: true);
+  //     }
+  //   } on FirebaseAuthException catch (e) {
+  //     Util.toast(e.message);
+  //   } catch (e) {
+  //     // Util.toast(e);
+  //   }
+
+  //   isSigningInWithGoogle.value = false;
+  // }
+
   signInWithGoogle() async {
     if (isSigningInWithGoogle.isTrue || isSigningInWithApple.isTrue) return;
-
     isSigningInWithGoogle.value = true;
+
+    print('Google Sign-In started...');
 
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      print('Google user: $googleUser');
+
+      if (googleUser == null) {
+        print('User canceled Google sign-in');
+        return;
+      }
 
       final GoogleSignInAuthentication? googleAuth =
-          await googleUser?.authentication;
+          await googleUser.authentication;
+      print('Google auth: $googleAuth');
 
-      if (googleAuth != null) {
-        final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-        );
-
-        await FirebaseAuth.instance.signInWithCredential(credential);
-
-        await syncWithServer();
-
-        Session.login(splash: true);
+      if (googleAuth == null) {
+        print('Google auth is null - did sign-in fail silently?');
+        return;
       }
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      print('credential.accessToken=${credential.accessToken}');
+      print('credential.idToken=${credential.idToken}');
+
+      print('Signing in to Firebase...');
+      final userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+      print('Firebase sign-in completed: user=${userCredential.user}');
+
+      print('Syncing with server...');
+      await syncWithServer();
+
+      Session.login(splash: true);
     } on FirebaseAuthException catch (e) {
+      print('FirebaseAuthException: ${e.message}');
       Util.toast(e.message);
     } catch (e) {
-      // Util.toast(e);
+      print('Unknown error: $e');
+      Util.toast(e.toString());
     }
 
     isSigningInWithGoogle.value = false;
+    print('Google Sign-In ended...');
   }
 
   signInWithApple() async {

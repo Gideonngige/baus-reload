@@ -110,6 +110,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "350745739273-9rc7ng7e8om742eosj827mrk3ebk71ob.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ke.co.baustaka.client",
+            "certificate_hash": "375d7f637b0db1321ee65efa0762619fceb8c2a6"
+          }
+        },
+        {
           "client_id": "350745739273-f4nntmjpfp57ps1lhl686cn97uaf3vk0.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
