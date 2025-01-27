@@ -28,6 +28,12 @@ class OnboardingWidget extends GetResponsiveView<OnboardingController> {
               Expanded(
                 child: PageView.builder(
                   controller: controller.pageController,
+                  itemCount: controller.pages.length, // Add itemCount
+                  onPageChanged: (index) {
+                    if (index < controller.pages.length) {
+                      controller.currentPage = index;
+                    }
+                  },
                   itemBuilder: (context, index) => KeepAliveWidget(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
