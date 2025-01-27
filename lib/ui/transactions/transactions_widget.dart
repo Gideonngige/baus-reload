@@ -29,9 +29,22 @@ class TransactionsWidget extends ResponsiveWidget<TransactionsController> {
               onPressed: () async => await Get.dialog(
                 DialogWidget(
                   title: 'Top up',
-                  content: 'Enter amount to top up your wallet in Ksh',
+                  content: 'Enter amount equal to or more than 10 to top up your wallet in Ksh',
                   hintText: 'Amount',
-                  onConfirm: () async => await controller.deposit(),
+                    onConfirm: () async {
+                    try {
+                      await controller.deposit();
+                    } catch (e) {
+                      Get.snackbar(
+                      'Error',
+                      e.toString(),
+                      snackPosition: SnackPosition.BOTTOM,
+                      );
+                    }
+                    },
+                    onCancel: () {
+                      Navigator.of(screen.context).pop();
+                    },
                   inputController: controller.amountToDeposit,
                 ),
               ),
