@@ -4,6 +4,7 @@ import 'package:baustaka/helper/util.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterController extends GetxController {
   var isRegistering = false.obs;
@@ -15,6 +16,28 @@ class RegisterController extends GetxController {
   String? phoneNumber;
   String? password;
   String? confirmPassword;
+
+  Future<void> _savePhoneInFirestore(String uid) async {
+    // If phoneNumber is not null, store it
+    if (phoneNumber != null && phoneNumber!.isNotEmpty) {
+      // Format if needed...
+      String formattedPhone = _formatPhone(phoneNumber!);
+
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'phoneNumber': formattedPhone,
+      }, SetOptions(merge: true));
+    }
+  }
+
+  String _formatPhone(String rawPhone) {
+    if (rawPhone.startsWith('0')) {
+      return '+254${rawPhone.substring(1)}';
+    } else if (rawPhone.startsWith('254')) {
+      return '+$rawPhone';
+    } else {
+      return rawPhone; // or handle differently
+    }
+  }
 
   Future<void> checkPhoneInServer(String phone) async {
     try {
@@ -99,6 +122,8 @@ class RegisterController extends GetxController {
 
       await checkPhoneInServer(modifiedPhoneNumber!);
 
+      await FirebaseAuth.instance.signOut();
+
       if (FirebaseAuth.instance.currentUser == null) {
         UserCredential userCredential =
             await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -108,6 +133,8 @@ class RegisterController extends GetxController {
         await userCredential.user?.sendEmailVerification();
         Util.toast(
             'A verification link has been sent to your email. Please verify before proceeding.');
+
+        await _savePhoneInFirestore(userCredential.user!.uid);
 
         await syncWithServer();
 

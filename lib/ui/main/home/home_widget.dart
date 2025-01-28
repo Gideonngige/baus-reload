@@ -186,7 +186,7 @@ class HomeWidget extends ResponsiveWidget<HomeController> {
 
                               TitleText(
                                 text: user != null && user.phoneNumber != null && user.phoneNumber!.isNotEmpty
-                                    ? '+254${user.phoneNumber}'
+                                    ? '${user.phoneNumber}'
                                     : 'Number unavailable',
                                 color: Colors.black,
                                 fontSize: 15,
