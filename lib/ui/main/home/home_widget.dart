@@ -184,13 +184,13 @@ class HomeWidget extends ResponsiveWidget<HomeController> {
                                 fontSize: 18,
                               ),
 
-                              // TitleText(
-                              //   text: user != null && user.phoneNumber != null && user.phoneNumber!.isNotEmpty
-                              //       ? '+254${user.phoneNumber}'
-                              //       : 'Number unavailable',
-                              //   color: Colors.black,
-                              //   fontSize: 15,
-                              // ),
+                              TitleText(
+                                text: user != null && user.phoneNumber != null && user.phoneNumber!.isNotEmpty
+                                    ? '+254${user.phoneNumber}'
+                                    : 'Number unavailable',
+                                color: Colors.black,
+                                fontSize: 15,
+                              ),
                             ],
                           )
                         ],
@@ -277,22 +277,22 @@ class HomeWidget extends ResponsiveWidget<HomeController> {
                       await Get.toNamed(Routes.kAddChamp);
                     },
                   ),
-                  _drawerListTileWithTrailingIcon(
-                    leadingIcon: Icons.card_giftcard,
-                    label: 'Switch to Waste Manager',
-                    onTap: () async {
-                      Navigator.of(screen.context).pop();
-                      try {
-                        await SettingsDb.setInitialRoute(Routes.kHomePicker);
-                      } catch (e) {
-                        Util.toast(e);
-                      }
+                  // _drawerListTileWithTrailingIcon(
+                  //   leadingIcon: Icons.card_giftcard,
+                  //   label: 'Switch to Waste Manager',
+                  //   onTap: () async {
+                  //     Navigator.of(screen.context).pop();
+                  //     try {
+                  //       await SettingsDb.setInitialRoute(Routes.kHomePicker);
+                  //     } catch (e) {
+                  //       Util.toast(e);
+                  //     }
 
-                      await Session.login(splash: true);
-                    },
-                    trailingIcon: const Icon(Icons.open_in_new_outlined,
-                        color: Colors.white),
-                  ),
+                  //     await Session.login(splash: true);
+                  //   },
+                  //   trailingIcon: const Icon(Icons.open_in_new_outlined,
+                  //       color: Colors.white),
+                  // ),
                   _drawerListTile(
                       icon: Icons.g_translate_outlined,
                       label: 'Switch Language',

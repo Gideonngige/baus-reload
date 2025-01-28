@@ -1,8 +1,10 @@
 // import 'package:baustaka/api/auth_api.dart';
 import 'package:baustaka/api/user_api.dart';
+import 'package:baustaka/config/env.dart';
 import 'package:baustaka/helper/session.dart';
 import 'package:baustaka/helper/util.dart';
 import 'package:baustaka/ui/state/state_controller.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -114,6 +116,49 @@ class ProfileController extends GetxController {
     _loadUserData();
   }
 
+  Future<void> _syncProfileWithServer({
+    required String displayName,
+    required String username,
+    String? phoneNumber,
+    // String? description,
+  }) async {
+    final fUser = FirebaseAuth.instance.currentUser;
+    if (fUser == null) return; // not logged in
+
+    // 1) Get the Firebase ID token for auth
+    final token = await FirebaseAuth.instance.currentUser?.getIdToken(true);
+
+    try {
+      // 2) Make a PUT request to your server (e.g. `/v1/user`)
+      final response = await Dio().put(
+        '${kBaseApiUrl}v1/user',
+        options: Options(
+          headers: {
+            // Your server probably reads the token from 'Authorization: Bearer ...'
+            'Authorization': 'Bearer $token',
+          },
+        ),
+        data: {
+          // the fields you want to update
+          'displayName': displayName,
+          'username': username,
+          // 'description': description,
+          // if your user is phone-based, you skip phoneNumber, so phoneNumber can remain
+          'phoneNumber': phoneNumber,
+        },
+      );
+
+      print('Server user updated: ${response.data}');
+      // Possibly parse `response.data['user']` if it returns it
+    } on DioException catch (e) {
+      // If the server fails or you get a validation error, show it
+      Util.toast(e.response?.data?['error'] ?? e.message);
+    } catch (e) {
+      print('syncProfileWithServer error: $e');
+      Util.toast(e.toString());
+    }
+  }
+
   void _loadUserData() async {
     // 1) Try to load from Firestore
     final fUser = FirebaseAuth.instance.currentUser;
@@ -178,19 +223,35 @@ class ProfileController extends GetxController {
         }
       }
 
+      String? modifiedPhoneNumber = phoneNumber;
+      if (phoneNumber != null) {
+        if (phoneNumber!.startsWith('0')) {
+          modifiedPhoneNumber = '+254${phoneNumber!.substring(1)}';
+        } else if (phoneNumber!.startsWith('254')) {
+          modifiedPhoneNumber = '+$phoneNumber';
+        }
+      }
+
       // 2) Upsert Firestore doc
       await FirebaseFirestore.instance.collection('users').doc(fUser.uid).set({
         'displayName': displayName,
         'username': username,
         'description': description,
         // If user is phone-based, don't override phoneNumber from Firebase:
-        if (!isPhoneUser) 'phoneNumber': phoneNumber ?? '',
+        if (!isPhoneUser) 'phoneNumber': modifiedPhoneNumber ?? '',
       }, SetOptions(merge: true));
 
       // If your app also updates `FirebaseAuth.instance.currentUser` display name:
       if (fUser.displayName != displayName) {
         await fUser.updateDisplayName(displayName);
       }
+
+      await _syncProfileWithServer(
+        displayName: displayName,
+        username: username,
+        phoneNumber: modifiedPhoneNumber,
+        // description: description ?? 'Update from user',
+      );
 
       Get.back(result: true);
       Util.toast('Account updated');

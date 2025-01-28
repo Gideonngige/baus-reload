@@ -16,6 +16,26 @@ class RegisterController extends GetxController {
   String? password;
   String? confirmPassword;
 
+  Future<void> checkPhoneInServer(String phone) async {
+    try {
+      // GET /v1/user?phoneNumber=<phone>
+      final response = await Dio().get(
+        '${kBaseApiUrl}v1/user',
+        queryParameters: {'phoneNumber': phone},
+      );
+      // If successful => user found => throw 'Phone number is already registered'
+      throw 'Phone number already exists, kindly use phone sign in method';
+    } on DioException catch (e) {
+      // If server responds 404 => phone not in use => proceed
+      if (e.response?.statusCode == 404) {
+        // "User not found" => means phone not in use => good
+        return;
+      }
+      // If some other code => rethrow or show error
+      rethrow;
+    }
+  }
+
   Future<void> syncWithServer() async {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) return; // not signed in at all
@@ -35,8 +55,10 @@ class RegisterController extends GetxController {
       // Replace kBaseApiUrl with your actual server domain, e.g. https://api.yourdomain.com
       final response = await Dio().post(
         '${kBaseApiUrl}v1/auth/firebase',
-        data: {'idToken': token,
-        'phoneNumber': modifiedPhoneNumber,},
+        data: {
+          'idToken': token,
+          'phoneNumber': modifiedPhoneNumber,
+        },
       );
 
       // This returns { "user": {...} }
@@ -57,13 +79,25 @@ class RegisterController extends GetxController {
     try {
       if (email == null || email!.isEmpty) throw 'Enter your email';
 
-      if (phoneNumber == null || phoneNumber!.isEmpty) throw 'Enter your phone number';
+      if (phoneNumber == null || phoneNumber!.isEmpty)
+        throw 'Enter your phone number';
 
       if (password == null || password!.isEmpty) throw 'Enter your password';
 
       if (password != confirmPassword) throw 'Passwords do not match';
 
       if (isAgreed.isFalse) throw 'Please accept the terms of service';
+
+      String? modifiedPhoneNumber = phoneNumber;
+      if (phoneNumber != null) {
+        if (phoneNumber!.startsWith('0')) {
+          modifiedPhoneNumber = '+254${phoneNumber!.substring(1)}';
+        } else if (phoneNumber!.startsWith('254')) {
+          modifiedPhoneNumber = '+$phoneNumber';
+        }
+      }
+
+      await checkPhoneInServer(modifiedPhoneNumber!);
 
       if (FirebaseAuth.instance.currentUser == null) {
         UserCredential userCredential =

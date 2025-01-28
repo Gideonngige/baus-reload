@@ -52,38 +52,6 @@ class EmailController extends GetxController {
     }
   }
 
-  // signInWithGoogle() async {
-  //   if (isSigningInWithGoogle.isTrue || isSigningInWithApple.isTrue) return;
-
-  //   isSigningInWithGoogle.value = true;
-
-  //   try {
-  //     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
-  //     final GoogleSignInAuthentication? googleAuth =
-  //         await googleUser?.authentication;
-
-  //     if (googleAuth != null) {
-  //       final credential = GoogleAuthProvider.credential(
-  //         accessToken: googleAuth.accessToken,
-  //         idToken: googleAuth.idToken,
-  //       );
-
-  //       await FirebaseAuth.instance.signInWithCredential(credential);
-
-  //       await syncWithServer();
-
-  //       Session.login(splash: true);
-  //     }
-  //   } on FirebaseAuthException catch (e) {
-  //     Util.toast(e.message);
-  //   } catch (e) {
-  //     // Util.toast(e);
-  //   }
-
-  //   isSigningInWithGoogle.value = false;
-  // }
-
   signInWithGoogle() async {
     if (isSigningInWithGoogle.isTrue || isSigningInWithApple.isTrue) return;
     isSigningInWithGoogle.value = true;

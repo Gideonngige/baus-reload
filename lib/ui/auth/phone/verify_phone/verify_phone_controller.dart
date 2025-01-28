@@ -30,6 +30,27 @@ class VerifyPhoneController extends GetxController {
 
   final _waitPeriod = 60;
 
+  Future<void> checkPhoneInServer(String phone) async {
+    try {
+      // GET /v1/user?phoneNumber=<phone>
+      final response = await Dio().get(
+        '${kBaseApiUrl}v1/user',
+        queryParameters: {'phoneNumber': phone},
+      );
+      // If successful => user found => throw 'Phone number is already registered'
+      // throw 'Phone number already exists, kindly use email sign in method';
+    } on DioException catch (e) {
+      // If server responds 404 => phone not in use => proceed
+      if (e.response?.statusCode == 404) {
+        // "User not found" => means phone not in use => good
+        await _syncPhoneWithServer(phone);
+        return;
+      }
+      // If some other code => rethrow or show error
+      rethrow;
+    }
+  }
+
   Future<void> _syncPhoneWithServer(String phone) async {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) return; // not signed in
@@ -209,11 +230,12 @@ class VerifyPhoneController extends GetxController {
         }
       }
 
-      await _syncPhoneWithServer(phoneNumber);
+      await checkPhoneInServer(phoneNumber);
 
       Get.back(
         result: true,
       );
+      Session.login(splash: true);
     } on FirebaseAuthException catch (e) {
       Util.toast(e.message);
     } catch (e) {

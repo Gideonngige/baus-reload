@@ -16,7 +16,7 @@ dependencies:
   intl: ^0.17.0
   flutter_dotenv: ^5.0.2
   url_launcher: ^6.0.18
-  hive: ^2.0.5
+  hive: ^2.2.3
   hive_flutter: ^1.1.0
   package_info_plus: ^4.2.0
   charts_flutter: ^0.12.0

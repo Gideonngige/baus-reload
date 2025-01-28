@@ -1,6 +1,7 @@
 import 'package:baustaka/config/palette.dart';
 import 'package:baustaka/helper/util.dart';
 import 'package:baustaka/ui/_/keep_alive_widget.dart';
+import 'package:baustaka/ui/auth/profile/profile_widget.dart';
 import 'package:baustaka/ui/blogs/blogs_widget.dart';
 import 'package:baustaka/ui/events/events_tabs_widget.dart';
 import 'package:baustaka/ui/explore/explore_tabs_widget.dart';
@@ -10,29 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class MainWidget extends GetResponsiveView<MainController> {
-  final pages = [
-    KeepAliveWidget(
-      key: const Key('shop'),
-      child: Container(),
-    ),
-    KeepAliveWidget(
-      key: const Key('blogs'),
-      child: BlogsWidget(),
-    ),
-    KeepAliveWidget(
-      key: const Key('home'),
-      child: HomeWidget(),
-    ),
-    KeepAliveWidget(
-      key: const Key('events'),
-      child: EventsTabsWidget(),
-    ),
-    KeepAliveWidget(
-      key: const Key('explore'),
-      child: ExploreTabsWidget(),
-    ),
-  ];
-
   MainWidget({super.key});
 
   @override
@@ -54,23 +32,37 @@ class MainWidget extends GetResponsiveView<MainController> {
             controller.currentPage.value = 0;
           },
           child: Scaffold(
-            body: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: PageView(
-                    controller: controller.pageController,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: pages,
-                  ),
-                ),
-                const Divider(height: 1),
-              ],
+            body: Navigator(
+              key: Get.nestedKey(1),
+              initialRoute: '/home',
+              onGenerateRoute: (settings) {
+                Widget page;
+                switch (settings.name) {
+                  case '/profile':
+                    page = ProfileWidget();
+                    break;
+                  case '/blogs':
+                    page = BlogsWidget();
+                    break;
+                  case '/home':
+                    page = HomeWidget();
+                    break;
+                  case '/events':
+                    page = EventsTabsWidget();
+                    break;
+                  case '/explore':
+                    page = ExploreTabsWidget();
+                    break;
+                  default:
+                    page = HomeWidget();
+                }
+                return MaterialPageRoute(builder: (_) => KeepAliveWidget(child: page));
+              },
             ),
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerDocked,
             floatingActionButton: FloatingActionButton(
-              onPressed: () => controller.currentPage.value = 2,
+              onPressed: () => Navigator.pushNamed(Get.nestedKey(1)!.currentContext!, '/home'),
               backgroundColor: Palette.primary,
               foregroundColor: Colors.white,
               shape: const CircleBorder(
@@ -91,14 +83,14 @@ class MainWidget extends GetResponsiveView<MainController> {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     TabWidget(
-                      onTap: () => controller.currentPage.value = 0,
-                      icon: Icons.shop_outlined,
-                      selectedIcon: Icons.shop,
-                      title: 'Eco Shop',
+                      onTap: () => Navigator.pushNamed(Get.nestedKey(1)!.currentContext!, '/profile'),
+                      icon: Icons.person_outline,
+                      selectedIcon: Icons.person,
+                      title: 'Profile',
                       selected: controller.currentPage.value == 0,
                     ),
                     TabWidget(
-                      onTap: () => controller.currentPage.value = 1,
+                      onTap: () => Navigator.pushNamed(Get.nestedKey(1)!.currentContext!, '/blogs'),
                       icon: Icons.list_alt_outlined,
                       selectedIcon: Icons.list_alt,
                       title: 'Blog',
@@ -108,14 +100,14 @@ class MainWidget extends GetResponsiveView<MainController> {
                       width: 48,
                     ),
                     TabWidget(
-                      onTap: () => controller.currentPage.value = 3,
+                      onTap: () => Navigator.pushNamed(Get.nestedKey(1)!.currentContext!, '/events'),
                       icon: Icons.event_outlined,
                       selectedIcon: Icons.event,
                       title: 'Events',
                       selected: controller.currentPage.value == 3,
                     ),
                     TabWidget(
-                      onTap: () => controller.currentPage.value = 4,
+                      onTap: () => Navigator.pushNamed(Get.nestedKey(1)!.currentContext!, '/explore'),
                       icon: Icons.explore_outlined,
                       selectedIcon: Icons.explore,
                       title: 'Explore',

@@ -32,7 +32,7 @@ class Routes {
   static const kOnboarding = '/onboarding';
 
   // Old
-  static const kAddChamp = '/add-champ';
+  static const kAddChamp = '/champs/add-champ';
   static const kChamps = '/champs';
   static const kChamp = '/champ/';
   static const kWasteManagers = '/waste-managers';
