@@ -88,6 +88,24 @@ class RegisterWidget extends GetResponsiveView<RegisterController> {
                   ),
                 ),
                 const SizedBox(
+                  height: 15,
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                  ),
+                  child: TextField(
+                    decoration: kInputDecoration.copyWith(
+                      hintText: '123-456-7890',
+                      labelText: 'Phone Number',
+                      prefixIcon: const Icon(Icons.phone),
+                    ),
+                    onChanged: (value) => controller.phoneNumber = value,
+                    keyboardType: TextInputType.phone,
+                    textAlignVertical: TextAlignVertical.center,
+                  ),
+                ),
+                const SizedBox(
                   height: 16,
                 ),
                 Obx(

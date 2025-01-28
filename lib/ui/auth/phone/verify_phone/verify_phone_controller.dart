@@ -6,6 +6,8 @@ import 'package:baustaka/helper/util.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:baustaka/config/env.dart';
+import 'package:dio/dio.dart';
 
 class VerifyPhoneController extends GetxController {
   var isVerifying = false.obs;
@@ -27,6 +29,33 @@ class VerifyPhoneController extends GetxController {
   Timer? timer;
 
   final _waitPeriod = 60;
+
+  Future<void> _syncPhoneWithServer(String phone) async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return; // not signed in
+
+    try {
+      // 1) Get ID token
+      final token = await currentUser.getIdToken();
+
+      // 2) POST to /v1/auth/firebase with `idToken` + `phoneNumber`
+      final response = await Dio().post(
+        '${kBaseApiUrl}v1/auth/firebase', // or ensure a '/' if needed
+        data: {
+          'idToken': token,
+          'phoneNumber': phone, // pass the verified phone
+        },
+      );
+
+      final data = response.data;
+      print('Phone updated server user: ${data['user']}');
+    } on DioException catch (e) {
+      Util.toast(e.response?.data?['error'] ?? e.message);
+    } catch (e) {
+      print('syncPhoneWithServer error: $e');
+      Util.toast(e.toString());
+    }
+  }
 
   VerifyPhoneController({
     required this.phoneNumber,
@@ -179,6 +208,8 @@ class VerifyPhoneController extends GetxController {
               .signInWithCredential(_phoneAuthCredential!);
         }
       }
+
+      await _syncPhoneWithServer(phoneNumber);
 
       Get.back(
         result: true,

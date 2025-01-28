@@ -12,6 +12,7 @@ class RegisterController extends GetxController {
   var confirmObscureText = true.obs;
 
   String? email;
+  String? phoneNumber;
   String? password;
   String? confirmPassword;
 
@@ -21,11 +22,21 @@ class RegisterController extends GetxController {
 
     final token = await currentUser.getIdToken(); // get the Firebase ID token
 
+    String? modifiedPhoneNumber = phoneNumber;
+    if (phoneNumber != null) {
+      if (phoneNumber!.startsWith('0')) {
+        modifiedPhoneNumber = '+254${phoneNumber!.substring(1)}';
+      } else if (phoneNumber!.startsWith('254')) {
+        modifiedPhoneNumber = '+$phoneNumber';
+      }
+    }
+
     try {
       // Replace kBaseApiUrl with your actual server domain, e.g. https://api.yourdomain.com
       final response = await Dio().post(
         '${kBaseApiUrl}v1/auth/firebase',
-        data: {'idToken': token},
+        data: {'idToken': token,
+        'phoneNumber': modifiedPhoneNumber,},
       );
 
       // This returns { "user": {...} }
@@ -45,6 +56,8 @@ class RegisterController extends GetxController {
 
     try {
       if (email == null || email!.isEmpty) throw 'Enter your email';
+
+      if (phoneNumber == null || phoneNumber!.isEmpty) throw 'Enter your phone number';
 
       if (password == null || password!.isEmpty) throw 'Enter your password';
 
