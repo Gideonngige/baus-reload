@@ -3,7 +3,7 @@ description: Baus Taka
 
 publish_to: "none"
 
-version: 8.0.0+57
+version: 8.0.1+57
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
@@ -75,16 +75,16 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - .env
-    - assets/icons/
-    - assets/images/
+  - .env
+  - assets/icons/
+  - assets/images/
   fonts:
-    - family: Medium
-      fonts:
-        - asset: assets/fonts/Poppins-Medium.ttf
-    - family: SemiBold
-      fonts:
-        - asset: assets/fonts/Poppins-SemiBold.ttf
-    - family: Bold
-      fonts:
-        - asset: assets/fonts/Poppins-Bold.ttf
+  - family: Medium
+    fonts:
+    - asset: assets/fonts/Poppins-Medium.ttf
+  - family: SemiBold
+    fonts:
+    - asset: assets/fonts/Poppins-SemiBold.ttf
+  - family: Bold
+    fonts:
+    - asset: assets/fonts/Poppins-Bold.ttf

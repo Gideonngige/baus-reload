@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 // class ProfileController extends GetxController {
 //   var isAdding = false.obs;
@@ -103,6 +104,8 @@ class ProfileController extends GetxController {
   final String? action;
   ProfileController({required this.action});
 
+  late TextEditingController phoneController;
+
   bool get isPhoneUser {
     final fUser = FirebaseAuth.instance.currentUser;
     // or do the provider check
@@ -113,7 +116,15 @@ class ProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    phoneController = TextEditingController();
     _loadUserData();
+  }
+
+  @override
+  void onClose() {
+    // Dispose the phoneController when the controller is closed
+    phoneController.dispose();
+    super.onClose();
   }
 
   Future<void> _syncProfileWithServer({
@@ -188,6 +199,7 @@ class ProfileController extends GetxController {
       map['description'] = '';
     }
 
+    phoneController.text = map['phoneNumber'] ?? '';
     map.refresh();
   }
 
@@ -225,10 +237,15 @@ class ProfileController extends GetxController {
 
       String? modifiedPhoneNumber = phoneNumber;
       if (phoneNumber != null) {
-        if (phoneNumber!.startsWith('0')) {
-          modifiedPhoneNumber = '+254${phoneNumber!.substring(1)}';
-        } else if (phoneNumber!.startsWith('254')) {
+        if (phoneNumber.startsWith('0')) {
+          modifiedPhoneNumber = '+254${phoneNumber.substring(1)}';
+        } else if (phoneNumber.startsWith('254')) {
+          if (!phoneNumber.startsWith('+254') && !phoneNumber.startsWith('0')) {
+            modifiedPhoneNumber = '+254$phoneNumber';
+          }
           modifiedPhoneNumber = '+$phoneNumber';
+        } else {
+          throw 'Invalid phone number format';
         }
       }
 

@@ -101,7 +101,7 @@ class ProfileWidget extends GetResponsiveView<ProfileController> {
                     ),
                     onChanged: (value) => controller.map['phoneNumber'] = value,
                     keyboardType: TextInputType.phone,
-                    controller: TextEditingController(text: phone),
+                    controller: controller.phoneController,
                     textAlignVertical: TextAlignVertical.center,
                   );
                 }),
