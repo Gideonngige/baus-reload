@@ -55,8 +55,8 @@ class Routes {
   static const kAddIssue = '/add-issue';
   static const kIssue = '/issue/';
   static const kIssues = '/issues';
-  static const kPromotion = '/promotion/';
-  static const kPromotions = '/promotions';
+  static const kPromotion = '/promo/';
+  static const kPromotions = '/promos';
   static const kRewards = '/rewards';
   static const kTransaction = '/transaction/';
   static const kTransactions = '/transactions';
