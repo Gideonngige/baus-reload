@@ -91,10 +91,10 @@ class ProfileWidget extends GetResponsiveView<ProfileController> {
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 child: Obx(() {
-                  final phone = controller.map['phoneNumber'] as String?;
-                  final readOnly = controller.isPhoneUser;
+                  // final phone = controller.map['phoneNumber'] as String?;
+                  // final readOnly = controller.isPhoneUser;
                   return TextField(
-                    readOnly: readOnly,
+                    // readOnly: readOnly,
                     decoration: kInputDecoration.copyWith(
                       hintText: 'Phone number',
                       prefixIcon: const Icon(Icons.phone),
