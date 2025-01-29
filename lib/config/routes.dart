@@ -43,7 +43,7 @@ class Routes {
   static const kCbos = '/cbos';
   static const kCbo = '/cbo/';
   static const kAddPicker = '/add-picker';
-  static const kHomePicker = '/home-picker';
+  static const kHomePicker = '/home_picker';
   static const kPicker = '/picker/';
   static const kStation = '/station/';
   static const kStations = '/stations';

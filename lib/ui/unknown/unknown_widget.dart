@@ -52,15 +52,15 @@ class UnknownWidget extends GetResponsiveView {
               const SizedBox(
                 height: 16,
               ),
-              ElevatedButton(
-                onPressed: () => Get.back(),
+                ElevatedButton(
+                onPressed: () => Get.offAllNamed('/home'),
                 child: const Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: 16,
+                  horizontal: 16,
                   ),
-                  child: Text('Go back'),
+                  child: Text('Go home'),
                 ),
-              ),
+                ),
               const SizedBox(
                 height: 48,
               ),

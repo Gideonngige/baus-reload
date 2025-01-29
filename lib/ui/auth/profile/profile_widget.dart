@@ -91,7 +91,7 @@ class ProfileWidget extends GetResponsiveView<ProfileController> {
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 child: Obx(() {
-                  // final phone = controller.map['phoneNumber'] as String?;
+                  final phone = controller.map['phoneNumber'] as String?;
                   // final readOnly = controller.isPhoneUser;
                   return TextField(
                     // readOnly: readOnly,
