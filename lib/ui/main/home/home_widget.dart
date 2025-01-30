@@ -183,9 +183,10 @@ class HomeWidget extends ResponsiveWidget<HomeController> {
                                 color: Colors.black,
                                 fontSize: 18,
                               ),
-
                               TitleText(
-                                text: user != null && user.phoneNumber != null && user.phoneNumber!.isNotEmpty
+                                text: user != null &&
+                                        user.phoneNumber != null &&
+                                        user.phoneNumber!.isNotEmpty
                                     ? '${user.phoneNumber}'
                                     : 'Number unavailable',
                                 color: Colors.black,
@@ -311,11 +312,11 @@ class HomeWidget extends ResponsiveWidget<HomeController> {
                       }
                     },
                   ),
-                    _drawerListTile(
+                  _drawerListTile(
                       icon: Icons.logout,
                       label: 'Logout',
                       onTap: () async {
-                      await Session.logout();
+                        await Session.logout();
                       }),
                 ],
               ),

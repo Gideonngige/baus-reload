@@ -24,7 +24,7 @@ AppNotification _$AppNotificationFromJson(Map<String, dynamic> json) =>
           ? null
           : User.fromJson(json['user'] as Map<String, dynamic>)
       ..title = json['title'] as String?
-      ..body = json['body'] as String?
+      ..body = json['message'] as String?
       ..route = json['route'] as String?
       ..status =
           $enumDecodeNullable(_$AppNotificationStatusEnumMap, json['status'])
@@ -38,4 +38,6 @@ const _$AppNotificationStatusEnumMap = {
 const _$AppNotificationTypeEnumMap = {
   AppNotificationType.hidden: 'hidden',
   AppNotificationType.visible: 'visible',
+  AppNotificationType.transaction: 'transaction',
+  AppNotificationType.post: 'post',
 };

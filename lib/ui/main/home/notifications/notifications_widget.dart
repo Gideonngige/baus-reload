@@ -60,12 +60,8 @@ class NotificationsWidget extends GetResponsiveView<NotificationsController> {
                       controller.isRefreshing.isTrue,
                   isProgressing: controller.isFetching.isTrue,
                   isFailed: controller.isFailed.isTrue,
-                  onPressed: () => controller.fetch(
-                    refresh: true,
-                  ),
-                  onEmpty: () => controller.fetch(
-                    refresh: true,
-                  ),
+                  onPressed: () => controller.fetch(refresh: true),
+                  onEmpty: () => controller.fetch(refresh: true),
                   emptyText: 'No notifications',
                   failedText: controller.failedText,
                 ),

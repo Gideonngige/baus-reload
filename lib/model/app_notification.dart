@@ -10,6 +10,7 @@ class AppNotification extends BaseObject {
   File? avatar;
   User? user;
   String? title;
+  @JsonKey(name: 'message')
   String? body;
   String? route;
   AppNotificationStatus? status;
@@ -31,4 +32,8 @@ enum AppNotificationType {
   hidden,
   @JsonValue('visible')
   visible,
+  @JsonValue('transaction')
+  transaction,
+  @JsonValue('post')
+  post,
 }

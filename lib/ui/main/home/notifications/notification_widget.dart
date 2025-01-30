@@ -24,13 +24,13 @@ class NotificationWidget extends StatelessWidget {
                 notification.status == AppNotificationStatus.unread
                     ? Icons.notifications
                     : Icons.notifications_none,
-                color: Colors.white,
+                color: Colors.black,
               ),
             ),
           ),
         ),
         title: Text(
-          notification.title ?? '',
+          notification.title ?? 'Baus Notification',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontFamily: notification.status == AppNotificationStatus.unread
                     ? Fonts.kBold
@@ -39,19 +39,22 @@ class NotificationWidget extends StatelessWidget {
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+            children: [
             Text(
               notification.body ?? '',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontFamily:
-                        notification.status == AppNotificationStatus.unread
-                            ? Fonts.kBold
-                            : null,
-                  ),
+                color: Colors.black,
+                fontFamily:
+                  notification.status == AppNotificationStatus.unread
+                    ? Fonts.kBold
+                    : null,
+                ),
             ),
             Text(
               notification.updatedAt?.ago ?? '',
-              style: Theme.of(context).textTheme.bodySmall,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Colors.black,
+                ),
             ),
           ],
         ),
