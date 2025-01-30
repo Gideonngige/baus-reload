@@ -14,8 +14,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
-
+import 'package:hive_flutter/hive_flutter.dart';
 import 'firebase_options.dart';
+import 'package:baustaka/db/type_id.dart';
+import 'package:baustaka/model/settings.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -115,6 +117,14 @@ late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+
+  // Register your adapter
+  Hive.registerAdapter(SettingsAdapter());
+
+  // Optionally open the box if you want
+  await Hive.openBox<Settings>('settings');
 
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,

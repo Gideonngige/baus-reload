@@ -1,4 +1,5 @@
 import 'package:baustaka/config/routes.dart';
+import 'package:baustaka/db/settings.dart';
 import 'package:baustaka/helper/session.dart';
 import 'package:baustaka/helper/util.dart';
 import 'package:get/get.dart';
@@ -24,7 +25,14 @@ class SplashController extends GetxController {
     isFetching.value = false;
 
     if (Session.user != null) {
-      await Get.offAndToNamed(Routes.kMain);
+      // Instead of always going to kMain, read the "initialRoute" from SettingsDb:
+      final route = await SettingsDb.getInitialRoute(); // e.g. '/home_picker'
+      // If for some reason route is null or empty, fallback
+      if (route == null || route.isEmpty) {
+        await Get.offAndToNamed(Routes.kMain);
+      } else {
+        await Get.offAndToNamed(route);
+      }
     } else {
       await Get.offAndToNamed(Routes.kOnboarding);
     }
