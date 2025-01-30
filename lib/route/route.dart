@@ -17,6 +17,7 @@ import 'package:baustaka/ui/booking/booking_widget.dart';
 import 'package:baustaka/ui/cbos/add_cbo/add_cbo_widget.dart';
 import 'package:baustaka/ui/cbos/cbo/cbo_widget.dart';
 import 'package:baustaka/ui/cbos/cbos_widget.dart';
+import 'package:baustaka/ui/champs/add_champ/add_champ_widget.dart';
 import 'package:baustaka/ui/champs/champ/champ_widget.dart';
 import 'package:baustaka/ui/champs/champs_widget.dart';
 import 'package:baustaka/ui/csrs/csr/csr_widget.dart';
@@ -343,4 +344,8 @@ final kRoutes = [
     name: Routes.kRedemption,
     page: () => RedemptionWidget(),
   ),
+  GetPage(
+  name: Routes.kAddChamp, // = '/add-champ'
+  page: () => AddChampWidget(), // or whatever your add-champ screen is
+),
 ];
