@@ -95,6 +95,12 @@ class BookingController extends GetxController {
   void onInit() async {
     super.onInit();
 
+    data.update((val) {
+      // If user never picks anything, 'client' remains 'residential'
+      val!['client'] ??= 'residential';
+      val['type'] = type; // pass from constructor
+    });
+
     data.value['type'] = type;
 
     data.value['groups'] = [

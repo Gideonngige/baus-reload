@@ -284,7 +284,7 @@ class BookingWasteWidget extends ResponsiveWidget<BookingController> {
                           } else {
                             controller.bookingState.value =
                                 BookingState.kPayment;
-                            // await controller.price();
+                            await controller.price();
                           }
                         },
                         style: ButtonStyle(

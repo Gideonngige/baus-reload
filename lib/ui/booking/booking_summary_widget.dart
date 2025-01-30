@@ -1,3 +1,4 @@
+import 'package:baustaka/api/user_api.dart';
 import 'package:baustaka/model/product.dart';
 import 'package:baustaka/ui/_/progress_rounded_containers.dart';
 import 'package:baustaka/ui/_/responsive_widget.dart';
@@ -28,6 +29,19 @@ class BookingSummaryWidget extends ResponsiveWidget<BookingController> {
         ),
         tag: tag,
       );
+
+  Future<String?> fetchPhoneFromServer() async {
+    try {
+      final userApi = UserApi();
+      final response = await userApi.me();
+      final user = response.data?.user; // parse from BaseResponse
+      return user?.phoneNumber;
+    } catch (e) {
+      // If an error occurs, log or show toast, then return null
+      print('fetchPhoneFromServer error: $e');
+      return null;
+    }
+  }
 
   Widget _summaryContainer({required String title, required String value}) {
     return Container(
@@ -215,9 +229,21 @@ class BookingSummaryWidget extends ResponsiveWidget<BookingController> {
               //   ),
               //   contentPadding: const EdgeInsets.all(0),
               // ),
-              _summaryContainer(
-                title: 'Mpesa Number',
-                value: controller.phoneNumber.text,
+              FutureBuilder<String?>(
+                future: fetchPhoneFromServer(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    final phone = snapshot.data ?? 'N/A';
+                    return _summaryContainer(
+                      title: 'Mpesa Number',
+                      value: phone,
+                    );
+                  }
+                },
               ),
 
               // if (controller.data.value['client'] != 'residential')

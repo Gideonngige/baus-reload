@@ -16,4 +16,6 @@ class UserApi extends BaseDio {
 
   Future<Response<BaseResponse>> remove(String userId) =>
       delete('v1/user/$userId');
+
+  Future<Response<BaseResponse>> me() => get('v1/user/me');
 }

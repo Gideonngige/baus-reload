@@ -1,3 +1,4 @@
+import 'package:baustaka/api/user_api.dart';
 import 'package:baustaka/config/frequency.dart';
 import 'package:baustaka/config/routes.dart';
 import 'package:baustaka/config/theme.dart';
@@ -93,19 +94,19 @@ class BookingPaymentWidget extends ResponsiveWidget<BookingController> {
                                 e.mode!.capitalize!,
                                 style: TextStyle(
                                   color: e.mode == controller.data.value['mode']
-                                      ? Colors.white
+                                      ? Colors.green
                                       : Colors.black,
                                   fontSize: 18,
                                 ),
                               ),
-                              if (controller.data.value['clientt'] ==
+                              if (controller.data.value['client'] ==
                                   'residential')
                                 Text(
                                   'Ksh ${e.cost}',
                                   style: TextStyle(
                                     color:
                                         e.mode == controller.data.value['mode']
-                                            ? Colors.white
+                                            ? Colors.green
                                             : Colors.black,
                                     fontSize: 18,
                                   ),
@@ -113,44 +114,6 @@ class BookingPaymentWidget extends ResponsiveWidget<BookingController> {
                             ],
                           ),
                         ),
-                        // Container(
-                        //   padding: const EdgeInsets.symmetric(
-                        //     horizontal: 16,
-                        //     vertical: 8,
-                        //   ),
-                        //   decoration: BoxDecoration(
-                        //     color: e.mode == controller.data.value['mode']
-                        //         ? controller.color
-                        //         : Colors.grey.shade200,
-                        //     borderRadius: const BorderRadius.all(
-                        //       Radius.circular(8),
-                        //     ),
-                        //   ),
-                        //   child: Column(
-                        //     children: [
-                        //       Text(
-                        //         e.mode!.capitalize!,
-                        //         style: TextStyle(
-                        //           color: e.mode == controller.data.value['mode']
-                        //               ? Colors.white
-                        //               : Colors.black,
-                        //         ),
-                        //       ),
-                        //       if (controller.data.value['client'] ==
-                        //           'residential')
-                        //         Text(
-                        //           'Ksh ${e.cost}',
-                        //           style: TextStyle(
-                        //             color:
-                        //                 e.mode == controller.data.value['mode']
-                        //                     ? Colors.white
-                        //                     : Colors.black,
-                        //             fontWeight: FontWeight.bold,
-                        //           ),
-                        //         ),
-                        //     ],
-                        //   ),
-                        // ),
                       ),
                     ),
                   ],
@@ -274,49 +237,49 @@ class BookingPaymentWidget extends ResponsiveWidget<BookingController> {
                   height: 32,
                 ),
               ],
-              Row(
-                children: [
-                  const TitleText(
-                    text: 'PAYMENT:',
-                    color: Colors.black,
-                    fontSize: 20,
-                  ),
-                  const Gap(10),
-                  Column(
-                    children: [
-                      Image.asset('assets/images/mpesa_logo.png', width: 50),
-                      Text(
-                        controller.phoneNumber.text,
-                        style: TextStyle(
-                          color: kAppTheme.hintColor,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Expanded(child: Container()),
-                  GestureDetector(
-                    onTap: () async => await Get.toNamed(
-                      Routes.kChangePhoneNumber,
-                      parameters: {
-                        'type': type,
-                        'withProduct': withProduct,
-                      },
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          'Change',
-                          style:
-                              TextStyle(color: controller.color, fontSize: 16),
-                        ),
-                        const Icon(Icons.chevron_right)
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const Gap(50),
+              // Row(
+              //   children: [
+              //     const TitleText(
+              //       text: 'PAYMENT:',
+              //       color: Colors.black,
+              //       fontSize: 20,
+              //     ),
+              //     const Gap(10),
+              //     Column(
+              //       children: [
+              //         Image.asset('assets/images/mpesa_logo.png', width: 50),
+              //         Text(
+              //           controller.phoneNumber.text,
+              //           style: TextStyle(
+              //             color: kAppTheme.hintColor,
+              //             fontSize: 14,
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //     Expanded(child: Container()),
+              //     GestureDetector(
+              //       onTap: () async => await Get.toNamed(
+              //         Routes.kChangePhoneNumber,
+              //         parameters: {
+              //           'type': type,
+              //           'withProduct': withProduct,
+              //         },
+              //       ),
+              //       child: Row(
+              //         children: [
+              //           Text(
+              //             'Change',
+              //             style:
+              //                 TextStyle(color: controller.color, fontSize: 16),
+              //           ),
+              //           const Icon(Icons.chevron_right)
+              //         ],
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              // const Gap(50),
               Row(
                 children: [
                   GestureDetector(
@@ -340,26 +303,50 @@ class BookingPaymentWidget extends ResponsiveWidget<BookingController> {
                   ),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        Future<String?> fetchPhoneFromServer() async {
+                          try {
+                            final userApi = UserApi();
+                            final response = await userApi.me();
+                            final user =
+                                response.data?.user; // parse from BaseResponse
+                            return user?.phoneNumber;
+                          } catch (e) {
+                            // If an error occurs, log or show toast, then return null
+                            print('fetchPhoneFromServer error: $e');
+                            return null;
+                          }
+                        }
+
+                        // 1) Validate other fields first
                         if (controller.data.value['mode'] == null) {
                           Util.toast('Pick up using?');
+                          return;
                         } else if (controller.data.value['date'] == null) {
                           Util.toast('Schedule pick up');
+                          return;
                         } else if (controller.data.value['frequency'] == null) {
                           Util.toast('How often should this be repeated?');
-                        } else if (!controller.phoneNumber.text
-                                .toString()
-                                .trim()
-                                .startsWith('0') ||
-                            controller.phoneNumber.text
-                                    .toString()
-                                    .trim()
-                                    .length !=
-                                10) {
-                          Util.toast('Check your phone number');
-                        } else {
-                          controller.bookingState.value = BookingState.kSummary;
+                          return;
                         }
+
+                        // 2) Fetch phone from server
+                        final phone = await fetchPhoneFromServer();
+                        if (phone == null || phone.isEmpty) {
+                          // phone not found => prompt user to update
+                          Util.toast(
+                              'No phone number found on server. Please update your profile.');
+                          Get.toNamed(Routes
+                              .kProfile); // or go to /profile with some param
+                          return;
+                        }
+
+                        // 3) If phone found, set in controller data
+                        controller.data
+                            .update((val) => val!['phoneNumber'] = phone);
+
+                        // 4) Now proceed to summary or final step
+                        controller.bookingState.value = BookingState.kSummary;
                       },
                       style: ButtonStyle(
                           backgroundColor:
