@@ -1,6 +1,6 @@
 import 'dart:async';
 
-// import 'package:baustaka/api/auth_api.dart';
+import 'package:baustaka/api/auth_api.dart';
 import 'package:baustaka/api/picker_api.dart';
 import 'package:baustaka/api/post_api.dart';
 import 'package:baustaka/db/settings.dart';
@@ -51,7 +51,7 @@ class HomeWasteManagerController extends GetxController {
 
   Rx<PostPage?> postPage = Rx(null);
 
-  // final _authApi = Get.put(AuthApi());
+  final _authApi = Get.put(AuthApi());
 
   final _pickerApi = Get.put(PickerApi());
 
@@ -133,7 +133,7 @@ class HomeWasteManagerController extends GetxController {
       if (Session.user == null) throw 'Please log in';
       firebaseUser.value = Session.user;
 
-      // user.value = (await _authApi.auth()).data?.user;
+      user.value = (await _authApi.auth()).data?.user;
 
       picker.value =
           (await _pickerApi.retrieve({'userId': user.value?.id})).data?.picker;
