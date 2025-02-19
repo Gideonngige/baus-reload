@@ -80,7 +80,7 @@ android {
                 usesCleartextTraffic: "true",
                 appName: rootProject.ext.appName
             ]
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.releaseConfig
         }
     }
 }
