@@ -7,12 +7,35 @@ import 'package:baustaka/helper/session.dart';
 import 'package:baustaka/helper/util.dart';
 import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:dio/dio.dart';
 
 class EmailController extends GetxController {
+  @override
+  void onReady() {
+    super.onReady();
+    showUpdateAlert();
+  }
+  void showUpdateAlert() {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Important Notice'),
+        content: const Text(
+          'If you are updating from the previous version, kindly use the phone icon to sign in, otherwise, use any other sign method.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+      barrierDismissible: false, // Prevent dismissing by tapping outside
+    );
+  }
   var isSigningIn = false.obs;
   var obscureText = true.obs;
 
