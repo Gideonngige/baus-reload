@@ -244,6 +244,8 @@ class ProfileController extends GetxController {
             modifiedPhoneNumber = '+254$phoneNumber';
           }
           modifiedPhoneNumber = '+$phoneNumber';
+        } else if (phoneNumber.startsWith('+254')) {
+          modifiedPhoneNumber = phoneNumber;
         } else {
           throw 'Invalid phone number format';
         }
