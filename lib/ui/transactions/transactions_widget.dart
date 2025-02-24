@@ -1,224 +1,156 @@
+import 'package:baustaka/config/palette.dart';
+import 'package:baustaka/config/routes.dart';
+import 'package:baustaka/helper/util.dart';
 import 'package:baustaka/ui/_/dialog_widget.dart';
+import 'package:baustaka/ui/_/empty_widget.dart';
+import 'package:baustaka/ui/_/progress_widget.dart';
 import 'package:baustaka/ui/_/item/transaction_item_widget.dart';
-import 'package:baustaka/ui/_/responsive_widget.dart';
 import 'package:baustaka/ui/transactions/transactions_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class TransactionsWidget extends ResponsiveWidget<TransactionsController> {
-  TransactionsWidget({super.key});
+class TransactionsWidget extends StatelessWidget {
+  const TransactionsWidget({Key? key}) : super(key: key);
 
   @override
-  String get tag => 'transactions';
+  Widget build(BuildContext context) {
+    final TransactionsController controller = Get.put(
+      TransactionsController(),
+      tag: 'transactions',
+    );
 
-  @override
-  bool get shouldAdjust => true;
-
-  @override
-  TransactionsController get controller =>
-      Get.put(TransactionsController(), tag: tag);
-
-  @override
-  Widget? tablet() => Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Wallet',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () async => await Get.dialog(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Wallet'),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              await Get.dialog(
                 DialogWidget(
                   title: 'Top up',
-                  content: 'Enter amount equal to or more than 10 to top up your wallet in Ksh',
+                  content:
+                      'Enter amount equal to or more than 10 to top up your wallet in Ksh',
                   hintText: 'Amount',
-                    onConfirm: () async {
+                  onConfirm: () async {
                     try {
                       await controller.deposit();
                     } catch (e) {
                       Get.snackbar(
-                      'Error',
-                      e.toString(),
-                      snackPosition: SnackPosition.BOTTOM,
+                        'Error',
+                        e.toString(),
+                        snackPosition: SnackPosition.BOTTOM,
                       );
                     }
-                    },
-                    onCancel: () {
-                      Navigator.of(screen.context).pop();
-                    },
+                  },
+                  onCancel: () {
+                    Navigator.of(context).pop();
+                  },
                   inputController: controller.amountToDeposit,
                 ),
-              ),
-              child: Obx(
-                () => controller.isDepositing.isTrue
-                    ? const SizedBox(
-                        height: 18,
-                        width: 18,
-                        child: CircularProgressIndicator(),
-                      )
-                    : const Text('Top up'),
-              ),
-            ),
-            const SizedBox(
-              width: 16,
-            ),
-          ],
-        ),
-        body: RefreshIndicator(
-          onRefresh: () async {
-            controller.fetch(true);
-          },
-          child: Obx(
-            () => NotificationListener<ScrollNotification>(
-              onNotification: (scrollInfo) {
-                if (scrollInfo.metrics.pixels ==
-                    scrollInfo.metrics.maxScrollExtent) controller.fetch(false);
-                return false;
-              },
-              child: controller.user.value != null
-                  ? ListView.builder(
-                      itemBuilder: (context, index) => index == 0
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(16),
-                                  margin: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade200,
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(8)),
-                                  ),
-                                  child: const Text(
-                                    'Summary',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.all(16),
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Expanded(
-                                        child: Text(
-                                          'Available',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        width: 16,
-                                      ),
-                                      Text(
-                                        'Ksh ${controller.user.value!.balance!.available}',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Theme.of(screen.context)
-                                              .primaryColor,
-                                        ),
-                                      ),
-                                      controller.user.value!.balance!
-                                                  .available! >
-                                              0
-                                          ? Row(
-                                              children: [
-                                                const SizedBox(
-                                                  width: 16,
-                                                ),
-                                                ElevatedButton(
-                                                  onPressed: () async {
-                                                    await Get.dialog(
-                                                      DialogWidget(
-                                                        title: 'Withdraw?',
-                                                        content:
-                                                            'Enter the amount to withdraw',
-                                                        onConfirm: () async {
-                                                          await controller
-                                                              .withdraw();
-                                                        },
-                                                        hintText: 'Amount',
-                                                        inputController:
-                                                            controller.amount,
-                                                      ),
-                                                    );
-                                                  },
-                                                  child: controller
-                                                          .isWithdrawing.isTrue
-                                                      ? const CircularProgressIndicator(
-                                                          backgroundColor:
-                                                              Colors.white,
-                                                        )
-                                                      : const Text('Withdraw'),
-                                                ),
-                                              ],
-                                            )
-                                          : Container(),
-                                    ],
-                                  ),
-                                ),
-                                if (controller.user.value!.balance!.held != 0)
-                                  Container(
-                                    padding: const EdgeInsets.all(16),
-                                    margin: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        const Expanded(
-                                          child: Text('On hold'),
-                                        ),
-                                        Text(
-                                            'Ksh ${controller.user.value!.balance!.held}')
-                                      ],
-                                    ),
-                                  ),
-                                Container(
-                                  padding: const EdgeInsets.all(16),
-                                  margin: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade200,
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(8)),
-                                  ),
-                                  child: const Text(
-                                    'Transactions',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                if (controller.transactions.isEmpty)
-                                  Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(48),
-                                      child: controller.isFetching.isTrue
-                                          ? const CircularProgressIndicator()
-                                          : const Text('No transactions'),
-                                    ),
-                                  ),
-                              ],
-                            )
-                          : TransactionItemWidget(
-                              transaction: controller.transactions[index - 1],
-                            ),
-                      itemCount: controller.transactions.length + 1,
+              );
+            },
+            child: Obx(
+              () => controller.isDepositing.isTrue
+                  ? const SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(),
                     )
-                  : ListView(
+                  : const Text('Top up'),
+            ),
+          ),
+          const SizedBox(width: 16),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await controller.fetch(true);
+          await controller.fetchWalletData();
+        },
+        child: Obx(
+          () {
+            return ListView(
+              children: [
+                // Wallet Summary Card
+                Card(
+                  margin: const EdgeInsets.all(16),
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(48),
-                            child: controller.isFetching.isTrue
-                                ? const CircularProgressIndicator()
-                                : const Text('No transactions'),
+                        const Text(
+                          'Wallet Summary',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
                           ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Available',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            Text(
+                              'Ksh ${controller.balance.value}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Palette.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-            ),
-          ),
+                  ),
+                ),
+                // Transactions Header
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: const Text(
+                    'Transactions',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                // If no transactions, show an empty widget
+                if (controller.transactions.isEmpty &&
+                    !controller.isFetching.value)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(48),
+                      child: const Text('No transactions'),
+                    ),
+                  ),
+                // List of Transactions
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: controller.transactions.length,
+                  itemBuilder: (context, index) {
+                    return TransactionItemWidget(
+                      transaction: controller.transactions[index],
+                    );
+                  },
+                ),
+                if (controller.isFetching.value)
+                  const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+              ],
+            );
+          },
         ),
-      );
+      ),
+    );
+  }
 }
