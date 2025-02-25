@@ -25,6 +25,8 @@ enum AppNotificationStatus {
   read,
   @JsonValue('unread')
   unread,
+  @JsonValue('pending')
+  pending,
 }
 
 enum AppNotificationType {

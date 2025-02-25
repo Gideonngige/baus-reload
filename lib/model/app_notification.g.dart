@@ -33,6 +33,7 @@ AppNotification _$AppNotificationFromJson(Map<String, dynamic> json) =>
 const _$AppNotificationStatusEnumMap = {
   AppNotificationStatus.read: 'read',
   AppNotificationStatus.unread: 'unread',
+  AppNotificationStatus.pending: 'pending',
 };
 
 const _$AppNotificationTypeEnumMap = {

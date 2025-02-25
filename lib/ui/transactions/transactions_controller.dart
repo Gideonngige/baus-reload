@@ -4,6 +4,7 @@ import 'package:baustaka/model/transaction.dart';
 import 'package:baustaka/model/transaction_page.dart';
 import 'package:baustaka/model/user.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:baustaka/config/env.dart';
@@ -68,25 +69,50 @@ class TransactionsController extends GetxController {
   }
 
   /// Fetches the wallet balance and completed transactions using the user ID.
+  // Future<void> fetchWalletData() async {
+  //   try {
+  //     final userId = user.value?.id;
+  //     if (userId == null) {
+  //       Util.toast('User not logged in');
+  //       return;
+  //     }
+  //     // Call the new wallet endpoint
+  //     final dioResponse = await Dio().get(
+  //       '${kBaseApiUrl}v1/user/wallet',
+  //       queryParameters: {'userId': userId},
+  //     );
+  //     final data = dioResponse.data;
+  //     // Update the balance observable
+  //     balance.value = data['balance'] ?? 0;
+  //     // Replace the transaction list with the wallet’s completed transactions
+  //     transactions.assignAll((data['transactions'] as List)
+  //         .map((json) => Transaction.fromJson(json))
+  //         .toList());
+  //   } catch (e) {
+  //     Util.toast(e.toString());
+  //   }
+  // }
+
   Future<void> fetchWalletData() async {
     try {
-      final userId = user.value?.id;
-      if (userId == null) {
+      // Use FirebaseAuth directly to get the uid if your observable isn't set
+      final firebaseUser = auth.FirebaseAuth.instance.currentUser;
+      if (firebaseUser == null) {
         Util.toast('User not logged in');
         return;
       }
-      // Call the new wallet endpoint
+      final userId = firebaseUser.uid;
+
       final dioResponse = await Dio().get(
-        '${kBaseApiUrl}v1/user/wallet',
-        queryParameters: {'userId': userId},
+        '${kBaseApiUrl}v1/transaction/wallet',
+        queryParameters: {'uid': userId},
       );
       final data = dioResponse.data;
-      // Update the balance observable
       balance.value = data['balance'] ?? 0;
-      // Replace the transaction list with the wallet’s completed transactions
       transactions.assignAll((data['transactions'] as List)
           .map((json) => Transaction.fromJson(json))
           .toList());
+      print('Wallet data => transactions.length = ${transactions.length}');
     } catch (e) {
       Util.toast(e.toString());
     }

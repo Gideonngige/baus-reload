@@ -59,6 +59,9 @@ class VerifyPhoneController extends GetxController {
       // 1) Get ID token
       final token = await currentUser.getIdToken();
 
+      // remove any spaces in the phone
+      phone = phone.replaceAll(RegExp(r'\s+'), '');
+
       // 2) POST to /v1/auth/firebase with `idToken` + `phoneNumber`
       final response = await Dio().post(
         '${kBaseApiUrl}v1/auth/firebase', // or ensure a '/' if needed
