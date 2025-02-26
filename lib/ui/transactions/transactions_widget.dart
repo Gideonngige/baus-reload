@@ -113,34 +113,34 @@ class TransactionsWidget extends StatelessWidget {
                   ),
                 ),
                 // Transactions Header
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: const Text(
-                    'Transactions',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                // If no transactions, show an empty widget
-                if (controller.transactions.isEmpty &&
-                    !controller.isFetching.value)
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(48),
-                      child: const Text('No transactions'),
-                    ),
-                  ),
-                // List of Transactions
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: controller.transactions.length,
-                  itemBuilder: (context, index) {
-                    return TransactionItemWidget(
-                      transaction: controller.transactions[index],
-                    );
-                  },
-                ),
+                // Container(
+                //   padding:
+                //       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                //   child: const Text(
+                //     'Transactions',
+                //     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                //   ),
+                // ),
+                // // If no transactions, show an empty widget
+                // if (controller.transactions.isEmpty &&
+                //     !controller.isFetching.value)
+                //   Center(
+                //     child: Padding(
+                //       padding: const EdgeInsets.all(48),
+                //       child: const Text('No transactions'),
+                //     ),
+                //   ),
+                // // List of Transactions
+                // ListView.builder(
+                //   shrinkWrap: true,
+                //   physics: const NeverScrollableScrollPhysics(),
+                //   itemCount: controller.transactions.length,
+                //   itemBuilder: (context, index) {
+                //     return TransactionItemWidget(
+                //       transaction: controller.transactions[index],
+                //     );
+                //   },
+                // ),
                 if (controller.isFetching.value)
                   const Padding(
                     padding: EdgeInsets.all(16),
