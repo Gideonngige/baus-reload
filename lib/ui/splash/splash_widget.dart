@@ -18,6 +18,10 @@ class SplashWidget extends GetResponsiveView<SplashController> {
         tag: tag,
       );
 
+    // For mobile devices (i.e., phone)
+  @override
+  Widget? phone() => tablet(); // reuse the tablet design for phone
+
   @override
   Widget? tablet() => Container(
         decoration: const BoxDecoration(
