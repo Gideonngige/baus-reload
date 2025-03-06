@@ -14,12 +14,11 @@ import 'package:baustaka/ui/_/responsive_widget.dart';
 import 'package:baustaka/ui/champs/add_champ/add_champ_controller.dart';
 import 'package:baustaka/ui/file/local_file_preview_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_google_places/flutter_google_places.dart';
+import 'package:google_place/google_place.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_webservice/places.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AddChampWidget extends ResponsiveWidget<AddChampController> {
@@ -194,49 +193,24 @@ class AddChampWidget extends ResponsiveWidget<AddChampController> {
                                                 milliseconds: 100,
                                               ),
                                               () async {
-                                                var prediction =
-                                                    await PlacesAutocomplete
-                                                        .show(
-                                                  context: screen.context,
-                                                  apiKey: kGoogleApiKey,
-                                                  mode: Mode.fullscreen,
-                                                  strictbounds: false,
-                                                  components: [],
-                                                  types: [],
-                                                  overlayBorderRadius:
-                                                      BorderRadius.circular(
-                                                          kDefaultRadius),
+                                                var googlePlace = GooglePlace(kGoogleApiKey);
+                                                var result = await googlePlace.autocomplete.get(
+                                                  '',
+                                                  components: [Component('country', 'ke')],
                                                 );
 
-                                                if (prediction != null &&
-                                                    prediction.placeId !=
-                                                        null) {
-                                                  final place =
-                                                      await GoogleMapsPlaces(
-                                                    apiKey: kGoogleApiKey,
-                                                    apiHeaders:
-                                                        await const GoogleApiHeaders()
-                                                            .getHeaders(),
-                                                  ).getDetailsByPlaceId(
-                                                          prediction.placeId!);
+                                                if (result != null && result.predictions!.isNotEmpty) {
+                                                  var prediction = result.predictions!.first;
+                                                  var details = await googlePlace.details.get(prediction.placeId!);
 
-                                                  if (!place.hasNoResults) {
-                                                    controller.map['area'] =
-                                                        prediction.description;
+                                                  if (details != null && details.result != null) {
+                                                    controller.map['area'] = prediction.description;
 
                                                     controller.map.update(
                                                         'lngLat',
                                                         (value) => [
-                                                              place
-                                                                  .result
-                                                                  .geometry!
-                                                                  .location
-                                                                  .lng,
-                                                              place
-                                                                  .result
-                                                                  .geometry!
-                                                                  .location
-                                                                  .lat
+                                                              details.result!.geometry!.location!.lng,
+                                                              details.result!.geometry!.location!.lat
                                                             ]);
 
                                                     _goToPosition();
@@ -504,156 +478,3 @@ class AddChampWidget extends ResponsiveWidget<AddChampController> {
         ),
       );
 }
-
-
-   // const SizedBox(
-              //   height: 8,
-              // ),
-              // Padding(
-              //   padding: const EdgeInsets.symmetric(
-              //     horizontal: 16,
-              //   ),
-              //   child: MapWidget(
-              //     onMapCreated: (updateMap) async {
-              //       controller.updateMap = updateMap;
-
-              //       _goToPosition();
-              //     },
-              //   ),
-              // ),
-              // ListTile(
-              //   title: const Text(
-              //       'Add up to 5 photos of your eco work (Optional)'),
-              //   subtitle: Obx(() =>
-              //       Text('${(controller.map['files'] as List).length} photos')),
-              //   trailing: PopupMenuButton(
-              //     shape: RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(kDefaultRadius),
-              //     ),
-              //     itemBuilder: (context) => <PopupMenuEntry>[
-              //       PopupMenuItem(
-              //         child: const Text('Camera'),
-              //         onTap: () async {
-              //           try {
-              //             var file = await ImagePicker().pickImage(
-              //               source: ImageSource.camera,
-              //               maxWidth: 720,
-              //               maxHeight: 720,
-              //             );
-
-              //             if (file != null) {
-              //               controller.map.update(
-              //                 'files',
-              //                 (value) {
-              //                   if ((value as List).length < 5) {
-              //                     (value).add(
-              //                       File(file.path),
-              //                     );
-              //                   } else {
-              //                     Util.toast('You can add up to 5 photos');
-              //                   }
-
-              //                   return value;
-              //                 },
-              //               );
-              //             }
-              //           } catch (e) {
-              //             Util.toast(e);
-              //           }
-              //         },
-              //       ),
-              //       PopupMenuItem(
-              //         child: const Text('Gallery'),
-              //         onTap: () async {
-              //           try {
-              //             var xfiles = await ImagePicker().pickMultiImage(
-              //               maxWidth: 720,
-              //               maxHeight: 720,
-              //             );
-
-              //             List<Uint8List> bytesFiles = List.empty(
-              //               growable: true,
-              //             );
-
-              //             for (var element in xfiles) {
-              //               Uint8List bytes = await element.readAsBytes();
-
-              //               bytesFiles.add(bytes);
-              //             }
-
-              //             controller.map.update(
-              //               'files',
-              //               (value) {
-              //                 var files = value as List<Uint8List>;
-
-              //                 for (var element in bytesFiles) {
-              //                   if (value.length < 5) {
-              //                     (value).add(
-              //                       element,
-              //                     );
-              //                   } else {
-              //                     Util.toast('You can add up to 5 photos');
-
-              //                     break;
-              //                   }
-              //                 }
-
-              //                 return files;
-              //               },
-              //             );
-              //           } catch (e) {
-              //             Util.toast(e);
-              //           }
-              //         },
-              //       ),
-              //     ],
-              //     icon: const Icon(
-              //       Icons.add,
-              //     ),
-              //   ),
-              // ),
-
-// return Stack(
-                        //   children: [
-                        //     GestureDetector(
-                        //       onTap: () async => await Get.to(
-                        //         () => LocalFilePreviewWidget(
-                        //           file: element,
-                        //         ),
-                        //       ),
-                        //       child: ClipRRect(
-                        //         borderRadius:
-                        //             BorderRadius.circular(kDefaultRadius),
-                        //         child: Image.memory(
-                        //           element,
-                        //           fit: BoxFit.cover,
-                        //           height: 120,
-                        //           width: 120,
-                        //         ),
-                        //       ),
-                        //     ),
-                        //     Positioned(
-                        //       top: 8,
-                        //       right: 8,
-                        //       child: GestureDetector(
-                        //         child: const CircleAvatar(
-                        //           radius: 16,
-                        //           backgroundColor: Colors.black45,
-                        //           child: Icon(
-                        //             Icons.clear,
-                        //             size: 18,
-                        //             color: Colors.white,
-                        //           ),
-                        //         ),
-                        //         onTap: () => controller.map.update(
-                        //           'files',
-                        //           (_) {
-                        //             (_ as List<Uint8List>).remove(element);
-
-                        //             return _;
-                        //           },
-                        //         ),
-                        //       ),
-                        //     ),
-                        //   ],
-                        // );

@@ -6,10 +6,9 @@ import 'package:baustaka/model/event.dart';
 import 'package:baustaka/model/event_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:get/get.dart';
+import 'package:google_place/google_place.dart';
 import 'package:google_api_headers/google_api_headers.dart';
-import 'package:google_maps_webservice/places.dart';
 
 class EventsController extends GetxController {
   var isFetching = false.obs;
@@ -104,30 +103,23 @@ class EventsController extends GetxController {
 
   fetchPlace(BuildContext context) async {
     try {
-      var prediction = await PlacesAutocomplete.show(
-        context: context,
-        apiKey: kGoogleApiKey,
-        mode: Mode.overlay,
-        overlayBorderRadius: BorderRadius.circular(8),
-        components: [Component(Component.country, 'ke')],
-        strictbounds: false,
-        types: [],
-        proxyBaseUrl: kIsWeb ? kProxyBaseUrl : null,
+      var googlePlace = GooglePlace(kGoogleApiKey);
+      var result = await googlePlace.autocomplete.get(
+        '',
+        components: [Component('country', 'ke')],
       );
 
-      if (prediction != null && prediction.placeId != null) {
-        final place = await GoogleMapsPlaces(
-          apiKey: kGoogleApiKey,
-          apiHeaders: await const GoogleApiHeaders().getHeaders(),
-        ).getDetailsByPlaceId(prediction.placeId!);
+      if (result != null && result.predictions!.isNotEmpty) {
+        var prediction = result.predictions!.first;
+        var details = await googlePlace.details.get(prediction.placeId!);
 
-        if (place.hasNoResults) throw 'Something went wrong. Try again';
+        if (details != null && details.result != null) {
+          area.value = details.result!.name;
+          latitude = details.result!.geometry!.location!.lat;
+          longitude = details.result!.geometry!.location!.lng;
 
-        area.value = place.result.name;
-        latitude = place.result.geometry!.location.lat;
-        longitude = place.result.geometry!.location.lng;
-
-        await fetch(true);
+          await fetch(true);
+        }
       }
     } catch (e) {
       Util.toast(e);

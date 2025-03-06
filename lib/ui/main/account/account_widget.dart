@@ -10,7 +10,7 @@ import 'package:baustaka/ui/_/username_widget.dart';
 import 'package:baustaka/ui/main/account/account_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_cropper/image_cropper.dart';
+import 'package:crop_your_image/crop_your_image.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AccountWidget extends GetResponsiveView<AccountController> {
@@ -132,31 +132,19 @@ class AccountWidget extends GetResponsiveView<AccountController> {
                                         ));
 
                                         if (xfile != null) {
-                                          var croppedFile =
-                                              await ImageCropper().cropImage(
-                                            sourcePath: xfile.path,
-                                            aspectRatio: const CropAspectRatio(
-                                              ratioX: 1,
-                                              ratioY: 1,
-                                            ),
-                                            uiSettings: [
-                                              AndroidUiSettings(
-                                                toolbarTitle: 'Edit',
-                                                toolbarColor: Colors.black,
-                                                toolbarWidgetColor:
-                                                    Colors.white,
-                                                statusBarColor: Colors.black,
-                                                activeControlsWidgetColor:
-                                                    Palette.primary,
-                                                backgroundColor: Colors.black,
+                                          var croppedFile = await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => CropPage(
+                                                file: File(xfile.path),
                                               ),
-                                            ],
+                                            ),
                                           );
 
                                           if (croppedFile != null) {
                                             controller.updateUser(
                                               data: {
-                                                'file': File(croppedFile.path),
+                                                'file': croppedFile,
                                               },
                                             );
                                           }
@@ -178,31 +166,19 @@ class AccountWidget extends GetResponsiveView<AccountController> {
                                         ));
 
                                         if (xfile != null) {
-                                          var croppedFile =
-                                              await ImageCropper().cropImage(
-                                            sourcePath: xfile.path,
-                                            aspectRatio: const CropAspectRatio(
-                                              ratioX: 1,
-                                              ratioY: 1,
-                                            ),
-                                            uiSettings: [
-                                              AndroidUiSettings(
-                                                toolbarTitle: 'Edit',
-                                                toolbarColor: Colors.black,
-                                                toolbarWidgetColor:
-                                                    Colors.white,
-                                                statusBarColor: Colors.black,
-                                                activeControlsWidgetColor:
-                                                    Palette.primary,
-                                                backgroundColor: Colors.black,
+                                          var croppedFile = await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => CropPage(
+                                                file: File(xfile.path),
                                               ),
-                                            ],
+                                            ),
                                           );
 
                                           if (croppedFile != null) {
                                             controller.updateUser(
                                               data: {
-                                                'file': File(croppedFile.path),
+                                                'file': croppedFile,
                                               },
                                             );
                                           }
@@ -293,4 +269,47 @@ class AccountWidget extends GetResponsiveView<AccountController> {
           ),
         ),
       );
+}
+
+class CropPage extends StatelessWidget {
+  final File file;
+
+  CropPage({required this.file});
+
+  @override
+  Widget build(BuildContext context) {
+    final _cropController = CropController();
+
+    return FutureBuilder(
+      future: file.readAsBytes(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Edit'),
+              actions: [
+                IconButton(
+                  icon: Icon(Icons.check),
+                  onPressed: () async {
+                    _cropController.crop();
+                  },
+                ),
+              ],
+            ),
+            body: Crop(
+              image: snapshot.data!,
+              controller: _cropController,
+              onCropped: (croppedData) async {
+                final croppedFile = File('${file.path}_cropped.jpg');
+                await croppedFile.writeAsBytes(croppedData as List<int>);
+                Navigator.pop(context, croppedFile);
+              },
+            ),
+          );
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
+    );
+  }
 }
