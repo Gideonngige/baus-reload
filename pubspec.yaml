@@ -3,7 +3,7 @@ description: Baus Taka
 
 publish_to: "none"
 
-version: 8.0.1+57
+version: 8.0.2+58
 
 environment:
   sdk: ">=3.4.0 <4.0.0"

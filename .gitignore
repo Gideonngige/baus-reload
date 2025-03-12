@@ -8,6 +8,8 @@
 .buildlog/
 .history
 .svn/
+cert_key
+cert_key.pub
 
 # IntelliJ related
 *.iml
