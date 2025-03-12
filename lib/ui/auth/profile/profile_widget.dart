@@ -196,6 +196,40 @@ class ProfileWidget extends GetResponsiveView<ProfileController> {
                   ),
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red, // red color for delete button
+                  ),
+                  onPressed: () {
+                    // Show confirmation dialog
+                    showDialog(
+                      context: Get.context!,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Delete Account'),
+                        content: const Text(
+                          'Are you sure you want to delete your account? This action cannot be undone.',
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Get.back(), // dismiss dialog
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              Get.back(); // dismiss dialog
+                              await controller.deleteAccount();
+                            },
+                            child: const Text('Confirm'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  child: const Text('Delete Account'),
+                ),
+              ),
               if (action == 'register') ...[
                 const SizedBox(
                   height: 32,
