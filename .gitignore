@@ -11,6 +11,9 @@
 cert_key
 cert_key.pub
 
+# Do not push android folder in this branch
+android/
+
 # IntelliJ related
 *.iml
 *.ipr
