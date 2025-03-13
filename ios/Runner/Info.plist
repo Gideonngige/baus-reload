@@ -29,16 +29,18 @@
 				<string>Editor</string>
 				<key>CFBundleURLSchemes</key>
 				<array>
+					<string>ke.co.baustaka.client</string>
 					<string>com.googleusercontent.apps.350745739273-d64i94n7rpunrtlaelc7kudtdm3dp074</string>
 				</array>
 			</dict>
 		</array>
 		<key>CFBundleVersion</key>
-		<string>59</string>
+		<string>60</string>
 		<key>ITSAppUsesNonExemptEncrymption</key>
-		<false/>
+		<false />
 		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-		<string>The app uses location data to provide user's location when calling for garbage collection, when selling plastics, and when when reporting illegal dumping.</string>
+		<string>The app uses location data to provide user's location when calling for garbage
+			collection, when selling plastics, and when when reporting illegal dumping.</string>
 		<key>FirebaseDynamicLinksCustomDomains</key>
 		<array>
 			<string>https://open.baus.kadengeyaa.com</string>
