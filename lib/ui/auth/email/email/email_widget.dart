@@ -262,30 +262,30 @@ class EmailWidget extends GetResponsiveView<EmailController> {
                                 ),
                         ),
                       ),
-                      FloatingActionButton(
-                        heroTag: 'apple',
-                        shape: RoundedRectangleBorder(
-                          side: const BorderSide(
-                            color: Colors.black,
-                          ),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        backgroundColor: Colors.black,
-                        elevation: 0,
-                        onPressed: () async {
-                          await controller.signInWithApple();
-                        },
-                        child: Obx(
-                          () => controller.isSigningInWithApple.isTrue
-                              ? const ProgressWidget()
-                              : Image.asset(
-                                  Images.kLogoApple,
-                                  color: Colors.white,
-                                  height: 32,
-                                  width: 32,
-                                ),
-                        ),
-                      ),
+                      // FloatingActionButton(
+                      //   heroTag: 'apple',
+                      //   shape: RoundedRectangleBorder(
+                      //     side: const BorderSide(
+                      //       color: Colors.black,
+                      //     ),
+                      //     borderRadius: BorderRadius.circular(30),
+                      //   ),
+                      //   backgroundColor: Colors.black,
+                      //   elevation: 0,
+                      //   onPressed: () async {
+                      //     await controller.signInWithApple();
+                      //   },
+                      //   child: Obx(
+                      //     () => controller.isSigningInWithApple.isTrue
+                      //         ? const ProgressWidget()
+                      //         : Image.asset(
+                      //             Images.kLogoApple,
+                      //             color: Colors.white,
+                      //             height: 32,
+                      //             width: 32,
+                      //           ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
