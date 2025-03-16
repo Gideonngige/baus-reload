@@ -1,0 +1,242 @@
+{
+  "project_info": {
+    "project_number": "350745739273",
+    "project_id": "baustaka",
+    "storage_bucket": "baustaka.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:350745739273:android:3c7d93770d07b62aacf8d8",
+        "android_client_info": {
+          "package_name": "ke.co.baustaka.admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "350745739273-21bdod8po35ti6l8fgmd5h1vdm9uf4nq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ke.co.baustaka.admin",
+            "certificate_hash": "25690313c2abe8e42101219947645df540841aac"
+          }
+        },
+        {
+          "client_id": "350745739273-4eci1snvr0r2ofiput52io67teh927ka.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ke.co.baustaka.admin",
+            "certificate_hash": "d1a0aa1f190a3cb3f4b0174ef047172e8cb01dec"
+          }
+        },
+        {
+          "client_id": "350745739273-ss09bdl7v51cc9s2sqjpp0f6e7dp1o4p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ke.co.baustaka.admin",
+            "certificate_hash": "c8cff4bd2eb807e7cf75db745c21e148594ab411"
+          }
+        },
+        {
+          "client_id": "350745739273-5dbdj31qn7otbtbics8hv895jlgl3f23.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4EZVUbOyLSSn5etZ9vhyNjrublcRHJtE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "350745739273-5dbdj31qn7otbtbics8hv895jlgl3f23.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "350745739273-d64i94n7rpunrtlaelc7kudtdm3dp074.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "ke.co.baustaka.client"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:350745739273:android:c31a754f6834fcd0acf8d8",
+        "android_client_info": {
+          "package_name": "ke.co.baustaka.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "350745739273-5dbdj31qn7otbtbics8hv895jlgl3f23.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4EZVUbOyLSSn5etZ9vhyNjrublcRHJtE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "350745739273-5dbdj31qn7otbtbics8hv895jlgl3f23.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "350745739273-d64i94n7rpunrtlaelc7kudtdm3dp074.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "ke.co.baustaka.client"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:350745739273:android:dad59c5b5fecb6feacf8d8",
+        "android_client_info": {
+          "package_name": "ke.co.baustaka.client"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "350745739273-9rc7ng7e8om742eosj827mrk3ebk71ob.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ke.co.baustaka.client",
+            "certificate_hash": "375d7f637b0db1321ee65efa0762619fceb8c2a6"
+          }
+        },
+        {
+          "client_id": "350745739273-f4nntmjpfp57ps1lhl686cn97uaf3vk0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ke.co.baustaka.client",
+            "certificate_hash": "d1a0aa1f190a3cb3f4b0174ef047172e8cb01dec"
+          }
+        },
+        {
+          "client_id": "350745739273-ilfrqn23v6oar4ekt686sd0342t2bkmn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ke.co.baustaka.client",
+            "certificate_hash": "a2d25832e201f229dee5d8131682b8ac395c53e5"
+          }
+        },
+        {
+          "client_id": "350745739273-kb94e13r8s4e9lve5jm5fh7me99jpkho.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ke.co.baustaka.client",
+            "certificate_hash": "9fa25452afb67cc1605e32d1198b3df2266ff12e"
+          }
+        },
+        {
+          "client_id": "350745739273-t0hanoca793ol866neota6h69bpkacuu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ke.co.baustaka.client",
+            "certificate_hash": "25690313c2abe8e42101219947645df540841aac"
+          }
+        },
+        {
+          "client_id": "350745739273-5dbdj31qn7otbtbics8hv895jlgl3f23.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4EZVUbOyLSSn5etZ9vhyNjrublcRHJtE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "350745739273-5dbdj31qn7otbtbics8hv895jlgl3f23.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "350745739273-d64i94n7rpunrtlaelc7kudtdm3dp074.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "ke.co.baustaka.client"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:350745739273:android:2c2d3cee6a5e8eb4acf8d8",
+        "android_client_info": {
+          "package_name": "ke.co.baustaka.collector"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "350745739273-gcolpr1f0iu1fkb70okjub2kfqmm86hg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ke.co.baustaka.collector",
+            "certificate_hash": "76dc7e7b2bf4077140c073e988ad00afa14ff59e"
+          }
+        },
+        {
+          "client_id": "350745739273-mgavvi7j76dr58hle8u4hoh01fgus1au.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ke.co.baustaka.collector",
+            "certificate_hash": "d1a0aa1f190a3cb3f4b0174ef047172e8cb01dec"
+          }
+        },
+        {
+          "client_id": "350745739273-tp9kvgjft14lhke04kdeqk6jbpgmakom.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ke.co.baustaka.collector",
+            "certificate_hash": "25690313c2abe8e42101219947645df540841aac"
+          }
+        },
+        {
+          "client_id": "350745739273-5dbdj31qn7otbtbics8hv895jlgl3f23.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4EZVUbOyLSSn5etZ9vhyNjrublcRHJtE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "350745739273-5dbdj31qn7otbtbics8hv895jlgl3f23.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "350745739273-d64i94n7rpunrtlaelc7kudtdm3dp074.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "ke.co.baustaka.client"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
