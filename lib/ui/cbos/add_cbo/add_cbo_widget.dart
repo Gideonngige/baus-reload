@@ -13,11 +13,10 @@ import 'package:baustaka/ui/_/responsive_widget.dart';
 import 'package:baustaka/ui/cbos/add_cbo/add_cbo_controller.dart';
 import 'package:baustaka/ui/file/local_file_preview_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_google_places/flutter_google_places.dart';
+import 'package:google_place/google_place.dart';
 import 'package:get/get.dart';
 import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_webservice/places.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AddCboWidget extends ResponsiveWidget<AddCboController> {
@@ -164,33 +163,24 @@ class AddCboWidget extends ResponsiveWidget<AddCboController> {
                             milliseconds: 100,
                           ),
                           () async {
-                            var prediction = await PlacesAutocomplete.show(
-                              context: screen.context,
-                              apiKey: kGoogleApiKey,
-                              mode: Mode.fullscreen,
-                              strictbounds: false,
-                              components: [],
-                              types: [],
-                              overlayBorderRadius:
-                                  BorderRadius.circular(kDefaultRadius),
+                            var googlePlace = GooglePlace(kGoogleApiKey);
+                            var result = await googlePlace.autocomplete.get(
+                              '',
+                              components: [Component('country', 'ke')],
                             );
 
-                            if (prediction != null &&
-                                prediction.placeId != null) {
-                              final place = await GoogleMapsPlaces(
-                                apiKey: kGoogleApiKey,
-                                apiHeaders:
-                                    await const GoogleApiHeaders().getHeaders(),
-                              ).getDetailsByPlaceId(prediction.placeId!);
+                            if (result != null && result.predictions!.isNotEmpty) {
+                              var prediction = result.predictions!.first;
+                              var details = await googlePlace.details.get(prediction.placeId!);
 
-                              if (!place.hasNoResults) {
+                              if (details != null && details.result != null) {
                                 controller.map['area'] = prediction.description;
 
                                 controller.map.update(
                                     'lngLat',
                                     (value) => [
-                                          place.result.geometry!.location.lng,
-                                          place.result.geometry!.location.lat
+                                          details.result!.geometry!.location!.lng,
+                                          details.result!.geometry!.location!.lat
                                         ]);
 
                                 _goToPosition();

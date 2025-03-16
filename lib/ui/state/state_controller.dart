@@ -71,61 +71,57 @@ class StateController extends SuperController {
   io.Socket? socket;
 
   @override
-  void onInit() {
-    Util.toast(
-      'StateController onInit',
-      show: false,
-    );
+void onInit() {
+  Util.toast(
+    'StateController onInit',
+    show: false,
+  );
 
-    ever(_user, (newValue) {
-      updateSocket();
-
-      updatePosition();
-    });
-
-    FirebaseMessaging.instance.getToken().then((newToken) {
-      messagingToken = newToken;
-
-      Util.toast(
-        'FirebaseMessaging initial $newToken',
-        show: false,
-      );
-    });
-
-    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-      messagingToken = newToken;
-
-      Util.toast(
-        'FirebaseMessaging $newToken',
-        show: false,
-      );
-    });
-
-    firebaseUser = firebase_auth.FirebaseAuth.instance.currentUser;
-
-    firebase_auth.FirebaseAuth.instance
-        .authStateChanges()
-        .listen((newFirebaseUser) async {
-      firebaseUser = newFirebaseUser;
-
-      Util.toast(
-        'FirebaseAuth $newFirebaseUser',
-        show: false,
-      );
-
-      if (newFirebaseUser != null) {
-        updateUser(
-          refresh: true,
-        );
-      } else {
-        user = null;
-      }
-    });
-
+  ever(_user, (newValue) {
+    updateSocket();
     updatePosition();
+  });
 
-    super.onInit();
-  }
+  // Get initial FirebaseMessaging token with null-check and error handling
+  FirebaseMessaging.instance.getToken().then((newToken) {
+    if (newToken != null) {
+      messagingToken = newToken;
+      Util.toast('FirebaseMessaging initial $newToken', show: false);
+    } else {
+      Util.toast('APNS token is null (expected on simulator)', show: false);
+    }
+  }).catchError((error) {
+    Util.toast('Error getting FirebaseMessaging token: $error', show: false);
+  });
+
+  // Listen for token refresh with null-check
+  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+    if (newToken != null) {
+      messagingToken = newToken;
+      Util.toast('FirebaseMessaging refreshed $newToken', show: false);
+    } else {
+      Util.toast('APNS token refresh returned null', show: false);
+    }
+  });
+
+  firebaseUser = firebase_auth.FirebaseAuth.instance.currentUser;
+
+  firebase_auth.FirebaseAuth.instance
+      .authStateChanges()
+      .listen((newFirebaseUser) async {
+    firebaseUser = newFirebaseUser;
+    Util.toast('FirebaseAuth $newFirebaseUser', show: false);
+    if (newFirebaseUser != null) {
+      updateUser(refresh: true);
+    } else {
+      user = null;
+    }
+  });
+
+  updatePosition();
+
+  super.onInit();
+}
 
   updatePosition() async {
     Util.currentPosition().then((newPosition) {

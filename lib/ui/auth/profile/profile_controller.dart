@@ -11,90 +11,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-// class ProfileController extends GetxController {
-//   var isAdding = false.obs;
-
-//   RxMap<String, dynamic> map = RxMap({
-//     'file': null,
-//   });
-
-//   // final _authApi = Get.put(AuthApi());
-
-//   final _userApi = Get.put(UserApi());
-
-//   final String? action;
-
-//   final imagePicker = ImagePicker();
-
-//   final stateController = Get.put(
-//     StateController(),
-//     permanent: true,
-//     tag: Util.tag(),
-//   );
-
-//   ProfileController({
-//     required this.action,
-//   });
-
-//   @override
-//   void onInit() {
-//     map['displayName'] =
-//         stateController.user?.displayName ?? Session.user?.displayName;
-//     map['username'] = stateController.user?.username ??
-//         Session.user?.email?.substring(0, Session.user?.email?.indexOf('@'));
-//     map['description'] = stateController.user?.description ?? '';
-
-//     map.refresh();
-
-//     super.onInit();
-//   }
-
-//   add() async {
-//     if (isAdding.isTrue) return;
-
-//     isAdding.value = true;
-
-//     try {
-//       var username = (map['username'] as String?)?.trim();
-
-//       var displayName = (map['displayName'] as String?)?.trim();
-
-//       var description = (map['description'] as String?)?.trim();
-
-//       if (username?.isNotEmpty != true) throw 'Enter your username';
-
-//       if (displayName?.isNotEmpty != true) throw 'Enter your name';
-
-//       Map<String, dynamic> data = {
-//         'username': username,
-//         'displayName': displayName,
-//         'description': description,
-//       };
-
-//       if (map['file'] != null) data['file'] = map['file'];
-
-//       // if (action == 'register') {
-//       //   stateController.user = (await _authApi.register(data)).data!.user!;
-//       // } else {
-//       //   stateController.user =
-//       //       (await _userApi.update(stateController.user!.id!, data))
-//       //           .data!
-//       //           .user!;
-//       // }
-
-//       Get.back(
-//         result: true,
-//       );
-
-//       Util.toast('Account updated');
-//     } catch (e) {
-//       Util.toast(e);
-//     }
-
-//     isAdding.value = false;
-//   }
-// }
-
 class ProfileController extends GetxController {
   RxBool isAdding = false.obs;
   RxMap<String, dynamic> map = RxMap({
@@ -169,6 +85,33 @@ class ProfileController extends GetxController {
       Util.toast(e.toString());
     }
   }
+
+  Future<void> deleteAccount() async {
+    final fUser = FirebaseAuth.instance.currentUser;
+    if (fUser == null) return; // not logged in
+
+    // 1) Get the Firebase ID token for auth
+    final token = await FirebaseAuth.instance.currentUser?.getIdToken(true);
+  try {
+    // Optionally show a loading indicator here
+    final response = await Dio().delete(
+      '${kBaseApiUrl}v1/user/me', // new endpoint
+      options: Options(
+        headers: {
+          // Include any required auth headers, for example:
+          'Authorization': 'Bearer $token',
+        },
+      ),
+    );
+    // After successful deletion, log the user out
+    await Session.logout();
+    Util.toast('Account deleted successfully');
+    // Optionally, navigate to the login screen or exit the app
+  } catch (e) {
+    Util.toast('Failed to delete account: ${e.toString()}');
+  }
+}
+
 
   void _loadUserData() async {
     // 1) Try to load from Firestore

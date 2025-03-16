@@ -6,7 +6,7 @@ import 'package:baustaka/helper/util.dart';
 import 'package:baustaka/ui/files/local/file_preview_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_cropper/image_cropper.dart';
+import 'package:crop_your_image/crop_your_image.dart';
 import 'package:photo_view/photo_view.dart';
 
 class FilePreviewWidget extends GetResponsiveView<FilePreviewController> {
@@ -97,22 +97,17 @@ class FilePreviewWidget extends GetResponsiveView<FilePreviewController> {
                     try {
                       var index = controller.page.value;
 
-                      var croppedFile = await ImageCropper().cropImage(
-                        sourcePath: controller.files[index].path,
-                        uiSettings: [
-                          AndroidUiSettings(
-                            toolbarTitle: 'Edit',
-                            toolbarColor: Colors.black,
-                            toolbarWidgetColor: Colors.white,
-                            statusBarColor: Colors.black,
-                            activeControlsWidgetColor: Palette.primary,
-                            backgroundColor: Colors.black,
+                      var croppedFile = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CropPage(
+                            file: controller.files[index],
                           ),
-                        ],
+                        ),
                       );
 
                       if (croppedFile != null) {
-                        controller.files[index] = File(croppedFile.path);
+                        controller.files[index] = croppedFile;
 
                         controller.files.refresh();
 
@@ -197,4 +192,47 @@ class FilePreviewWidget extends GetResponsiveView<FilePreviewController> {
                 ),
         ),
       );
+}
+
+class CropPage extends StatelessWidget {
+  final File file;
+
+  CropPage({required this.file});
+
+  @override
+  Widget build(BuildContext context) {
+    final _cropController = CropController();
+
+    return FutureBuilder(
+      future: file.readAsBytes(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Edit'),
+              actions: [
+                IconButton(
+                  icon: Icon(Icons.check),
+                  onPressed: () async {
+                    _cropController.crop();
+                  },
+                ),
+              ],
+            ),
+            body: Crop(
+              image: snapshot.data!,
+              controller: _cropController,
+              onCropped: (croppedData) async {
+                final croppedFile = File('${file.path}_cropped.jpg');
+                await croppedFile.writeAsBytes(croppedData as List<int>);
+                Navigator.pop(context, croppedFile);
+              },
+            ),
+          );
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
+    );
+  }
 }

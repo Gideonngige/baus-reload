@@ -154,6 +154,7 @@ class EmailController extends GetxController {
       final oauthCredential = OAuthProvider('apple.com').credential(
         idToken: appleCredential.identityToken,
         rawNonce: rawNonce,
+        accessToken: appleCredential.authorizationCode,
       );
 
       await FirebaseAuth.instance.signInWithCredential(oauthCredential);

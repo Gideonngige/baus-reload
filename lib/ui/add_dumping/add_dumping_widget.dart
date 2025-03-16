@@ -11,12 +11,11 @@ import 'package:baustaka/ui/_/title_text.dart';
 import 'package:baustaka/ui/map/map_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_google_places/flutter_google_places.dart';
+import 'package:google_place/google_place.dart' as google_place;
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_webservice/places.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
@@ -145,43 +144,21 @@ class AddDumpingWidget extends ResponsiveWidget<AddDumpingController> {
                               child: GestureDetector(
                                 onTap: () async {
                                   try {
-                                    var prediction =
-                                        await PlacesAutocomplete.show(
-                                      context: screen.context,
-                                      apiKey: kGoogleApiKey,
-                                      mode: Mode.overlay,
-                                      overlayBorderRadius:
-                                          BorderRadius.circular(8),
-                                      components: [
-                                        Component(Component.country, 'ke')
-                                      ],
-                                      strictbounds: false,
-                                      types: [],
-                                      proxyBaseUrl:
-                                          kIsWeb ? kProxyBaseUrl : null,
+                                    var googlePlace = google_place.GooglePlace(kGoogleApiKey);
+                                    var result = await googlePlace.autocomplete.get(
+                                      '',
+                                      components: [google_place.Component('country', 'ke')],
                                     );
 
-                                    if (prediction != null &&
-                                        prediction.placeId != null) {
-                                      final place = await GoogleMapsPlaces(
-                                        apiKey: kGoogleApiKey,
-                                        apiHeaders:
-                                            await const GoogleApiHeaders()
-                                                .getHeaders(),
-                                        baseUrl: kIsWeb ? kProxyBaseUrl : null,
-                                      ).getDetailsByPlaceId(
-                                          prediction.placeId!);
+                                    if (result != null && result.predictions!.isNotEmpty) {
+                                      var prediction = result.predictions!.first;
+                                      var details = await googlePlace.details.get(prediction.placeId!);
 
-                                      if (place.hasNoResults) {
-                                        throw 'Something went wrong. Try again';
+                                      if (details != null && details.result != null) {
+                                        controller.area.value = prediction.description;
+                                        controller.latitude = details.result!.geometry!.location!.lat;
+                                        controller.longitude = details.result!.geometry!.location!.lng;
                                       }
-
-                                      controller.area.value =
-                                          prediction.description;
-                                      controller.latitude =
-                                          place.result.geometry!.location.lat;
-                                      controller.longitude =
-                                          place.result.geometry!.location.lng;
                                     }
                                   } catch (e) {
                                     Util.toast(e);
@@ -396,178 +373,3 @@ class PanelWidget extends StatelessWidget {
     );
   }
 }
-
-
-   // ListView(
-        //   children: [
-        //     Container(
-        //       margin: const EdgeInsets.all(16),
-        //       child: ClipRRect(
-        //         borderRadius: BorderRadius.circular(8),
-        //         child: Obx(
-        //           () => controller.bytes.value != null
-        //               ? Image.memory(
-        //                   controller.bytes.value!,
-        //                   fit: BoxFit.cover,
-        //                 )
-        //               : Container(),
-        //         ),
-        //       ),
-        //     ),
-        //     const SizedBox(
-        //       height: 16,
-        //     ),
-        //     Container(
-        //       margin: const EdgeInsets.symmetric(
-        //         horizontal: 16,
-        //       ),
-        //       child: Text(
-        //         'Location',
-        //         style: Theme.of(screen.context).textTheme.bodySmall,
-        //       ),
-        //     ),
-        //     const SizedBox(
-        //       height: 16,
-        //     ),
-        //     Row(
-        //       children: [
-        //         const SizedBox(
-        //           width: 16,
-        //         ),
-        //         Expanded(
-        //           child: GestureDetector(
-        //             onTap: () async {
-        //               try {
-        //                 var prediction = await PlacesAutocomplete.show(
-        //                   context: screen.context,
-        //                   apiKey: kGoogleApiKey,
-        //                   mode: Mode.overlay,
-        //                   overlayBorderRadius: BorderRadius.circular(8),
-        //                   components: [Component(Component.country, 'ke')],
-        //                   strictbounds: false,
-        //                   types: [],
-        //                   proxyBaseUrl: kIsWeb ? kProxyBaseUrl : null,
-        //                 );
-
-        //                 if (prediction != null && prediction.placeId != null) {
-        //                   final place = await GoogleMapsPlaces(
-        //                     apiKey: kGoogleApiKey,
-        //                     apiHeaders:
-        //                         await const GoogleApiHeaders().getHeaders(),
-        //                     baseUrl: kIsWeb ? kProxyBaseUrl : null,
-        //                   ).getDetailsByPlaceId(prediction.placeId!);
-
-        //                   if (place.hasNoResults) {
-        //                     throw 'Something went wrong. Try again';
-        //                   }
-
-        //                   controller.area.value = prediction.description;
-        //                   controller.latitude =
-        //                       place.result.geometry!.location.lat;
-        //                   controller.longitude =
-        //                       place.result.geometry!.location.lng;
-        //                 }
-        //               } catch (e) {
-        //                 Util.toast(e);
-        //               }
-        //             },
-        //             child: Container(
-        //               decoration: BoxDecoration(
-        //                 color: Colors.grey.shade200,
-        //                 borderRadius: BorderRadius.circular(8),
-        //               ),
-        //               padding: const EdgeInsets.symmetric(
-        //                 horizontal: 16,
-        //                 vertical: 12,
-        //               ),
-        //               child: Row(
-        //                 children: [
-        //                   const Icon(Icons.search),
-        //                   const SizedBox(
-        //                     width: 8,
-        //                   ),
-        //                   Expanded(
-        //                     child: Obx(() =>
-        //                         Text(controller.area.value ?? 'Search place')),
-        //                   ),
-        //                 ],
-        //               ),
-        //             ),
-        //           ),
-        //         ),
-        //         const SizedBox(
-        //           width: 8,
-        //         ),
-        //         IconButton(
-        //           onPressed: () async =>
-        //               await controller.updateCurrentLocation(),
-        //           icon: Obx(
-        //             () => controller.isRequestingMyLocation.isTrue
-        //                 ? const CircularProgressIndicator()
-        //                 : const Icon(
-        //                     Icons.my_location_outlined,
-        //                   ),
-        //           ),
-        //         ),
-        //       ],
-        //     ),
-        //     Container(
-        //       padding: const EdgeInsets.symmetric(
-        //         horizontal: 16,
-        //       ),
-        //       margin: const EdgeInsets.only(
-        //         right: 16,
-        //         left: 16,
-        //         top: 16,
-        //         bottom: 16,
-        //       ),
-        //       decoration: BoxDecoration(
-        //         color: Colors.grey.shade100,
-        //         borderRadius: BorderRadius.circular(8),
-        //       ),
-        //       child: Row(
-        //         children: [
-        //           Expanded(
-        //             child: TextField(
-        //               decoration: const InputDecoration(
-        //                 labelText: 'Message',
-        //                 border: InputBorder.none,
-        //               ),
-        //               textCapitalization: TextCapitalization.sentences,
-        //               minLines: 4,
-        //               maxLines: 8,
-        //               onChanged: (value) => controller.message.value = value,
-        //             ),
-        //           ),
-        //         ],
-        //       ),
-        //     ),
-        //     Container(
-        //       margin: const EdgeInsets.only(
-        //           right: 16, left: 16, top: 16, bottom: 24),
-        //       child: ElevatedButton(
-        //         onPressed: () async {
-        //           if (controller.check()) {
-        //             await Get.dialog(
-        //               DialogWidget(
-        //                 title: 'Report Illegal Dumping?',
-        //                 content:
-        //                     'You are about to report illegal dumping. Please confirm.',
-        //                 onConfirm: () async {
-        //                   await controller.add();
-        //                 },
-        //               ),
-        //             );
-        //           }
-        //         },
-        //         child: Obx(() => controller.isAdding.isTrue
-        //             ? const CircularProgressIndicator(
-        //                 backgroundColor: Colors.white,
-        //                 strokeWidth: 2,
-        //               )
-        //             : const Text('Report')),
-        //       ),
-        //     ),
-        //   ],
-        // ),
-    

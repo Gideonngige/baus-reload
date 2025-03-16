@@ -9,6 +9,9 @@
 .history
 .svn/
 
+# Do not push android folder in this branch
+android/
+
 # IntelliJ related
 *.iml
 *.ipr
