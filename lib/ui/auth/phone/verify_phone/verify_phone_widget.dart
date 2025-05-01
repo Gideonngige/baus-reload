@@ -1,197 +1,150 @@
-import 'package:baustaka/config/images.dart';
-import 'package:baustaka/config/palette.dart';
-import 'package:baustaka/config/theme.dart';
 import 'package:baustaka/helper/util.dart';
-import 'package:baustaka/ui/_/keyboard_widget.dart';
-import 'package:baustaka/ui/_/progress_widget.dart';
 import 'package:baustaka/ui/auth/phone/verify_phone/verify_phone_controller.dart';
+import 'package:baustaka/ui/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 
-class VerifyPhoneWidget extends GetResponsiveView<VerifyPhoneController> {
+class VerifyPhoneWidget extends StatelessWidget {
   final String phoneNumber;
   final String? action;
-
+  
   VerifyPhoneWidget({
-    super.key,
     required this.phoneNumber,
     this.action,
   });
 
   @override
-  String get tag => Util.tag();
+  Widget build(BuildContext context) {
+    // Initialize controller with parameters
+    final controller = Get.put(
+      VerifyPhoneController(
+        phoneNumber: phoneNumber,
+        token: Get.arguments?['token'] ?? '',
+        hasEmail: Get.arguments?['hasEmail'] ?? false,
+      ),
+    );
+    
+    return Scaffold(
+      appBar: AppBar(title: Text('Verify Phone')),
+      body: Obx(() {
+        if (controller.showEmailLinkForm.isTrue) {
+          return _buildEmailLinkForm(controller);
+        }
+        return _buildVerificationForm(controller);
+      }),
+    );
+  }
 
-  @override
-  VerifyPhoneController get controller => Get.put(
-        VerifyPhoneController(
-          phoneNumber: '+$phoneNumber',
-          action: action,
-        ),
-        tag: tag,
-      );
-
-  @override
-  Widget? tablet() => Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-        ),
-        body: KeyboardWidget(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Stack(
-                  children: [
-                    AspectRatio(
-                      aspectRatio: 360 / 320,
-                      child: Container(
-                        width: double.infinity,
-                        decoration: const BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage(Images.kImgTopBanner),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.center,
-                      heightFactor: 2,
-                      child: SizedBox(
-                        width: 176,
-                        child: Image.asset(Images.kImgBannerLogo),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 32,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                  ),
-                  child: Text(
-                    'Enter code sent to your phone',
-                    style: Theme.of(screen.context).appBarTheme.titleTextStyle,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                  ),
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        const TextSpan(text: 'We sent it to '),
-                        TextSpan(
-                          text: '+$phoneNumber',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Palette.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    textAlign: TextAlign.center,
-                    style: Theme.of(screen.context).textTheme.titleSmall,
-                  ),
-                ),
-                const SizedBox(
-                  height: 32,
-                ),
-                Container(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                  ),
-                  child: TextField(
-                    onChanged: (value) => controller.smsCode = value,
-                    keyboardType: TextInputType.number,
-                    textAlignVertical: TextAlignVertical.center,
-                    decoration: kInputDecoration.copyWith(
-                      hintText: '012345',
-                      prefixIcon: const Icon(Icons.lock_open),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 32,
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                  ),
-                  child: GestureDetector(
-                    onTap: () async => await controller.verify(),
-                    child: Obx(
-                      () => Text.rich(
-                        TextSpan(
-                          children: [
-                            TextSpan(
-                              text: 'Didn\'t receive the OTP? ',
-                              style: Theme.of(screen.context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                    color: Palette.textSecondary,
-                                  ),
-                            ),
-                            TextSpan(
-                              text: 'Resend OTP',
-                              style: Theme.of(screen.context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                      color: Theme.of(screen.context)
-                                          .primaryColor),
-                            ),
-                            if (controller.seconds.value > 0)
-                              TextSpan(
-                                text: ' in ${controller.seconds.value} seconds',
-                                style: Theme.of(screen.context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith(
-                                      color: Palette.textSecondary,
-                                    ),
-                              )
-                          ],
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 32,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                  ),
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      await controller.signIn();
-                    },
-                    child: Obx(
-                      () => controller.isVerifying.isTrue ||
-                              controller.isSigningIn.isTrue
-                          ? const ProgressWidget()
-                          : const Text('Verify'),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 64,
-                ),
-              ],
+  Widget _buildVerificationForm(VerifyPhoneController controller) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Verify your phone',
+            style: Get.textTheme.headlineSmall,
+          ),
+          SizedBox(height: 8),
+          Text(
+            'We sent a verification code to ${controller.phoneNumber}',
+            style: Get.textTheme.bodyMedium,
+          ),
+          SizedBox(height: 32),
+          PinCodeTextField(
+            appContext: Get.context!,
+            length: 6,
+            onChanged: (value) => controller.smsCode = value,
+            keyboardType: TextInputType.number,
+            pinTheme: PinTheme(
+              shape: PinCodeFieldShape.box,
+              borderRadius: BorderRadius.circular(8),
+              fieldHeight: 50,
+              fieldWidth: 40,
+              activeFillColor: Colors.white,
+              inactiveFillColor: Colors.white,
+              selectedFillColor: Colors.white,
+              activeColor: Get.theme.primaryColor,
+              inactiveColor: Colors.grey,
+              selectedColor: Get.theme.primaryColor,
             ),
           ),
-        ),
-      );
+          SizedBox(height: 16),
+          Obx(() => controller.seconds.value > 0
+              ? Text(
+                  'Resend code in ${controller.seconds.value} seconds',
+                  style: Get.textTheme.bodySmall,
+                )
+              : GestureDetector(
+                  onTap: controller.resendOtp,
+                  child: Text(
+                    'Resend code',
+                    style: Get.textTheme.bodySmall?.copyWith(
+                      color: Get.theme.primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                )),
+          SizedBox(height: 32),
+          Button(
+            onPressed: controller.signIn,
+            text: 'Verify',
+            isLoading: controller.isSigningIn.value,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmailLinkForm(VerifyPhoneController controller) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Link Email to Your Account',
+            style: Get.textTheme.headlineSmall,
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Add an email to your account so you can sign in without SMS verification in the future.',
+            style: Get.textTheme.bodyMedium,
+          ),
+          SizedBox(height: 24),
+          TextField(
+            decoration: InputDecoration(
+              labelText: 'Email',
+              border: OutlineInputBorder(),
+            ),
+            keyboardType: TextInputType.emailAddress,
+            onChanged: (value) => controller.email = value,
+          ),
+          SizedBox(height: 16),
+          TextField(
+            decoration: InputDecoration(
+              labelText: 'Password',
+              border: OutlineInputBorder(),
+            ),
+            obscureText: true,
+            onChanged: (value) => controller.password = value,
+          ),
+          SizedBox(height: 32),
+          Button(
+            onPressed: controller.linkEmail,
+            text: 'Link Email & Continue',
+            isLoading: controller.emailLinkingInProgress.value,
+          ),
+          SizedBox(height: 16),
+          Center(
+            child: TextButton(
+              onPressed: controller.skipEmailLinking,
+              child: Text('Skip for now'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

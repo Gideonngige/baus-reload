@@ -5,6 +5,7 @@ import 'package:baustaka/ui/auth/email/change_email/change_email_widget.dart';
 import 'package:baustaka/ui/auth/email/change_password/change_password_widget.dart';
 import 'package:baustaka/ui/auth/email/email/email_widget.dart';
 import 'package:baustaka/ui/auth/email/forgot_password/forgot_password_widget.dart';
+import 'package:baustaka/ui/auth/email/link_email/link_email_screen.dart';
 import 'package:baustaka/ui/auth/email/register/register_widget.dart';
 import 'package:baustaka/ui/auth/email/verify_email/verify_email_widget.dart';
 import 'package:baustaka/ui/auth/phone/change_phone/change_phone_widget.dart';
@@ -97,6 +98,10 @@ final kRoutes = [
   GetPage(
     name: Routes.kRegister,
     page: () => RegisterWidget(),
+  ),
+  GetPage(
+    name: Routes.kLinkEmail,
+    page: () => LinkEmailScreen(),
   ),
 
   // Phone

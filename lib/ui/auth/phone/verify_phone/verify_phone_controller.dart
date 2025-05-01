@@ -12,239 +12,187 @@ import 'package:dio/dio.dart';
 class VerifyPhoneController extends GetxController {
   var isVerifying = false.obs;
   var isSigningIn = false.obs;
+  var showEmailLinkForm = false.obs;
+  var emailLinkingInProgress = false.obs;
 
   String smsCode = '';
+  String? email;
+  String? password;
 
   final String phoneNumber;
-  final String? action;
-
-  String? _verificationId;
-
-  ConfirmationResult? _confirmationResult;
-
-  PhoneAuthCredential? _phoneAuthCredential;
+  String token;
+  final bool hasEmail;
 
   RxInt seconds = RxInt(0);
-
   Timer? timer;
-
   final _waitPeriod = 60;
-
-  Future<void> checkPhoneInServer(String phone) async {
-    try {
-      // GET /v1/user?phoneNumber=<phone>
-      final response = await Dio().get(
-        '${kBaseApiUrl}v1/user',
-        queryParameters: {'phoneNumber': phone},
-      );
-      // If successful => user found => throw 'Phone number is already registered'
-      // throw 'Phone number already exists, kindly use email sign in method';
-    } on DioException catch (e) {
-      // If server responds 404 => phone not in use => proceed
-      if (e.response?.statusCode == 404) {
-        // "User not found" => means phone not in use => good
-        await _syncPhoneWithServer(phone);
-        return;
-      }
-      // If some other code => rethrow or show error
-      rethrow;
-    }
-  }
-
-  Future<void> _syncPhoneWithServer(String phone) async {
-    final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser == null) return; // not signed in
-
-    try {
-      // 1) Get ID token
-      final token = await currentUser.getIdToken();
-
-      // remove any spaces in the phone
-      phone = phone.replaceAll(RegExp(r'\s+'), '');
-
-      // 2) POST to /v1/auth/firebase with `idToken` + `phoneNumber`
-      final response = await Dio().post(
-        '${kBaseApiUrl}v1/auth/firebase', // or ensure a '/' if needed
-        data: {
-          'idToken': token,
-          'phoneNumber': phone, // pass the verified phone
-        },
-      );
-
-      final data = response.data;
-      print('Phone updated server user: ${data['user']}');
-    } on DioException catch (e) {
-      Util.toast(e.response?.data?['error'] ?? e.message);
-    } catch (e) {
-      print('syncPhoneWithServer error: $e');
-      Util.toast(e.toString());
-    }
-  }
 
   VerifyPhoneController({
     required this.phoneNumber,
-    this.action,
+    required this.token,
+    this.hasEmail = false,
   });
 
   @override
   void onReady() async {
     super.onReady();
-
-    await verify();
+    startTimer();
   }
 
-  verify() async {
-    if (isVerifying.isTrue || seconds.value > 0) return;
+  void startTimer() {
+    seconds.value = _waitPeriod;
+    timer?.cancel();
+    timer = Timer.periodic(
+      const Duration(seconds: 1),
+      (timer) => seconds.value = seconds.value < 1 ? 0 : seconds.value - 1,
+    );
+  }
 
-    if (Session.user != null && action != 'update') {
-      if (Get.currentRoute.contains(Routes.kVerifyPhoneNumber)) {
-        Get.back(
-          result: true,
-        );
-      }
-
-      return;
-    }
-
-    isVerifying.value = true;
-
+  Future<void> resendOtp() async {
+    if (seconds.value > 0) return;
+    
     try {
-      if (GetPlatform.isWeb) {
-        _confirmationResult =
-            await FirebaseAuth.instance.signInWithPhoneNumber(phoneNumber);
-
-        isVerifying.value = false;
-      } else {
-        await FirebaseAuth.instance.verifyPhoneNumber(
-          phoneNumber: phoneNumber,
-          verificationCompleted:
-              (PhoneAuthCredential phoneAuthCredential) async {
-            isVerifying.value = false;
-
-            _phoneAuthCredential = phoneAuthCredential;
-
-            await _signIn();
-
-            seconds.value = _waitPeriod;
-          },
-          verificationFailed: (FirebaseAuthException e) {
-            isVerifying.value = false;
-
-            seconds.value = 0;
-
-            Util.toast(e.message);
-          },
-          codeSent: (String verificationId, int? token) {
-            if (kDebugMode) {
-              print('codeSent $token $verificationId');
-            }
-
-            isVerifying.value = false;
-
-            _verificationId = verificationId;
-
-            seconds.value = _waitPeriod;
-
-            timer?.cancel();
-
-            timer = Timer.periodic(
-              const Duration(
-                seconds: 1,
-              ),
-              (timer) =>
-                  seconds.value = seconds.value < 1 ? 0 : seconds.value - 1,
-            );
-          },
-          codeAutoRetrievalTimeout: (String verificationId) {
-            if (kDebugMode) {
-              print('codeAutoRetrievalTimeout $verificationId');
-            }
-
-            isVerifying.value = false;
-
-            _verificationId = verificationId;
-
-            seconds.value = _waitPeriod;
-          },
-          timeout: const Duration(seconds: 90),
-        );
+      final response = await Dio().post(
+        '${kBaseApiUrl}v1/auth/phone-check',
+        data: {'phoneNumber': phoneNumber},
+      );
+      
+      final data = response.data;
+      if (data['exists'] == true) {
+        // Got a new token
+        token = data['token'];
+        startTimer();
+        Util.toast('New verification code sent!');
       }
-    } on FirebaseAuthException catch (e) {
-      Util.toast(e.message);
-
-      isVerifying.value = false;
-
-      seconds.value = 0;
     } catch (e) {
-      Util.toast(e);
-
-      isVerifying.value = false;
-
-      seconds.value = 0;
+      Util.toast('Failed to resend code: ${e.toString()}');
     }
   }
 
   signIn() async {
-    try {
-      if (GetPlatform.isWeb) {
-        if (_confirmationResult == null) {
-          await verify();
-
-          throw 'Sending...';
-        }
-      } else if (_verificationId == null) {
-        await verify();
-
-        throw 'Sending...';
-      }
-
-      if (smsCode.trim().isEmpty) throw 'Enter code';
-
-      if (!GetPlatform.isWeb) {
-        _phoneAuthCredential = PhoneAuthProvider.credential(
-          verificationId: _verificationId!,
-          smsCode: smsCode.trim(),
-        );
-      }
-
-      _signIn();
-    } on FirebaseAuthException catch (e) {
-      Util.toast(e.message);
-    } catch (e) {
-      Util.toast(e);
-    }
-  }
-
-  _signIn() async {
     if (isSigningIn.isTrue) return;
-
     isSigningIn.value = true;
 
     try {
-      if (GetPlatform.isWeb) {
-        await _confirmationResult!.confirm(smsCode.trim());
-      } else {
-        if (action == 'update') {
-          await FirebaseAuth.instance.currentUser
-              ?.updatePhoneNumber(_phoneAuthCredential!);
-        } else {
-          await FirebaseAuth.instance
-              .signInWithCredential(_phoneAuthCredential!);
-        }
-      }
+      if (smsCode.trim().isEmpty) throw 'Enter verification code';
 
-      await checkPhoneInServer(phoneNumber);
-
-      Get.back(
-        result: true,
+      // Verify OTP with our backend
+      final response = await Dio().post(
+        '${kBaseApiUrl}v1/auth/phone-verify',
+        data: {
+          'token': token,
+          'code': smsCode.trim(),
+        },
       );
-      Session.login(splash: true);
-    } on FirebaseAuthException catch (e) {
-      Util.toast(e.message);
-    } catch (e) {
-      Util.toast(e);
-    }
 
-    isSigningIn.value = false;
+      final data = response.data;
+      
+      // Sign in with the custom token
+      await FirebaseAuth.instance.signInWithCustomToken(data['token']);
+      
+      // Sync with server
+      await syncWithServer();
+      
+      // If user doesn't have an email linked, show the form to add email
+      if (!hasEmail) {
+        showEmailLinkForm.value = true;
+        isSigningIn.value = false;
+        return;
+      }
+      
+      // Otherwise, proceed to login
+      Get.back(result: true);
+      Session.login(splash: true);
+      
+    } catch (e) {
+      Util.toast(e.toString());
+      isSigningIn.value = false;
+    }
+  }
+
+  linkEmail() async {
+    if (emailLinkingInProgress.isTrue) return;
+    emailLinkingInProgress.value = true;
+    
+    try {
+      if (email == null || email!.trim().isEmpty) {
+        throw 'Please enter an email address';
+      }
+      
+      if (password == null || password!.trim().isEmpty || password!.length < 6) {
+        throw 'Password must be at least 6 characters';
+      }
+      
+      // Get current user
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) throw 'User not signed in';
+      
+      // Create email credential
+      final credential = EmailAuthProvider.credential(
+        email: email!.trim(),
+        password: password!.trim(),
+      );
+      
+      // Link with credential
+      try {
+        await user.linkWithCredential(credential);
+      } catch (e) {
+        // If the email is already in use, show a clear error
+        if (e is FirebaseAuthException && e.code == 'email-already-in-use') {
+          throw 'This email is already in use by another account. Please use a different email.';
+        }
+        rethrow;
+      }
+      
+      // Update the email in our backend
+      await Dio().post(
+        '${kBaseApiUrl}v1/auth/link-email',
+        data: {
+          'uid': user.uid,
+          'email': email!.trim(),
+          'password': password!.trim(),
+        },
+      );
+      
+      // Show success message
+      Util.toast('Email linked successfully! You can now sign in with email and password.');
+      
+      // Continue to app
+      Get.back(result: true);
+      Session.login(splash: true);
+      
+    } catch (e) {
+      Util.toast(e.toString());
+    } finally {
+      emailLinkingInProgress.value = false;
+    }
+  }
+
+  skipEmailLinking() {
+    // Just continue without linking email
+    Get.back(result: true);
+    Session.login(splash: true);
+  }
+
+  Future<void> syncWithServer() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return;
+
+    try {
+      final token = await currentUser.getIdToken();
+      
+      final response = await Dio().post(
+        '${kBaseApiUrl}v1/auth/firebase',
+        data: {
+          'idToken': token,
+          'phoneNumber': phoneNumber,
+        },
+      );
+      
+      final data = response.data;
+      print('Phone auth server user: ${data['user']}');
+    } catch (e) {
+      print('Error syncing with server: $e');
+    }
   }
 }
