@@ -23,7 +23,7 @@ def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '
 
 android {
     namespace "ke.co.baustaka.client"
-    compileSdkVersion 34
+    compileSdk 35
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -41,7 +41,7 @@ android {
     defaultConfig {
         applicationId rootProject.ext.applicationId
         minSdkVersion 24
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
@@ -51,7 +51,7 @@ android {
         releaseConfig {
             keyAlias rootProject.ext.keyAlias
             keyPassword rootProject.ext.keyPassword
-            storeFile file('/home/mwiti/baus-reload/android/.config/kotlina.jks')
+            storeFile file('/Users/mwiti/dev/baus/baus-reload/android/.config/kotlina.jks')
             storePassword rootProject.ext.storePassword
         }
     }
