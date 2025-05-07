@@ -154,12 +154,17 @@ class VerifyPhoneController extends GetxController {
         },
       );
       
-      // Show success message
-      Util.toast('Email linked successfully! You can now sign in with email and password.');
+      // Save email temporarily to show in message
+      final linkedEmail = email!.trim();
       
-      // Continue to app
-      Get.back(result: true);
-      Session.login(splash: true);
+      // Log out the user
+      await FirebaseAuth.instance.signOut();
+      
+      // Show success message
+      Util.toast('Email linked successfully! Please sign in with your email and password.');
+      
+      // Navigate to email login page
+      Get.offAllNamed(Routes.kLoginWithEmail, arguments: {'email': linkedEmail});
       
     } catch (e) {
       Util.toast(e.toString());
