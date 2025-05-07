@@ -6,12 +6,13 @@ class Routes {
   static const kNotifications = '/notifications';
 
   // Email
-  static const kLoginWithEmail = '/login-with-email';
-  static const kRegister = '/register';
+  static const kLoginWithEmail = '/auth/email';
+  static const kRegister = '/auth/register';
   static const kForgotPassword = '/forgot-password';
   static const kChangePassword = '/change-password';
   static const kChangeEmail = '/change-email';
   static const kVerifyEmail = '/verify-email';
+  static const kLinkEmail = '/auth/link-email';
 
   // Phone
   static const kChangePhoneNumber = '/change-phone-number';

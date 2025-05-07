@@ -18,6 +18,13 @@ class EmailController extends GetxController {
   void onReady() {
     super.onReady();
     showUpdateAlert();
+    
+    // Check if email was passed in arguments (for users who just linked their email)
+    if (Get.arguments != null && Get.arguments is Map && Get.arguments['email'] != null) {
+      email = Get.arguments['email'];
+      // Show a helpful message
+      Util.toast('Please sign in with your newly linked email and password');
+    }
   }
   void showUpdateAlert() {
     Get.dialog(

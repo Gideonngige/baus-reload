@@ -89,6 +89,7 @@ class EmailWidget extends GetResponsiveView<EmailController> {
                       prefixIcon: const Icon(Icons.email),
                     ),
                     onChanged: (value) => controller.email = value,
+                    controller: TextEditingController(text: controller.email),
                     keyboardType: TextInputType.emailAddress,
                     textAlignVertical: TextAlignVertical.center,
                   ),

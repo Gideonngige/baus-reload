@@ -12,6 +12,7 @@ import 'package:baustaka/socket/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class HomeController extends GetxController {
@@ -68,6 +69,9 @@ class HomeController extends GetxController {
       // 1) Get the Firebase user directly from Auth
       final fUser = firebase_auth.FirebaseAuth.instance.currentUser;
       if (fUser == null) throw 'Please log in';
+
+      // Check if this user needs to add an email
+      checkIfNeedsEmailLinking(fUser);
 
       // If they're using email/password, check if verified
       final isEmailPasswordUser =
@@ -132,6 +136,38 @@ class HomeController extends GetxController {
     }
 
     isFetching.value = false;
+  }
+
+  void checkIfNeedsEmailLinking(firebase_auth.User user) {
+    // Check if the user is phone-only (has phoneNumber provider but no password provider)
+    final hasPhoneProvider = user.providerData.any((p) => p.providerId == 'phone');
+    final hasEmailProvider = user.providerData.any((p) => p.providerId == 'password');
+    
+    if (hasPhoneProvider && !hasEmailProvider && user.email == null) {
+      // This user only has phone auth, show prompt to add email
+      Get.dialog(
+        AlertDialog(
+          title: const Text('Add Email to Your Account'),
+          content: const Text(
+            'For improved security and easier sign-in, we recommend adding an email to your account. Would you like to do that now?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(),
+              child: const Text('Not Now'),
+            ),
+            TextButton(
+              onPressed: () {
+                Get.back();
+                Get.toNamed(Routes.kLinkEmail);
+              },
+              child: const Text('Add Email'),
+            ),
+          ],
+        ),
+        barrierDismissible: true,
+      );
+    }
   }
 
   @override

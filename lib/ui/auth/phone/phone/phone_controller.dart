@@ -1,13 +1,17 @@
 import 'package:baustaka/config/routes.dart';
 import 'package:baustaka/helper/util.dart';
 import 'package:get/get.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:dio/dio.dart';
+import 'package:baustaka/config/env.dart';
 
 class PhoneController extends GetxController {
   String? phoneNumber;
+  var isChecking = false.obs;
 
   signIn() async {
+    if (isChecking.isTrue) return;
+    isChecking.value = true;
+
     try {
       if (phoneNumber == null || phoneNumber!.length < 4) {
         throw 'Check your phone number';
@@ -16,28 +20,38 @@ class PhoneController extends GetxController {
       // 1) Format phone
       String formattedPhone = _formatPhone(phoneNumber!);
 
-      // 2) Check if any user doc has this phoneNumber
-      final snap = await FirebaseFirestore.instance
-          .collection('users')
-          .where('phoneNumber', isEqualTo: formattedPhone)
-          .limit(1)
-          .get();
-
-      if (snap.docs.isNotEmpty) {
-        // That means some existing user doc is using phoneNumber
-        throw 'Phone number already in use. Please sign in with email or Google/Apple.';
-      }
-
-      // 3) If not found, proceed to verification flow
-      // For example:
-      final result = await Get.toNamed(
-        '${Routes.kVerifyPhoneNumber}$formattedPhone',
+      // 2) Check with our backend if this phone exists in Firebase Auth
+      final response = await Dio().post(
+        '${kBaseApiUrl}v1/auth/phone-check',
+        data: {'phoneNumber': formattedPhone},
       );
 
-      if (result == true) Get.back(result: true);
+      final data = response.data;
+      
+      if (data['exists'] == true) {
+        // Phone exists in Firebase Auth, proceed to OTP verification
+        final token = data['token'];
+        final hasEmail = data['hasEmail'] ?? false;
+        
+        // Navigate to OTP verification
+        final result = await Get.toNamed(
+          '${Routes.kVerifyPhoneNumber}$formattedPhone',
+          arguments: {
+            'token': token,
+            'hasEmail': hasEmail,
+          },
+        );
+
+        if (result == true) Get.back(result: true);
+      } else {
+        // Phone not found in Firebase Auth
+        throw data['message'] ?? 'This phone number is not registered. Please use Google, Apple, or Email login.';
+      }
 
     } catch (e) {
       Util.toast(e.toString());
+    } finally {
+      isChecking.value = false;
     }
   }
 
