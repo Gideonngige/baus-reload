@@ -47,7 +47,7 @@ class AddCboWidget extends ResponsiveWidget<AddCboController> {
         ),
         body: Builder(
           builder: (context) => Stack(
-            children: [
+          children: [
               // Full-screen map background
               Positioned.fill(
                 child: SizedBox.expand(
@@ -328,6 +328,33 @@ class AddCboWidget extends ResponsiveWidget<AddCboController> {
                 controller: _scrollController,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 children: [
+                  // Main title section
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Register Your CBO',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: kAppTheme.primaryColor,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Help us learn more about your Community Based Organization',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey.shade600,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
                   // CBO Name
                   const Text(
                     'What is the name or title of the CBO?',
@@ -393,11 +420,11 @@ class AddCboWidget extends ResponsiveWidget<AddCboController> {
                         ],
                       ),
                       PopupMenuButton(
-                        shape: RoundedRectangleBorder(
+                shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
-                        ),
-                        itemBuilder: (context) => <PopupMenuEntry>[
-                          PopupMenuItem(
+                ),
+                itemBuilder: (context) => <PopupMenuEntry>[
+                  PopupMenuItem(
                             child: Row(
                               children: [
                                 Icon(Icons.camera_alt, size: 20),
@@ -405,35 +432,35 @@ class AddCboWidget extends ResponsiveWidget<AddCboController> {
                                 Text('Camera'),
                               ],
                             ),
-                            onTap: () async {
-                              try {
-                                var file = await ImagePicker().pickImage(
-                                  source: ImageSource.camera,
-                                  maxWidth: 720,
-                                  maxHeight: 720,
-                                );
+                    onTap: () async {
+                      try {
+                        var file = await ImagePicker().pickImage(
+                          source: ImageSource.camera,
+                          maxWidth: 720,
+                          maxHeight: 720,
+                        );
 
-                                if (file != null) {
-                                  controller.map.update(
-                                    'files',
-                                    (value) {
-                                      if ((value as List).length < 5) {
-                                        (value).add(
-                                          File(file.path),
-                                        );
-                                      } else {
-                                        Util.toast('You can add up to 5 photos');
-                                      }
-                                      return value;
-                                    },
-                                  );
-                                }
-                              } catch (e) {
-                                Util.toast(e);
+                        if (file != null) {
+                          controller.map.update(
+                            'files',
+                            (value) {
+                              if ((value as List).length < 5) {
+                                (value).add(
+                                  File(file.path),
+                                );
+                              } else {
+                                Util.toast('You can add up to 5 photos');
                               }
+                              return value;
                             },
-                          ),
-                          PopupMenuItem(
+                          );
+                        }
+                      } catch (e) {
+                        Util.toast(e);
+                      }
+                    },
+                  ),
+                  PopupMenuItem(
                             child: Row(
                               children: [
                                 Icon(Icons.photo_library, size: 20),
@@ -441,44 +468,44 @@ class AddCboWidget extends ResponsiveWidget<AddCboController> {
                                 Text('Gallery'),
                               ],
                             ),
-                            onTap: () async {
-                              try {
-                                var xfiles = await ImagePicker().pickMultiImage(
-                                  maxWidth: 720,
-                                  maxHeight: 720,
-                                );
+                    onTap: () async {
+                      try {
+                        var xfiles = await ImagePicker().pickMultiImage(
+                          maxWidth: 720,
+                          maxHeight: 720,
+                        );
 
-                                List<Uint8List> bytesFiles = List.empty(
-                                  growable: true,
-                                );
+                        List<Uint8List> bytesFiles = List.empty(
+                          growable: true,
+                        );
 
-                                for (var element in xfiles) {
-                                  Uint8List bytes = await element.readAsBytes();
-                                  bytesFiles.add(bytes);
-                                }
+                        for (var element in xfiles) {
+                          Uint8List bytes = await element.readAsBytes();
+                          bytesFiles.add(bytes);
+                        }
 
-                                controller.map.update(
-                                  'files',
-                                  (value) {
-                                    var files = value as List<Uint8List>;
+                        controller.map.update(
+                          'files',
+                          (value) {
+                            var files = value as List<Uint8List>;
 
-                                    for (var element in bytesFiles) {
-                                      if (value.length < 5) {
+                            for (var element in bytesFiles) {
+                              if (value.length < 5) {
                                         (value).add(element);
-                                      } else {
-                                        Util.toast('You can add up to 5 photos');
-                                        break;
-                                      }
-                                    }
-                                    return files;
-                                  },
-                                );
-                              } catch (e) {
-                                Util.toast(e);
+                              } else {
+                                Util.toast('You can add up to 5 photos');
+                                break;
                               }
-                            },
-                          ),
-                        ],
+                            }
+                            return files;
+                          },
+                        );
+                      } catch (e) {
+                        Util.toast(e);
+                      }
+                    },
+                  ),
+                ],
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
@@ -500,44 +527,44 @@ class AddCboWidget extends ResponsiveWidget<AddCboController> {
                                 ),
                               ),
                             ],
-                          ),
-                        ),
-                      ),
+                ),
+              ),
+            ),
                     ],
-                  ),
+            ),
                   const SizedBox(height: 12),
                   
                   // Photo preview
-                  Obx(
-                    () => Visibility(
+            Obx(
+              () => Visibility(
                       visible: (controller.map['files'] as List<Uint8List>).isNotEmpty,
-                      child: SizedBox(
+                child: SizedBox(
                         height: 100,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: (controller.map['files'] as List).length,
-                          itemBuilder: (context, index) {
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: (controller.map['files'] as List).length,
+                    itemBuilder: (context, index) {
                             var element = (controller.map['files'] as List<Uint8List>)[index];
-                            return Stack(
-                              children: [
-                                GestureDetector(
-                                  onTap: () async => await Get.to(
+                      return Stack(
+                        children: [
+                          GestureDetector(
+                            onTap: () async => await Get.to(
                                     () => LocalFilePreviewWidget(file: element),
-                                  ),
-                                  child: ClipRRect(
+                            ),
+                            child: ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
-                                    child: Image.memory(
-                                      element,
-                                      fit: BoxFit.cover,
+                              child: Image.memory(
+                                element,
+                                fit: BoxFit.cover,
                                       height: 100,
                                       width: 100,
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
+                              ),
+                            ),
+                          ),
+                          Positioned(
                                   top: 4,
                                   right: 4,
-                                  child: GestureDetector(
+                            child: GestureDetector(
                                     child: Container(
                                       padding: const EdgeInsets.all(4),
                                       decoration: const BoxDecoration(
@@ -547,46 +574,46 @@ class AddCboWidget extends ResponsiveWidget<AddCboController> {
                                       child: const Icon(
                                         Icons.close,
                                         size: 16,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    onTap: () => controller.map.update(
-                                      'files',
-                                      (e) {
-                                        (e as List<Uint8List>).remove(element);
-                                        return e;
-                                      },
-                                    ),
-                                  ),
+                                  color: Colors.white,
                                 ),
-                              ],
-                            );
-                          },
+                              ),
+                              onTap: () => controller.map.update(
+                                'files',
+                                (e) {
+                                  (e as List<Uint8List>).remove(element);
+                                  return e;
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                           separatorBuilder: (context, index) => const SizedBox(width: 8),
-                        ),
-                      ),
                     ),
                   ),
+                ),
+              ),
                   const SizedBox(height: 24),
                   
                   // Submit button
                   ElevatedButtonWidget(
-                    onPressed: () async {
-                      await controller.submit();
-                    },
-                    child: Obx(
-                      () => controller.isSubmitting.isTrue
-                          ? const ProgressWidget()
+                onPressed: () async {
+                  await controller.submit();
+                },
+                child: Obx(
+                  () => controller.isSubmitting.isTrue
+                      ? const ProgressWidget()
                           : const Text('Register CBO'),
                     ),
-                  ),
+                ),
                   const SizedBox(height: 32),
                 ],
               ),
             ),
           ],
         ),
-      ),
-    );
+        ),
+      );
   }
 }
