@@ -3,6 +3,7 @@ import 'dart:async';
 // import 'package:baustaka/api/auth_api.dart';
 import 'package:baustaka/api/post_api.dart';
 import 'package:baustaka/config/routes.dart';
+import 'package:baustaka/db/user_db.dart';
 import 'package:baustaka/helper/session.dart';
 import 'package:baustaka/helper/util.dart';
 import 'package:baustaka/model/picker.dart';
@@ -66,7 +67,14 @@ class HomeController extends GetxController {
     isFetching.value = true;
 
     try {
-      // 1) Get the Firebase user directly from Auth
+      // 1) First try to load cached user data
+      final cachedUser = await UserDb.getCachedUser();
+      if (cachedUser != null) {
+        user.value = cachedUser;
+        print('Using cached user data for immediate display');
+      }
+
+      // 2) Get the Firebase user directly from Auth
       final fUser = firebase_auth.FirebaseAuth.instance.currentUser;
       if (fUser == null) throw 'Please log in';
 
@@ -87,6 +95,8 @@ class HomeController extends GetxController {
         // Option A: Log them out so they must sign in again once verified
         await firebase_auth.FirebaseAuth.instance.signOut();
         await Session.logout();
+        // Clear cached user data on logout
+        await UserDb.clearUser();
         // Then navigate to login screen
         Get.offAllNamed(Routes.kLoginWithEmail);
 
@@ -96,7 +106,7 @@ class HomeController extends GetxController {
         return; // Stop further logic
       }
 
-      // 3) Load user doc from Firestore
+      // 3) Load user doc from Firestore (this will update cached data)
       final docSnapshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(fUser.uid)
@@ -117,13 +127,19 @@ class HomeController extends GetxController {
       }
 
       // 5) Construct your local "User" model
-      user.value = User(
+      final freshUser = User(
         uid: fUser.uid,
         email: fUser.email,
         displayName: displayName ?? '',
         phoneNumber: phoneNumber ?? '',
         // ... any other fields if needed
       );
+
+      // 6) Update the observable and cache the fresh data
+      user.value = freshUser;
+      await UserDb.saveUser(freshUser);
+
+      print('User data fetched and cached: ${freshUser.displayName}');
 
       // (Optional) If you still want to fetch "postPage" from the server, do so here:
       // final query = {
@@ -132,7 +148,15 @@ class HomeController extends GetxController {
       // };
       // postPage.value = (await _postApi.retrieve(query)).data!.postPage;
     } catch (e) {
-      Util.toast(e);
+      print('Error fetching user data: $e');
+      // If we have cached data and there's a network error, use cached data
+      final cachedUser = await UserDb.getCachedUser();
+      if (cachedUser != null && user.value == null) {
+        user.value = cachedUser;
+        print('Using cached user data due to fetch error');
+      } else {
+        Util.toast(e);
+      }
     }
 
     isFetching.value = false;

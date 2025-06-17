@@ -1,5 +1,6 @@
 import 'package:baustaka/config/env.dart';
 import 'package:baustaka/config/routes.dart';
+import 'package:baustaka/db/user_db.dart';
 import 'package:baustaka/helper/util.dart';
 import 'package:baustaka/ui/state/state_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -61,12 +62,15 @@ class Session {
     try {
       await FirebaseAuth.instance.signOut();
 
+      // Clear cached user data
+      await UserDb.clearUser();
+
       await Get.deleteAll(force: true);
 
       await Get.offAllNamed(Routes.kSplash);
 
       if (kDebugMode) {
-        print('Logged out');
+        print('Logged out and cleared cached user data');
       }
     } on Exception {
       Util.toast('Oops! Retry');
