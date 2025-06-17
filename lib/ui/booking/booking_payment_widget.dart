@@ -122,68 +122,6 @@ class BookingPaymentWidget extends ResponsiveWidget<BookingController> {
               const SizedBox(
                 height: 32,
               ),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(20)),
-                  border: Border(
-                    top: BorderSide(
-                      width: 1.0,
-                      color: controller.color,
-                    ),
-                  ),
-                ),
-                child: ListTile(
-                  title: const TitleText(
-                    text: 'Pickup date & time',
-                    color: Colors.black,
-                    fontSize: 18,
-                  ),
-                  trailing: Container(
-                    width: 20, // Adjust width as needed
-                    height: 20, // Adjust height as needed
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 1.0,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                width: MediaQuery.of(screen.context).size.width * .7,
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: 300,
-                      child: Text(
-                        'We will reach out to confirm date & time of collection',
-                        style:
-                            TextStyle(color: kAppTheme.hintColor, fontSize: 15),
-                      ),
-                    ),
-                    const Gap(20),
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: kAppTheme.hintColor.withOpacity(.6),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: const Text(
-                        'Schedule Time',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 32,
-              ),
               if (withProduct != 'yes' || type != 'disposal') ...[
                 const Text(
                   'How often',

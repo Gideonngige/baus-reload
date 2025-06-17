@@ -83,6 +83,7 @@ class BookingWidget extends ResponsiveWidget<BookingController> {
                     child: BookingDetailsWidget(
                       type: type,
                       withProduct: withProduct,
+                      controller: controller,
                     ),
                   ),
                 if (controller.bookingState.value == BookingState.kWaste)
