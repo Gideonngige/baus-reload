@@ -126,7 +126,7 @@ class AddDumpingController extends GetxController {
     try {
       if (bytes.value == null) throw 'Add an image';
 
-      if (area.value == null || area.isEmpty!) throw 'Select location';
+      if (area.value == null || area.value!.isEmpty) throw 'Select location';
 
       if (message.value == null || message.value!.isEmpty) {
         throw 'Type message';
