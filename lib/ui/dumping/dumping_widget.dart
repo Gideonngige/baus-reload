@@ -47,134 +47,6 @@ class DumpingWidget extends ResponsiveWidget<DumpingController> {
             color: Colors.black,
           ),
           actions: [
-            GestureDetector(
-              onTap: () {},
-              child: Container(
-                padding: const EdgeInsets.all(10.0),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(.4),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Icon(
-                      Icons.campaign,
-                      color: Colors.white,
-                    ),
-                    Gap(4),
-                    Text(
-                      'Reported',
-                      style: TextStyle(color: Colors.white, fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const Gap(10),
-            GestureDetector(
-              onTap: () {
-                showDialog(
-                    context: screen.context,
-                    builder: (context) {
-                      return AlertDialog(
-                        backgroundColor: Colors.white,
-                        title: Image.asset(
-                          'assets/images/delete_large.png',
-                          width: 60,
-                        ),
-                        content: const Text(
-                          'Delete this report?',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        actions: [
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: kAppTheme.primaryColor, width: 2.0),
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.white,
-                            ),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                              ),
-                              child: Text(
-                                'Cancel',
-                                style: TextStyle(
-                                  color: kAppTheme.primaryColor,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [
-                                  Color.fromARGB(255, 58, 148, 61),
-                                  Color.fromARGB(255, 70, 197, 75),
-                                ],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                              color: kAppTheme.primaryColor,
-                            ),
-                            child: ElevatedButton(
-                              onPressed: () {
-                                // Navigator.of(context).pop();
-                                // Navigator.of(context).push(MaterialPageRoute(
-                                //     builder: (context) => StartedWasteJobPage()));
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                              ),
-                              child: const Text(
-                                'Confirm',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    });
-              },
-              child: Container(
-                padding: const EdgeInsets.all(10.0),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(.4),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(
-                      Icons.delete,
-                      color: Colors.white,
-                    ),
-                  ],
-                ),
-              ),
-            ),
             const Gap(10),
           ],
         ),
@@ -230,7 +102,7 @@ class DumpingWidget extends ResponsiveWidget<DumpingController> {
                               width:
                                   MediaQuery.of(screen.context).size.width * .7,
                               child: Text(
-                                dumping.area!,
+                                dumping.area ?? 'Unknown location',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
@@ -239,8 +111,9 @@ class DumpingWidget extends ResponsiveWidget<DumpingController> {
                               ),
                             ),
                             IconButton(
-                                onPressed: () async => await Util.directions(
-                                    dumping.point!.coordinates!),
+                                onPressed: dumping.point?.coordinates != null 
+                                    ? () async => await Util.directions(dumping.point!.coordinates!)
+                                    : null,
                                 icon: const Icon(
                                   Icons.directions_outlined,
                                   color: Colors.white,
@@ -290,7 +163,7 @@ class DumpingWidget extends ResponsiveWidget<DumpingController> {
                       Padding(
                         padding: const EdgeInsets.only(left: 10.0),
                         child: Text(
-                          dumping.message!,
+                          dumping.message ?? 'No message provided',
                           style: const TextStyle(fontSize: 17),
                         ),
                       ),
