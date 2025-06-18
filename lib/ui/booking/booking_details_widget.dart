@@ -1,11 +1,8 @@
 import 'package:baustaka/config/client.dart';
-import 'package:baustaka/helper/util.dart';
 import 'package:baustaka/ui/_/map_widget.dart';
 import 'package:baustaka/ui/_/responsive_widget.dart';
-import 'package:baustaka/ui/_/title_text.dart';
 import 'package:baustaka/ui/booking/booking_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -78,7 +75,7 @@ class BookingDetailsWidget extends ResponsiveWidget {
                 children: [
                   // Header with back button and title
                   Row(
-                    children: [
+          children: [
                       GestureDetector(
                         onTap: () => Get.back(),
                         child: Container(
@@ -109,8 +106,8 @@ class BookingDetailsWidget extends ResponsiveWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
+                    child: Container(
+                      decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: Colors.grey.shade200),
@@ -136,7 +133,7 @@ class BookingDetailsWidget extends ResponsiveWidget {
                               }),
                               border: InputBorder.none,
                               contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
+                                  horizontal: 16,
                                 vertical: 14,
                               ),
                             ),
@@ -161,12 +158,12 @@ class BookingDetailsWidget extends ResponsiveWidget {
                           ],
                         ),
                         child: IconButton(
-                          onPressed: () async {
-                            await controller.updateCurrentLocation();
-                            controller.updateLocation();
-                          },
-                          icon: Obx(
-                            () => controller.isRequestingMyLocation.isTrue
+                            onPressed: () async {
+                              await controller.updateCurrentLocation();
+                              controller.updateLocation();
+                            },
+                            icon: Obx(
+                              () => controller.isRequestingMyLocation.isTrue
                                 ? const SizedBox(
                                     width: 20,
                                     height: 20,
@@ -174,8 +171,8 @@ class BookingDetailsWidget extends ResponsiveWidget {
                                       strokeWidth: 2,
                                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                     ),
-                                  )
-                                : const Icon(
+                                    )
+                                  : const Icon(
                                     Icons.my_location,
                                     color: Colors.white,
                                     size: 22,
@@ -193,7 +190,7 @@ class BookingDetailsWidget extends ResponsiveWidget {
                         margin: const EdgeInsets.only(top: 8),
                         constraints: const BoxConstraints(maxHeight: 160),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                                      color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: Colors.grey.shade200),
                         ),
@@ -319,9 +316,9 @@ class BookingDetailsWidget extends ResponsiveWidget {
             body: const SizedBox.shrink(),
           ),
         ),
-      ],
-    ),
-  );
+          ],
+        ),
+      );
 }
 
 // ignore: must_be_immutable
@@ -339,10 +336,10 @@ class PanelWidget extends StatelessWidget {
     required this.type,
   });
 
-  RxString selectedRadioTile = 'residential'.obs;
-
   setSelectedRadioTile(val) {
-    selectedRadioTile.value = val;
+    controller.data.update((data) {
+      data!['client'] = val;
+    });
   }
 
   @override
@@ -362,7 +359,7 @@ class PanelWidget extends StatelessWidget {
                   Container(
                     width: 40,
                     height: 4,
-                    decoration: BoxDecoration(
+                decoration: BoxDecoration(
                       color: Colors.grey.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(2),
                     ),
@@ -401,7 +398,7 @@ class PanelWidget extends StatelessWidget {
                   // Property types
                   Obx(() => Column(
                     children: kClients.map((clientType) {
-                      final isSelected = selectedRadioTile.value == clientType;
+                      final isSelected = (controller.data.value['client'] ?? 'residential') == clientType;
                       
                       // Create client data based on type
                       IconData getIcon(String type) {
@@ -539,16 +536,14 @@ class PanelWidget extends StatelessWidget {
                     width: double.infinity,
                     height: 56,
                     margin: const EdgeInsets.only(bottom: 20),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (selectedRadioTile.value.isNotEmpty) {
-                          controller.data.update((val) {
-                            val!['client'] = selectedRadioTile.value;
-                          });
-                          // Navigate to next step or perform action
-                          controller.price();
-                        }
-                      },
+                                          child: ElevatedButton(
+                        onPressed: () {
+                          final selectedClient = controller.data.value['client'] ?? 'residential';
+                          if (selectedClient.isNotEmpty) {
+                            // Navigate to next step or perform action
+                            controller.price();
+                          }
+                        },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: controller.color,
                         foregroundColor: Colors.white,

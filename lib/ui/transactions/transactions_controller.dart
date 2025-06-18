@@ -48,7 +48,7 @@ class TransactionsController extends GetxController {
       await fetchWalletData();
       // Then try to fetch paginated transactions if user.value is set
       if (user.value?.id != null) {
-        await fetch(true);
+    await fetch(true);
       }
     } catch (e) {
       print('Error during transactions controller init: $e');
@@ -134,7 +134,7 @@ class TransactionsController extends GetxController {
       final userId = firebaseUser.uid;
 
       print('Fetching wallet data for user: $userId');
-      
+
       final dioResponse = await Dio().get(
         '${kBaseApiUrl}v1/transaction/wallet',
         queryParameters: {'uid': userId},

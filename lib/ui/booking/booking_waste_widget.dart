@@ -34,10 +34,8 @@ class BookingWasteWidget extends ResponsiveWidget<BookingController> {
         tag: tag,
       );
 
-  RxString selectedRadioTile = 'residential'.obs;
-
   setSelectedRadioTile(val) {
-    selectedRadioTile.value = val;
+    // This method can be removed as group selection is handled directly in the onTap
   }
 
   @override
@@ -192,9 +190,16 @@ class BookingWasteWidget extends ResponsiveWidget<BookingController> {
                                 fillColor:
                                     WidgetStateProperty.all(controller.color),
                                 value: e,
-                                groupValue: selectedRadioTile.value,
+                                groupValue: (controller.data.value['groups'] as List<String>).isNotEmpty 
+                                    ? (controller.data.value['groups'] as List<String>)[0] 
+                                    : null,
                                 onChanged: (val) {
-                                  setSelectedRadioTile(val!);
+                                  controller.data.update((data) {
+                                    List<String> groups = data!['groups'] as List<String>;
+                                    groups.clear();
+                                    groups.add(val!);
+                                    data['groups'] = groups;
+                                  });
                                 },
                               ),
                             ),

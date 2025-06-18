@@ -89,7 +89,7 @@ class TransactionsWidget extends StatelessWidget {
         onRefresh: () async {
           try {
             await controller.fetchWalletData();
-            await controller.fetch(true);
+          await controller.fetch(true);
           } catch (e) {
             print('Refresh error: $e');
           }
@@ -149,9 +149,9 @@ class TransactionsWidget extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            const Text(
+                        const Text(
                               'Available Balance',
-                              style: TextStyle(
+                          style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
@@ -255,10 +255,10 @@ class TransactionsWidget extends StatelessWidget {
                                     fontSize: 14,
                                     color: Colors.grey.shade500,
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                         )
                       else
                         ListView.builder(

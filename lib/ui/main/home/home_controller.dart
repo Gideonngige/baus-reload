@@ -21,7 +21,7 @@ class HomeController extends GetxController {
 
   Rx<firebase_auth.User?> firebaseUser = Rx(null);
 
-  // final _postApi = Get.put(PostApi());
+  final _postApi = Get.put(PostApi());
 
   Rx<User?> user = Rx(null);
 
@@ -141,12 +141,25 @@ class HomeController extends GetxController {
 
       print('User data fetched and cached: ${freshUser.displayName}');
 
-      // (Optional) If you still want to fetch "postPage" from the server, do so here:
-      // final query = {
-      //   'userId': user.value!.id,
-      //   'status': 'accepted',
-      // };
-      // postPage.value = (await _postApi.retrieve(query)).data!.postPage;
+      // Fetch upcoming pickups for this user
+      try {
+        final query = {
+          'userId': user.value!.uid, // Use Firebase UID since we don't have backend user ID
+          'status': 'accepted',
+          'limit': '10', // Limit for performance
+        };
+        
+        // Only fetch if we have valid user data
+        if (user.value?.uid != null) {
+          final result = await _postApi.retrieve(query);
+          postPage.value = result.data?.postPage;
+          print('Fetched ${postPage.value?.total ?? 0} upcoming pickups');
+        }
+      } catch (e) {
+        print('Error fetching pickups: $e');
+        // Don't show error to user for pickup count, just keep it at 0
+        postPage.value = null;
+      }
     } catch (e) {
       print('Error fetching user data: $e');
       // If we have cached data and there's a network error, use cached data
@@ -160,6 +173,26 @@ class HomeController extends GetxController {
     }
 
     isFetching.value = false;
+  }
+
+  // Lightweight method to refresh just pickup count - for frequent access
+  Future<void> refreshPickupCount() async {
+    if (user.value?.uid == null) return;
+    
+    try {
+      final query = {
+        'userId': user.value!.uid,
+        'status': 'accepted',
+        'limit': '1', // Just get count, not actual data
+      };
+      
+      final result = await _postApi.retrieve(query);
+      postPage.value = result.data?.postPage;
+      print('Refreshed pickup count: ${postPage.value?.total ?? 0}');
+    } catch (e) {
+      print('Error refreshing pickup count: $e');
+      // Silently fail to avoid bothering users
+    }
   }
 
   void checkIfNeedsEmailLinking(firebase_auth.User user) {
@@ -215,6 +248,14 @@ class HomeController extends GetxController {
         seconds: 15,
       ),
       (_) => updatePickers(),
+    );
+
+    // Refresh pickup count every 5 minutes to keep it fresh but not overload server
+    Timer.periodic(
+      const Duration(
+        minutes: 5,
+      ),
+      (_) => refreshPickupCount(),
     );
 
     await fetch();

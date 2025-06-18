@@ -134,8 +134,8 @@ class MapWidgetState extends State<MapWidget> {
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
         border: Border.all(
-          color: Colors.grey.shade300,
-        ),
+                color: Colors.grey.shade300,
+              ),
         borderRadius: BorderRadius.circular(widget.radius ?? kDefaultRadius),
       ),
       child: ClipRRect(

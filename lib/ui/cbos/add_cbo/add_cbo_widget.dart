@@ -80,7 +80,7 @@ class AddCboWidget extends ResponsiveWidget<AddCboController> {
                     ],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                  ),
+            ),
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
@@ -99,7 +99,7 @@ class AddCboWidget extends ResponsiveWidget<AddCboController> {
                           Icon(Icons.search, color: Colors.grey.shade600),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: TextField(
+              child: TextField(
                               controller: controller.searchController,
                               decoration: InputDecoration(
                                 hintText: 'Search CBO location...',
@@ -108,7 +108,7 @@ class AddCboWidget extends ResponsiveWidget<AddCboController> {
                                   color: Colors.grey.shade500,
                                   fontSize: 14,
                                 ),
-                              ),
+                ),
                               onChanged: (value) {
                                 controller.searchPlaces(value);
                               },
@@ -177,7 +177,7 @@ class AddCboWidget extends ResponsiveWidget<AddCboController> {
                                 },
                               );
                             },
-                          ),
+            ),
                         );
                       }
                       return const SizedBox.shrink();
@@ -219,8 +219,8 @@ class AddCboWidget extends ResponsiveWidget<AddCboController> {
                             Icons.location_on, 
                             color: Colors.green.shade600, 
                             size: 16
-                          ),
-                        ),
+              ),
+            ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
@@ -233,7 +233,7 @@ class AddCboWidget extends ResponsiveWidget<AddCboController> {
                                   fontSize: 11,
                                   color: Colors.grey.shade600,
                                   fontWeight: FontWeight.w500,
-                                ),
+              ),
                               ),
                               const SizedBox(height: 2),
                               Text(
@@ -245,7 +245,7 @@ class AddCboWidget extends ResponsiveWidget<AddCboController> {
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                              ),
+                ),
                             ],
                           ),
                         ),
@@ -267,7 +267,7 @@ class AddCboWidget extends ResponsiveWidget<AddCboController> {
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
                 panel: _buildCboDetailsPanel(),
                 body: const SizedBox.shrink(),
-              ),
+                ),
             ],
           ),
         ),
@@ -381,8 +381,8 @@ class AddCboWidget extends ResponsiveWidget<AddCboController> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                    ),
-                  ),
+              ),
+            ),
                   const SizedBox(height: 8),
                   TextField(
                     decoration: kInputDecoration.copyWith(
@@ -393,7 +393,7 @@ class AddCboWidget extends ResponsiveWidget<AddCboController> {
                     textCapitalization: TextCapitalization.sentences,
                     maxLines: 3,
                     maxLength: 280,
-                  ),
+            ),
                   const SizedBox(height: 16),
                   
                   // Photo section
