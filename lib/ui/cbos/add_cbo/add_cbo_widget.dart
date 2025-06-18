@@ -40,9 +40,16 @@ class AddCboWidget extends ResponsiveWidget<AddCboController> {
   @override
   Widget? tablet() => Scaffold(
         appBar: AppBar(
-          title: const Text('Register a CBO'),
+          title: const Text(
+            'Register a CBO',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           backgroundColor: kAppTheme.primaryColor,
           foregroundColor: Colors.white,
+          iconTheme: const IconThemeData(color: Colors.white),
           elevation: 0,
         ),
         body: Builder(

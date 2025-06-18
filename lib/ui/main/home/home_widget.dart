@@ -295,12 +295,6 @@ class HomeWidget extends ResponsiveWidget<HomeController> {
                         color: Colors.white),
                   ),
                   _drawerListTile(
-                      icon: Icons.g_translate_outlined,
-                      label: 'Switch Language',
-                      onTap: () {
-                        Navigator.of(screen.context).pop();
-                      }),
-                  _drawerListTile(
                     icon: Icons.share_outlined,
                     label: 'Refer a friend',
                     onTap: () async {
