@@ -29,6 +29,7 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled true
     }
     kotlinOptions {
         jvmTarget = '1.8'
@@ -51,7 +52,7 @@ android {
         releaseConfig {
             keyAlias rootProject.ext.keyAlias
             keyPassword rootProject.ext.keyPassword
-            storeFile file('/Users/mwiti/dev/baus/baus-reload/android/.config/kotlina.jks')
+            storeFile file(rootProject.ext.storeFile)
             storePassword rootProject.ext.storePassword
         }
     }
@@ -72,7 +73,6 @@ android {
                 usesCleartextTraffic: "true",
                 appName: rootProject.ext.appName
             ]
-            signingConfig signingConfigs.releaseConfig
         }
     }
 }
@@ -85,4 +85,5 @@ dependencies {
     implementation "androidx.appcompat:appcompat:1.6.1"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.22"
     implementation "androidx.multidex:multidex:2.0.1"
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
 }
