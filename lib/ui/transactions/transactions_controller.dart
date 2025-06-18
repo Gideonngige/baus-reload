@@ -44,14 +44,13 @@ class TransactionsController extends GetxController {
     }
     
     try {
-      // Fetch wallet data first (this is more reliable)
+      // Fetch wallet data (this is the primary method for getting transactions)
       await fetchWalletData();
-      // Then try to fetch paginated transactions if user.value is set
-      if (user.value?.id != null) {
-    await fetch(true);
-      }
     } catch (e) {
       print('Error during transactions controller init: $e');
+      // Set default values on error
+      balance.value = 0;
+      transactions.clear();
     }
   }
 
@@ -114,7 +113,7 @@ class TransactionsController extends GetxController {
   //     final data = dioResponse.data;
   //     // Update the balance observable
   //     balance.value = data['balance'] ?? 0;
-  //     // Replace the transaction list with the wallet’s completed transactions
+  //     // Replace the transaction list with the wallet's completed transactions
   //     transactions.assignAll((data['transactions'] as List)
   //         .map((json) => Transaction.fromJson(json))
   //         .toList());
