@@ -123,7 +123,7 @@ class BookingController extends GetxController {
 
     if (withProduct == 'yes' && type == 'disposal') {
       data.value['frequency'] = 'monthly';
-      // For subscriptions, set default categories since waste selection step might be skipped
+      // For subscriptions, set default categories (user can still modify in waste selection step)
       data.value['categories'] = ['plastic']; // Default to plastic for subscriptions
       // Add empty files array to prevent API validation errors
       data.value['files'] = [];

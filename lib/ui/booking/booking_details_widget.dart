@@ -540,8 +540,8 @@ class PanelWidget extends StatelessWidget {
                         onPressed: () {
                           final selectedClient = controller.data.value['client'] ?? 'residential';
                           if (selectedClient.isNotEmpty) {
-                            // Navigate to next step or perform action
-                            controller.price();
+                            // Navigate to waste selection step first
+                            controller.bookingState.value = BookingState.kWaste;
                           }
                         },
                       style: ElevatedButton.styleFrom(
