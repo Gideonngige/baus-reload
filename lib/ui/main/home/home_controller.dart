@@ -3,6 +3,7 @@ import 'dart:async';
 // import 'package:baustaka/api/auth_api.dart';
 import 'package:baustaka/api/post_api.dart';
 import 'package:baustaka/config/routes.dart';
+import 'package:baustaka/db/user_db.dart';
 import 'package:baustaka/helper/session.dart';
 import 'package:baustaka/helper/util.dart';
 import 'package:baustaka/model/picker.dart';
@@ -20,7 +21,7 @@ class HomeController extends GetxController {
 
   Rx<firebase_auth.User?> firebaseUser = Rx(null);
 
-  // final _postApi = Get.put(PostApi());
+  final _postApi = Get.put(PostApi());
 
   Rx<User?> user = Rx(null);
 
@@ -66,7 +67,14 @@ class HomeController extends GetxController {
     isFetching.value = true;
 
     try {
-      // 1) Get the Firebase user directly from Auth
+      // 1) First try to load cached user data
+      final cachedUser = await UserDb.getCachedUser();
+      if (cachedUser != null) {
+        user.value = cachedUser;
+        print('Using cached user data for immediate display');
+      }
+
+      // 2) Get the Firebase user directly from Auth
       final fUser = firebase_auth.FirebaseAuth.instance.currentUser;
       if (fUser == null) throw 'Please log in';
 
@@ -87,6 +95,8 @@ class HomeController extends GetxController {
         // Option A: Log them out so they must sign in again once verified
         await firebase_auth.FirebaseAuth.instance.signOut();
         await Session.logout();
+        // Clear cached user data on logout
+        await UserDb.clearUser();
         // Then navigate to login screen
         Get.offAllNamed(Routes.kLoginWithEmail);
 
@@ -96,7 +106,7 @@ class HomeController extends GetxController {
         return; // Stop further logic
       }
 
-      // 3) Load user doc from Firestore
+      // 3) Load user doc from Firestore (this will update cached data)
       final docSnapshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(fUser.uid)
@@ -117,7 +127,7 @@ class HomeController extends GetxController {
       }
 
       // 5) Construct your local "User" model
-      user.value = User(
+      final freshUser = User(
         uid: fUser.uid,
         email: fUser.email,
         displayName: displayName ?? '',
@@ -125,17 +135,64 @@ class HomeController extends GetxController {
         // ... any other fields if needed
       );
 
-      // (Optional) If you still want to fetch "postPage" from the server, do so here:
-      // final query = {
-      //   'userId': user.value!.id,
-      //   'status': 'accepted',
-      // };
-      // postPage.value = (await _postApi.retrieve(query)).data!.postPage;
+      // 6) Update the observable and cache the fresh data
+      user.value = freshUser;
+      await UserDb.saveUser(freshUser);
+
+      print('User data fetched and cached: ${freshUser.displayName}');
+
+      // Fetch upcoming pickups for this user
+      try {
+        final query = {
+          'userId': user.value!.uid, // Use Firebase UID since we don't have backend user ID
+          'status': 'accepted',
+          'limit': '10', // Limit for performance
+        };
+        
+        // Only fetch if we have valid user data
+        if (user.value?.uid != null) {
+          final result = await _postApi.retrieve(query);
+          postPage.value = result.data?.postPage;
+          print('Fetched ${postPage.value?.total ?? 0} upcoming pickups');
+        }
+      } catch (e) {
+        print('Error fetching pickups: $e');
+        // Don't show error to user for pickup count, just keep it at 0
+        postPage.value = null;
+      }
     } catch (e) {
-      Util.toast(e);
+      print('Error fetching user data: $e');
+      // If we have cached data and there's a network error, use cached data
+      final cachedUser = await UserDb.getCachedUser();
+      if (cachedUser != null && user.value == null) {
+        user.value = cachedUser;
+        print('Using cached user data due to fetch error');
+      } else {
+        Util.toast(e);
+      }
     }
 
     isFetching.value = false;
+  }
+
+  // Lightweight method to refresh just pickup count - for frequent access
+  Future<void> refreshPickupCount() async {
+    if (user.value?.uid == null) return;
+    
+    try {
+      final query = {
+        'userId': user.value!.uid,
+        'status': 'accepted',
+        'limit': '1', // Just get count, not actual data
+      };
+      
+      final result = await _postApi.retrieve(query);
+      postPage.value = result.data?.postPage;
+      print('Refreshed pickup count: ${postPage.value?.total ?? 0}');
+    } catch (e) {
+      print('Error refreshing pickup count: $e');
+      // Silently fail to avoid bothering users
+    }
   }
 
   void checkIfNeedsEmailLinking(firebase_auth.User user) {
@@ -191,6 +248,14 @@ class HomeController extends GetxController {
         seconds: 15,
       ),
       (_) => updatePickers(),
+    );
+
+    // Refresh pickup count every 5 minutes to keep it fresh but not overload server
+    Timer.periodic(
+      const Duration(
+        minutes: 5,
+      ),
+      (_) => refreshPickupCount(),
     );
 
     await fetch();

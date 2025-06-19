@@ -108,7 +108,7 @@ class MapWidgetState extends State<MapWidget> {
             center: newPosition,
             circleId: const CircleId('anyUniqueId'),
             radius: radius ?? kCircleRadius,
-            fillColor: Palette.primary.withOpacity(0.2),
+            fillColor: Palette.primary.withValues(alpha: 0.2),
             strokeWidth: 0,
           ),
         );
@@ -125,21 +125,22 @@ class MapWidgetState extends State<MapWidget> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.fullscreen) {
+      // For fullscreen mode, remove any decorations that might cause layout issues
+      return _buildMap();
+    }
+    
     return Container(
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        border: widget.fullscreen == true
-            ? null
-            : Border.all(
+        border: Border.all(
                 color: Colors.grey.shade300,
               ),
-        borderRadius: widget.fullscreen == true
-            ? null
-            : BorderRadius.circular(widget.radius ?? kDefaultRadius),
+        borderRadius: BorderRadius.circular(widget.radius ?? kDefaultRadius),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(widget.radius ?? kDefaultRadius),
-        child: widget.aspectRatio != null && widget.fullscreen != true
+        child: widget.aspectRatio != null
             ? AspectRatio(
                 aspectRatio: widget.aspectRatio!,
                 child: _buildMap(),
@@ -181,6 +182,9 @@ class MapWidgetState extends State<MapWidget> {
                     circles: circles,
                     zoomControlsEnabled: false,
                     scrollGesturesEnabled: widget.scrollGesturesEnabled,
+                    rotateGesturesEnabled: widget.scrollGesturesEnabled,
+                    zoomGesturesEnabled: widget.scrollGesturesEnabled,
+                    tiltGesturesEnabled: widget.scrollGesturesEnabled,
                     gestureRecognizers: widget.scrollGesturesEnabled
                         ? <Factory<OneSequenceGestureRecognizer>>{
                             Factory<OneSequenceGestureRecognizer>(

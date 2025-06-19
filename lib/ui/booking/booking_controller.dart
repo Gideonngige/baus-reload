@@ -1,4 +1,5 @@
 import 'package:baustaka/api/post_api.dart';
+import 'package:baustaka/config/env.dart';
 import 'package:baustaka/config/palette.dart';
 import 'package:baustaka/config/routes.dart';
 import 'package:baustaka/helper/util.dart';
@@ -16,8 +17,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_place/google_place.dart';
+import 'package:google_maps_webservice/geocoding.dart' as geocoding;
 
 enum BookingState {
+  kProduct,
   kDetails,
   kWaste,
   kPayment,
@@ -78,6 +82,13 @@ class BookingController extends GetxController {
 
   TextEditingController total = TextEditingController(text: '1');
 
+  // Enhanced location search functionality
+  TextEditingController searchController = TextEditingController();
+  RxBool isSearching = RxBool(false);
+  RxList<AutocompletePrediction> searchSuggestions = RxList.empty(growable: true);
+  
+  late GooglePlace _googlePlace;
+
   Function(
     LatLng newPosition, {
     double? radius,
@@ -95,6 +106,9 @@ class BookingController extends GetxController {
   void onInit() async {
     super.onInit();
 
+    // Initialize Google Place API
+    _googlePlace = GooglePlace(kGoogleApiKey);
+
     data.update((val) {
       // If user never picks anything, 'client' remains 'residential'
       val!['client'] ??= 'residential';
@@ -109,6 +123,12 @@ class BookingController extends GetxController {
 
     if (withProduct == 'yes' && type == 'disposal') {
       data.value['frequency'] = 'monthly';
+      // For subscriptions, set default categories (user can still modify in waste selection step)
+      data.value['categories'] = ['plastic']; // Default to plastic for subscriptions
+      // Add empty files array to prevent API validation errors
+      data.value['files'] = [];
+      // Start with product selection for subscriptions
+      bookingState.value = BookingState.kProduct;
     }
 
     ever(userSocket.picker, (value) {
@@ -162,11 +182,11 @@ class BookingController extends GetxController {
         dataToSend['product'] = (data.value['product'] as Product).id;
       }
 
-      post.value = (await _postApi.create(dataToSend)).data!.post;
+      post.value = (await _postApi.create(dataToSend)).data?.post;
 
       Util.toast('We are processing your request');
 
-      await Get.offAndToNamed('${Routes.kPost}${post.value!.id}');
+      await Get.offAndToNamed('${Routes.kPost}${post.value?.id}');
 
       await Get.put(HomeController(), tag: 'home').fetch();
     } catch (e) {
@@ -202,7 +222,7 @@ class BookingController extends GetxController {
 
       station.value = result!.station;
 
-      data.value['station'] = station.value!.id;
+      data.value['station'] = station.value?.id;
 
       prices.addAll(result.prices!);
 
@@ -232,5 +252,110 @@ class BookingController extends GetxController {
         withZoom: kZoomForMarker,
       );
     }
+  }
+
+  // Enhanced location search functionality
+  void searchPlaces(String query) async {
+    if (query.trim().isEmpty) {
+      searchSuggestions.clear();
+      return;
+    }
+
+    if (isSearching.value) return;
+
+    isSearching.value = true;
+
+    try {
+      var result = await _googlePlace.autocomplete.get(
+        query,
+        components: [Component('country', 'ke')],
+      );
+
+      if (result != null && result.predictions != null) {
+        searchSuggestions.assignAll(result.predictions!);
+      }
+    } catch (e) {
+      Util.toast('Search failed: ${e.toString()}');
+    } finally {
+      isSearching.value = false;
+    }
+  }
+
+  void selectPlace(AutocompletePrediction prediction) async {
+    try {
+      searchController.text = prediction.description ?? '';
+      searchSuggestions.clear();
+
+      var details = await _googlePlace.details.get(prediction.placeId!);
+
+      if (details != null && details.result != null) {
+        data.update((val) {
+          val!['area'] = prediction.description;
+          val['latitude'] = details.result?.geometry?.location?.lat;
+          val['longitude'] = details.result?.geometry?.location?.lng;
+        });
+
+        updateLocation();
+      }
+    } catch (e) {
+      Util.toast('Failed to get place details: ${e.toString()}');
+    }
+  }
+
+  void updateLocationFromMap(LatLng position) async {
+    try {
+      // Update the location data
+      data.update((val) {
+        val!['latitude'] = position.latitude;
+        val!['longitude'] = position.longitude;
+      });
+
+      // Update the map pin
+      updateLocation();
+
+      // Get the address for this location using reverse geocoding
+      await _reverseGeocode(position);
+    } catch (e) {
+      Util.toast('Failed to update location: ${e.toString()}');
+    }
+  }
+
+  Future<void> _reverseGeocode(LatLng position) async {
+    try {
+      final geocoding.GoogleMapsGeocoding geocodingService = 
+          geocoding.GoogleMapsGeocoding(apiKey: kGoogleApiKey);
+      
+      final geocoding.GeocodingResponse response = 
+          await geocodingService.searchByLocation(
+        geocoding.Location(lat: position.latitude, lng: position.longitude),
+      );
+
+      if (response.isOkay && response.results.isNotEmpty) {
+        final address = response.results.first.formattedAddress;
+        
+        data.update((val) {
+          val!['area'] = address;
+        });
+        
+        if (address != null) {
+          searchController.text = address;
+        }
+      } else {
+        data.update((val) {
+          val!['area'] = 'Selected location (${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)})';
+        });
+      }
+    } catch (e) {
+      // Fallback to coordinates if reverse geocoding fails
+      data.update((val) {
+        val!['area'] = 'Selected location (${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)})';
+      });
+    }
+  }
+
+  @override
+  void onClose() {
+    searchController.dispose();
+    super.onClose();
   }
 }

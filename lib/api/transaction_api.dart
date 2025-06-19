@@ -8,4 +8,7 @@ class TransactionApi extends BaseDio {
 
   Future<Response<BaseResponse>> create(Map<String, dynamic> data) =>
       post('v1/transaction', data: data);
+
+  Future<Response<BaseResponse>> getWallet(String firebaseUid) =>
+      get('v1/transaction/wallet', queryParameters: {'uid': firebaseUid});
 }

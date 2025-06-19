@@ -176,9 +176,6 @@ class BookingSummaryWidget extends ResponsiveWidget<BookingController> {
                 title: 'Pickup Address',
                 value: controller.data.value['area'],
               ),
-              _summaryContainer(
-                  title: 'Pickup Date & Time',
-                  value: 'We will reach out to confirm'),
               if (withProduct != 'yes' || type != 'disposal')
                 _summaryContainer(
                   title: 'How Often',

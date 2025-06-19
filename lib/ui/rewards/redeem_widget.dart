@@ -92,7 +92,7 @@ class RedeemWidget extends ResponsiveWidget<RewardsController> {
                         const Gap(15),
                         Text.rich(
                           TextSpan(
-                            text: '${controller.user.value?.points} points',
+                            text: '${controller.stateController.user?.points ?? 0} points',
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,

@@ -1,20 +1,18 @@
 import 'dart:ui';
 
 import 'package:baustaka/config/env.dart';
-import 'package:baustaka/config/routes.dart';
+import 'package:flutter/foundation.dart';
 import 'package:baustaka/config/theme.dart';
 import 'package:baustaka/helper/util.dart';
 import 'package:baustaka/ui/_/dialog_widget.dart';
 import 'package:baustaka/ui/_/elevated_button_widget.dart';
 import 'package:baustaka/ui/_/responsive_widget.dart';
 import 'package:baustaka/ui/_/title_text.dart';
-import 'package:baustaka/ui/map/map_widget.dart';
-import 'package:flutter/foundation.dart';
+import 'package:baustaka/ui/_/map_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_place/google_place.dart' as google_place;
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
-import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -40,7 +38,14 @@ class AddDumpingWidget extends ResponsiveWidget<AddDumpingController> {
           centerTitle: true,
           leading: IconButton(
             onPressed: () {
-              Get.back();
+              try {
+                Get.back();
+              } catch (e) {
+                // Handle any GetX navigation errors
+                if (kDebugMode) {
+                  print('Navigation error: $e');
+                }
+              }
             },
             icon: const Icon(
               Icons.chevron_left,
@@ -97,26 +102,52 @@ class AddDumpingWidget extends ResponsiveWidget<AddDumpingController> {
           minHeight: MediaQuery.of(screen.context).size.height * .3,
           body: Stack(
             children: [
-              Obx(
-                () => MapWidget(
-                  markers: controller.pickers
-                      .map(
-                        (e) => Marker(
-                          markerId: MarkerId(e.id!),
-                          position: LatLng(
-                            e.point!.coordinates![1],
-                            e.point!.coordinates![0],
-                          ),
-                          infoWindow: InfoWindow(
-                            title: e.user?.displayName,
-                            snippet: '${e.mode?.capitalize} ${e.plate}',
-                            onTap: () async =>
-                                await Get.toNamed('${Routes.kPost}${e.id}'),
-                          ),
-                        ),
-                      )
-                      .toList(),
-                ),
+              MapWidget(
+                key: Key('add_dumping_map'),
+                fullscreen: true,
+                scrollGesturesEnabled: true,
+                onTap: (latLng) async {
+                  // Update controller location when map is tapped
+                  controller.latitude = latLng.latitude;
+                  controller.longitude = latLng.longitude;
+                  
+                  // Update the map with new marker
+                  if (controller.updateMap != null) {
+                    controller.updateMap!(
+                      latLng,
+                      showCircles: false,
+                      showMarkers: true,
+                      withZoom: 15.0,
+                    );
+                  }
+                  
+                  // Reverse geocode to get address
+                  try {
+                    var googlePlace = google_place.GooglePlace(kGoogleApiKey);
+                    var result = await googlePlace.search.getNearBySearch(
+                      google_place.Location(lat: latLng.latitude, lng: latLng.longitude),
+                      1000,
+                    );
+
+                    if (result != null && result.results != null && result.results!.isNotEmpty) {
+                      final place = result.results!.first;
+                      final address = place.name ?? place.vicinity ?? 'Selected location';
+                      controller.area.value = address;
+                    } else {
+                      controller.area.value = 'Selected location (${latLng.latitude.toStringAsFixed(4)}, ${latLng.longitude.toStringAsFixed(4)})';
+                    }
+                  } catch (e) {
+                    controller.area.value = 'Selected location (${latLng.latitude.toStringAsFixed(4)}, ${latLng.longitude.toStringAsFixed(4)})';
+                  }
+                },
+                initialLatLng: const LatLng(-1.2921, 36.8219), // Nairobi default
+                onMapCreated: (updateMapFunction) {
+                  // Store the update function for later use
+                  controller.updateMap = updateMapFunction;
+                  
+                  // Get current location on map creation
+                  controller.updateCurrentLocation();
+                },
               ),
               Column(
                 children: [
@@ -129,7 +160,7 @@ class AddDumpingWidget extends ResponsiveWidget<AddDumpingController> {
                           horizontal: 20,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(.4),
+                          color: Colors.black.withValues(alpha: 0.4),
                           border: const Border(
                             bottom: BorderSide(
                               width: 2.0,
@@ -141,51 +172,69 @@ class AddDumpingWidget extends ResponsiveWidget<AddDumpingController> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Expanded(
-                              child: GestureDetector(
-                                onTap: () async {
-                                  try {
-                                    var googlePlace = google_place.GooglePlace(kGoogleApiKey);
-                                    var result = await googlePlace.autocomplete.get(
-                                      '',
-                                      components: [google_place.Component('country', 'ke')],
-                                    );
-
-                                    if (result != null && result.predictions!.isNotEmpty) {
-                                      var prediction = result.predictions!.first;
-                                      var details = await googlePlace.details.get(prediction.placeId!);
-
-                                      if (details != null && details.result != null) {
-                                        controller.area.value = prediction.description;
-                                        controller.latitude = details.result!.geometry!.location!.lat;
-                                        controller.longitude = details.result!.geometry!.location!.lng;
-                                      }
-                                    }
-                                  } catch (e) {
-                                    Util.toast(e);
-                                  }
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade200,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 12,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.search),
-                                      const SizedBox(
-                                        width: 8,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Stack(
+                                  children: [
+                                    // Search Input Field
+                                    TextField(
+                                      controller: controller.searchController,
+                                      decoration: InputDecoration(
+                                        hintText: 'Search your location',
+                                        prefixIcon: const Icon(Icons.search),
+                                        border: InputBorder.none,
+                                        contentPadding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 12,
+                                        ),
                                       ),
-                                      Expanded(
-                                        child: Obx(() => Text(
-                                            controller.area.value ??
-                                                'Search your location')),
-                                      ),
-                                    ],
-                                  ),
+                                      onChanged: (value) {
+                                        controller.searchPlaces(value);
+                                      },
+                                    ),
+                                    
+                                    // Search Results Dropdown
+                                    Obx(() => controller.searchResults.isNotEmpty
+                                        ? Positioned(
+                                            top: 50,
+                                            left: 0,
+                                            right: 0,
+                                            child: Material(
+                                              elevation: 8,
+                                              borderRadius: BorderRadius.circular(8),
+                                              child: Container(
+                                                constraints: const BoxConstraints(maxHeight: 200),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                                child: ListView.builder(
+                                                  shrinkWrap: true,
+                                                  itemCount: controller.searchResults.length > 4 
+                                                      ? 4 
+                                                      : controller.searchResults.length,
+                                                  itemBuilder: (context, index) {
+                                                    final prediction = controller.searchResults[index];
+                                                    return ListTile(
+                                                      leading: const Icon(Icons.location_on, size: 20),
+                                                      title: Text(
+                                                        prediction.description ?? '',
+                                                        style: const TextStyle(fontSize: 14),
+                                                      ),
+                                                      onTap: () async {
+                                                        await controller.selectPlace(prediction);
+                                                      },
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        : const SizedBox.shrink()),
+                                  ],
                                 ),
                               ),
                             ),
@@ -248,7 +297,7 @@ class PanelWidget extends StatelessWidget {
                 width: MediaQuery.of(context).size.width * .3,
                 height: 5,
                 decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(.6),
+                  color: Colors.grey.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),

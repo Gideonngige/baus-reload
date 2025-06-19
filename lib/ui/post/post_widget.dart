@@ -185,21 +185,6 @@ class PostWidget extends ResponsiveWidget<PostController> {
                     const SizedBox(
                       height: 16,
                     ),
-                    ListTile(
-                      title: Text(
-                        'Pick up date and time',
-                        style: Theme.of(screen.context).textTheme.bodySmall,
-                      ),
-                      subtitle: Text(
-                        'We will reach out to you to confirm date and time of collection',
-                        style: Theme.of(screen.context)
-                            .textTheme
-                            .bodyLarge
-                            ?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                    ),
                     if (post.product == null)
                       ListTile(
                         title: Text(

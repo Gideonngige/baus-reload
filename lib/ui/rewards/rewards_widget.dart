@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class RewardsWidget extends ResponsiveWidget<RewardsController> {
   RewardsWidget({super.key});
@@ -21,38 +22,40 @@ class RewardsWidget extends ResponsiveWidget<RewardsController> {
   @override
   RewardsController get controller => Get.put(RewardsController(), tag: tag);
 
-  final List<Map<String, dynamic>> _rewardsList = [
-    {
-      'title': 'Account Creation',
-      'date': 'August 7 2021',
-      'time': '7:03pm',
-      'points': '10'
-    },
-    {
-      'title': 'Waste Disposal',
-      'date': 'August 7 2021',
-      'time': '7:03pm',
-      'points': '5'
-    },
-    {
-      'title': 'Referrals',
-      'date': 'August 7 2021',
-      'time': '7:03pm',
-      'points': '20'
-    },
-    {
-      'title': 'Referrals',
-      'date': 'August 7 2021',
-      'time': '7:03pm',
-      'points': '10'
-    },
-    {
-      'title': 'Promotion',
-      'date': 'August 7 2021',
-      'time': '7:03pm',
-      'points': '25'
+  // Helper method to format reward type for display
+  String _formatRewardType(String? type) {
+    if (type == null) return 'Unknown';
+    switch (type.toLowerCase()) {
+      case 'sign up':
+        return 'Account Creation';
+      case 'sale':
+        return 'Waste Disposal';
+      case 'referral':
+        return 'Referrals';
+      case 'promo':
+        return 'Promotion';
+      case 'purchase':
+        return 'Purchase';
+      case 'first purchase':
+        return 'First Purchase';
+      case 'expenditure':
+        return 'Expenditure';
+      default:
+        return type.capitalize ?? type;
     }
-  ];
+  }
+
+  // Helper method to format date
+  String _formatDate(DateTime? dateTime) {
+    if (dateTime == null) return 'Unknown date';
+    return DateFormat('MMMM d yyyy').format(dateTime);
+  }
+
+  // Helper method to format time
+  String _formatTime(DateTime? dateTime) {
+    if (dateTime == null) return 'Unknown time';
+    return DateFormat('h:mma').format(dateTime).toLowerCase();
+  }
 
   @override
   Widget? tablet() => Obx(
@@ -106,7 +109,9 @@ class RewardsWidget extends ResponsiveWidget<RewardsController> {
             child: NotificationListener<ScrollNotification>(
               onNotification: (scrollInfo) {
                 if (scrollInfo.metrics.pixels ==
-                    scrollInfo.metrics.maxScrollExtent) controller.fetch(false);
+                    scrollInfo.metrics.maxScrollExtent) {
+                  controller.fetch(false);
+                }
                 return false;
               },
               child: controller.rewards.isNotEmpty
@@ -153,7 +158,7 @@ class RewardsWidget extends ResponsiveWidget<RewardsController> {
                                               Text.rich(
                                                 TextSpan(
                                                   text:
-                                                      '${controller.user.value!.points} points ',
+                                                      '${controller.stateController.user?.points ?? 0} points ',
                                                   style: const TextStyle(
                                                     color: Colors.white,
                                                     fontWeight: FontWeight.bold,
@@ -208,93 +213,156 @@ class RewardsWidget extends ResponsiveWidget<RewardsController> {
                                   ),
                                 ),
                               ),
-                              ...List.generate(
-                                _rewardsList.length,
-                                (index) => ListTile(
-                                  title: TitleText(
-                                    text: _rewardsList[index]['title'],
-                                    color: Colors.black,
-                                    fontSize: 20,
-                                  ),
-                                  subtitle: Text.rich(
-                                    TextSpan(
-                                      text: "${_rewardsList[index]['date']},  ",
-                                      style: const TextStyle(
-                                          color: Colors.black54),
-                                      children: [
-                                        TextSpan(
-                                          text: _rewardsList[index]['time'],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  trailing: SizedBox(
-                                    width: 140,
-                                    height: 40,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: [
-                                        Text(
-                                          "+${_rewardsList[index]['points']} points",
-                                          style: TextStyle(
-                                            color: kAppTheme.primaryColor,
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w300,
-                                          ),
-                                        ),
-                                        Image.asset('assets/images/medal.png'),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const Gap(80),
-                              Container(
-                                width: MediaQuery.of(context).size.width * .9,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.grey,
-                                ),
-                                child: ElevatedButton(
-                                  onPressed: () async {
-                                    await Get.toNamed(Routes.kRedeemReward);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.transparent,
-                                    elevation: 0,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                  ),
-                                  child: const Text(
-                                    'Redeem',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                    ),
-                                  ),
-                                ),
-                              ),
                             ],
                           );
-                        } else {
-                          return null;
                         }
-                      }
-                      // : RewardItemWidget(
-                      //     reward: controller.rewards[index - 1],
-                      //   ),
-                      )
+                        
+                        // Show real rewards data
+                        final reward = controller.rewards[index - 1];
+                        return ListTile(
+                          title: TitleText(
+                            text: _formatRewardType(reward.type),
+                            color: Colors.black,
+                            fontSize: 20,
+                          ),
+                          subtitle: Text.rich(
+                            TextSpan(
+                              text: "${_formatDate(reward.createdAt)},  ",
+                              style: const TextStyle(color: Colors.black54),
+                              children: [
+                                TextSpan(
+                                  text: _formatTime(reward.createdAt),
+                                ),
+                              ],
+                            ),
+                          ),
+                          trailing: SizedBox(
+                            width: 150,
+                            height: 40,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    "${reward.points! >= 0 ? '+' : ''}${reward.points} points",
+                                    style: TextStyle(
+                                      color: reward.points! >= 0 
+                                          ? kAppTheme.primaryColor 
+                                          : Colors.red,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w300,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Image.asset('assets/images/medal.png'),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    )
                   : ListView(
                       children: [
+                        // Show the top card even when no rewards
+                        GestureDetector(
+                          onTap: () => Get.toNamed(Routes.kPointsBalance),
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(
+                              vertical: 10.0,
+                            ),
+                            height: 180,
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 20.0),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20.0),
+                                color: kAppTheme.primaryColor,
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    height: 120,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const TitleText(
+                                          text: 'Green Guru',
+                                          color: Colors.white,
+                                          fontSize: 35,
+                                        ),
+                                        const Gap(15),
+                                        Text.rich(
+                                          TextSpan(
+                                            text:
+                                                '${controller.stateController.user?.points ?? 0} points ',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20,
+                                            ),
+                                            children: const [
+                                              TextSpan(
+                                                text: '(level 1)',
+                                                style: TextStyle(
+                                                  fontWeight:
+                                                      FontWeight.w300,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const Gap(10),
+                                        Stack(
+                                          children: [
+                                            Container(
+                                              width: 150,
+                                              height: 15,
+                                              decoration: BoxDecoration(
+                                                color: kAppTheme
+                                                    .primaryColor,
+                                                border: Border.all(
+                                                    color: Colors.white,
+                                                    width: 1),
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        10),
+                                              ),
+                                            ),
+                                            Container(
+                                              width: 70,
+                                              height: 15,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        10),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  Image.asset('assets/images/medal.png'),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                         Center(
                           child: Padding(
                             padding: const EdgeInsets.all(48),
                             child: controller.isFetching.isTrue
                                 ? const CircularProgressIndicator()
-                                : const Text('No rewards'),
+                                : const Text('No rewards yet'),
                           ),
                         ),
                       ],

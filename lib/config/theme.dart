@@ -127,7 +127,7 @@ final kAppTheme = ThemeData(
       iconColor: Palette.primary,
     ),
   ),
-  tabBarTheme: TabBarTheme(
+  tabBarTheme: TabBarThemeData(
     indicatorSize: TabBarIndicatorSize.label,
     labelColor: Palette.primary,
     unselectedLabelColor: Palette.textSecondary,

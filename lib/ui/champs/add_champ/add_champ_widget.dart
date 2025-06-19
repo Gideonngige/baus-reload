@@ -2,24 +2,20 @@
 
 import 'dart:io';
 import 'dart:typed_data';
-import 'dart:ui';
 
-import 'package:baustaka/config/env.dart';
 import 'package:baustaka/config/theme.dart';
 import 'package:baustaka/helper/util.dart';
 import 'package:baustaka/ui/_/elevated_button_widget.dart';
 import 'package:baustaka/ui/_/map_widget.dart';
-import 'package:baustaka/ui/_/progress_widget.dart';
 import 'package:baustaka/ui/_/responsive_widget.dart';
 import 'package:baustaka/ui/champs/add_champ/add_champ_controller.dart';
 import 'package:baustaka/ui/file/local_file_preview_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:google_place/google_place.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
-import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class AddChampWidget extends ResponsiveWidget<AddChampController> {
   AddChampWidget({
@@ -37,6 +33,9 @@ class AddChampWidget extends ResponsiveWidget<AddChampController> {
         AddChampController(),
         tag: tag,
       );
+
+  final PanelController _panelController = PanelController();
+  final ScrollController _scrollController = ScrollController();
 
   _goToPosition() async {
     var newPosition = LatLng(
@@ -57,424 +56,555 @@ class AddChampWidget extends ResponsiveWidget<AddChampController> {
 
   @override
   Widget? tablet() => Scaffold(
-        appBar: AppBar(
-          title: const Text('Become an eco-champion'),
+    body: Stack(
+      children: [
+        // Full-screen map background
+        Positioned.fill(
+          child: MapWidget(
+            onTap: (LatLng position) {
+              controller.onMapTap(position);
+            },
+            onMapCreated: (updateMapFn) {
+              controller.updateMap = updateMapFn;
+              _goToPosition();
+            },
+            scrollGesturesEnabled: true,
+            fullscreen: true,
+          ),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: ListView(
-            physics: const BouncingScrollPhysics(),
-            children: [
-              const Text(
-                'Tell us why',
-              ),
-              const Gap(10),
-              TextField(
-                onChanged: (value) => controller.map['description'] = value,
-                maxLines: 4,
-                keyboardType: TextInputType.multiline,
-                textCapitalization: TextCapitalization.sentences,
-                decoration: InputDecoration(
-                  hintText: 'Details',
-                  hintStyle: TextStyle(color: kAppTheme.hintColor),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(color: kAppTheme.hintColor),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: kAppTheme.hintColor),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: kAppTheme.hintColor),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
+        
+        // Top search bar with gradient background
+        Builder(
+          builder: (context) => Positioned(
+            top: MediaQuery.of(context).padding.top + 10,
+            left: 16,
+            right: 16,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.white.withValues(alpha: 0.95),
+                    Colors.white.withValues(alpha: 0.9),
+                  ],
                 ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.15),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-              const Gap(20),
-              const Text(
-                'Where are you located',
-                style: TextStyle(fontSize: 18),
-              ),
-              const Gap(10),
-              Container(
-                height: 210,
-                decoration: BoxDecoration(
-                  color: Colors.green,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Stack(
-                  children: [
-                    SizedBox(
-                      height: 210,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(14.0),
-                        child: MapWidget(
-                          onMapCreated: (updateMap) async {
-                            controller.updateMap = updateMap;
-
-                            _goToPosition();
-                          },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Header with back button and title
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Get.back(),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.arrow_back, size: 20),
                         ),
                       ),
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        ClipRRect(
-                          borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(14.0)),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
-                            child: Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 15,
-                                horizontal: 20,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(.4),
-                                border: const Border(
-                                  bottom: BorderSide(
-                                    width: 2.0,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  SizedBox(
-                                    width: 280,
-                                    child: Obx(
-                                      () => Text(
-                                        controller.map['area'] ??
-                                            'Select address',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 19,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text(
+                          'Become an eco-champion',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Search input with location button
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.grey.shade200),
+                          ),
+                          child: TextField(
+                            controller: controller.searchController,
+                            decoration: InputDecoration(
+                              hintText: 'Search for a location...',
+                              hintStyle: TextStyle(color: Colors.grey.shade500),
+                              prefixIcon: Icon(Icons.search, color: Colors.grey.shade400, size: 20),
+                              suffixIcon: Obx(() {
+                                if (controller.isSearching.value) {
+                                  return Container(
+                                    padding: const EdgeInsets.all(12),
+                                    child: const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(strokeWidth: 2),
                                     ),
-                                  ),
-                                  PopupMenuButton(
-                                    itemBuilder: (context) => <PopupMenuEntry>[
-                                      PopupMenuItem(
-                                        child:
-                                            const Text('My current location'),
-                                        onTap: () async {
-                                          try {
-                                            var position =
-                                                await Util.currentPosition();
-
-                                            controller.map['area'] = 'Area';
-
-                                            controller.map.update(
-                                                'lngLat',
-                                                (value) => [
-                                                      position.longitude,
-                                                      position.latitude,
-                                                    ]);
-
-                                            _goToPosition();
-                                          } catch (e) {
-                                            Util.toast(e);
-                                          }
-                                        },
-                                      ),
-                                      PopupMenuItem(
-                                        child: const Text('Another location'),
-                                        onTap: () async {
-                                          try {
-                                            Future.delayed(
-                                              const Duration(
-                                                milliseconds: 100,
-                                              ),
-                                              () async {
-                                                var googlePlace = GooglePlace(kGoogleApiKey);
-                                                var result = await googlePlace.autocomplete.get(
-                                                  '',
-                                                  components: [Component('country', 'ke')],
-                                                );
-
-                                                if (result != null && result.predictions!.isNotEmpty) {
-                                                  var prediction = result.predictions!.first;
-                                                  var details = await googlePlace.details.get(prediction.placeId!);
-
-                                                  if (details != null && details.result != null) {
-                                                    controller.map['area'] = prediction.description;
-
-                                                    controller.map.update(
-                                                        'lngLat',
-                                                        (value) => [
-                                                              details.result!.geometry!.location!.lng,
-                                                              details.result!.geometry!.location!.lat
-                                                            ]);
-
-                                                    _goToPosition();
-                                                  }
-                                                }
-                                              },
-                                            );
-                                          } catch (e) {
-                                            Util.toast(e);
-                                          }
-                                        },
-                                      ),
-                                    ],
-                                    child: const Row(
-                                      children: [
-                                        Text(
-                                          'Change',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14),
-                                        ),
-                                        Icon(
-                                          Icons.chevron_right,
-                                          color: Colors.white,
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ],
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              }),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
                               ),
                             ),
                           ),
                         ),
-                      ],
+                      ),
+                      const SizedBox(width: 12),
+                      // My Location Button
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.green.withValues(alpha: 0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: IconButton(
+                          onPressed: controller.getCurrentLocation,
+                          icon: Obx(() => controller.isGettingLocation.value
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.my_location,
+                                  color: Colors.white,
+                                  size: 22,
+                                )),
+                        ),
+                      ),
+                    ],
+                  ),
+                  
+                  // Search Suggestions
+                  Obx(() {
+                    if (controller.searchPredictions.isNotEmpty) {
+                      return Container(
+                        margin: const EdgeInsets.only(top: 8),
+                        constraints: const BoxConstraints(maxHeight: 160),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey.shade200),
+                        ),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          padding: EdgeInsets.zero,
+                          itemCount: controller.searchPredictions.length > 3 
+                              ? 3 
+                              : controller.searchPredictions.length,
+                          itemBuilder: (context, index) {
+                            final prediction = controller.searchPredictions[index];
+                            return ListTile(
+                              dense: true,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                              leading: Icon(Icons.location_on, color: Colors.grey.shade400, size: 18),
+                              title: Text(
+                                prediction.description ?? '',
+                                style: const TextStyle(fontSize: 14),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              onTap: () {
+                                controller.selectPlace(prediction);
+                              },
+                            );
+                          },
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  }),
+                ],
+              ),
+            ),
+          ),
+        ),
+        
+        // Floating location indicator
+        Positioned(
+          bottom: 200,
+          left: 16,
+          right: 16,
+          child: Obx(() {
+            if (controller.map['area'] != null) {
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.95),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-              ),
-              const Gap(20),
-              const Text(
-                'Add upto 5 photos of your eco work',
-                style: TextStyle(fontSize: 18),
-              ),
-              const Gap(10),
-              PopupMenuButton(
-                itemBuilder: (context) => <PopupMenuEntry>[
-                  PopupMenuItem(
-                    child: const Text('Camera'),
-                    onTap: () async {
-                      try {
-                        var file = await ImagePicker().pickImage(
-                          source: ImageSource.camera,
-                          maxWidth: 720,
-                          maxHeight: 720,
-                        );
-
-                        if (file != null) {
-                          controller.map.update(
-                            'files',
-                            (value) {
-                              if ((value as List).length < 5) {
-                                (value).add(
-                                  File(file.path),
-                                );
-                              } else {
-                                Util.toast('You can add up to 5 photos');
-                              }
-
-                              return value;
-                            },
-                          );
-                        }
-                      } catch (e) {
-                        Util.toast(e);
-                      }
-                    },
-                  ),
-                  PopupMenuItem(
-                    child: const Text('Gallery'),
-                    onTap: () async {
-                      try {
-                        var xfiles = await ImagePicker().pickMultiImage(
-                          maxWidth: 720,
-                          maxHeight: 720,
-                        );
-
-                        List<Uint8List> bytesFiles = List.empty(
-                          growable: true,
-                        );
-
-                        for (var element in xfiles) {
-                          Uint8List bytes = await element.readAsBytes();
-
-                          bytesFiles.add(bytes);
-                        }
-
-                        controller.map.update(
-                          'files',
-                          (value) {
-                            var files = value as List<Uint8List>;
-
-                            for (var element in bytesFiles) {
-                              if (value.length < 5) {
-                                (value).add(
-                                  element,
-                                );
-                              } else {
-                                Util.toast('You can add up to 5 photos');
-
-                                break;
-                              }
-                            }
-
-                            return files;
-                          },
-                        );
-                      } catch (e) {
-                        Util.toast(e);
-                      }
-                    },
-                  ),
-                ],
-                child: Container(
-                  height: 150,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadiusDirectional.circular(10.0),
-                    border: Border.all(color: kAppTheme.hintColor, width: .5),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.add_photo_alternate_outlined,
-                        size: 60,
-                        color: kAppTheme.hintColor,
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.green.shade50,
+                        borderRadius: BorderRadius.circular(6),
                       ),
-                      Text(
-                        'Upload Image',
-                        style: TextStyle(
-                          color: kAppTheme.hintColor,
-                          fontSize: 19,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      )
-                    ],
-                  ),
+                      child: Icon(
+                        Icons.location_on, 
+                        color: Colors.green.shade600, 
+                        size: 16
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Selected Location',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.grey.shade600,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            controller.map['area'],
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              const Gap(10),
-              Obx(
-                () => Visibility(
-                  visible:
-                      (controller.map['files'] as List<Uint8List>).isNotEmpty,
-                  child: SizedBox(
-                    height: 120,
-                    child: ListView.separated(
-                      physics: const BouncingScrollPhysics(),
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                      ),
-                      itemCount: (controller.map['files'] as List).length,
-                      itemBuilder: (context, index) {
-                        var element =
-                            (controller.map['files'] as List<Uint8List>)[index];
-                        return GestureDetector(
-                          onTap: () async => await Get.to(
-                            () => LocalFilePreviewWidget(
-                              file: element,
-                            ),
-                          ),
-                          child: Container(
-                            margin: const EdgeInsets.only(right: 12.0),
-                            child: Stack(
-                              children: [
-                                Container(
-                                  width: 70,
-                                  height: 70,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20.0),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(20.0),
-                                    child: Image.memory(
-                                      element,
-                                      fit: BoxFit.cover,
-                                      height: 120,
-                                      width: 120,
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  top: 0,
-                                  right: 0,
-                                  child: GestureDetector(
-                                    onTap: () => controller.map.update(
-                                      'files',
-                                      (e) {
-                                        (e as List<Uint8List>).remove(element);
+              );
+            }
+            return const SizedBox.shrink();
+          }),
+        ),
+        
+        // Bottom panel with form content
+        Builder(
+          builder: (context) => SlidingUpPanel(
+            controller: _panelController,
+            minHeight: 140,
+            maxHeight: MediaQuery.of(context).size.height * 0.7,
+            parallaxEnabled: true,
+            parallaxOffset: 0.5,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            panel: _buildPanelContent(),
+            body: const SizedBox.shrink(),
+          ),
+        ),
+      ],
+    ),
+  );
 
-                                        return e;
-                                      },
-                                    ),
-                                    child: Container(
-                                      width: 20,
-                                      height: 20,
-                                      padding: const EdgeInsets.all(5),
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        gradient: const LinearGradient(
-                                          colors: [
-                                            Color.fromARGB(255, 58, 148, 61),
-                                            Color.fromARGB(255, 70, 197, 75),
-                                          ],
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                        ),
-                                        color: kAppTheme.primaryColor,
-                                      ),
-                                      child: const Icon(Icons.close,
-                                          color: Colors.white, size: 10),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                      separatorBuilder: (context, index) => const SizedBox(
-                        width: 8,
+  Widget _buildPanelContent() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Drag handle
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          
+          Expanded(
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Tell us why',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const Gap(10),
+                  TextField(
+                    onChanged: (value) => controller.map['description'] = value,
+                    maxLines: 4,
+                    keyboardType: TextInputType.multiline,
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: InputDecoration(
+                      hintText: 'Tell us about your eco work and why you want to become a champion...',
+                      hintStyle: TextStyle(color: kAppTheme.hintColor),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(color: kAppTheme.hintColor),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.green),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: kAppTheme.hintColor),
+                        borderRadius: BorderRadius.circular(10.0),
                       ),
                     ),
                   ),
-                ),
-              ),
-              Obx(
-                () => Visibility(
-                  visible:
-                      (controller.map['files'] as List<Uint8List>).isNotEmpty,
-                  child: const SizedBox(
-                    height: 16,
+                  const Gap(20),
+                  
+                  const Text(
+                    'Add up to 5 photos of your eco work',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
+                  const Gap(10),
+                  
+                  // Photo upload button
+                  PopupMenuButton(
+                    itemBuilder: (context) => <PopupMenuEntry>[
+                      PopupMenuItem(
+                        child: const Row(
+                          children: [
+                            Icon(Icons.camera_alt, color: Colors.grey),
+                            SizedBox(width: 8),
+                            Text('Camera'),
+                          ],
+                        ),
+                        onTap: () async {
+                          try {
+                            var file = await ImagePicker().pickImage(
+                              source: ImageSource.camera,
+                              maxWidth: 720,
+                              maxHeight: 720,
+                            );
+
+                            if (file != null) {
+                              controller.map.update(
+                                'files',
+                                (value) {
+                                  if ((value as List).length < 5) {
+                                    (value).add(File(file.path));
+                                  } else {
+                                    Util.toast('You can add up to 5 photos');
+                                  }
+                                  return value;
+                                },
+                              );
+                            }
+                          } catch (e) {
+                            Util.toast(e);
+                          }
+                        },
+                      ),
+                      PopupMenuItem(
+                        child: const Row(
+                          children: [
+                            Icon(Icons.photo_library, color: Colors.grey),
+                            SizedBox(width: 8),
+                            Text('Gallery'),
+                          ],
+                        ),
+                        onTap: () async {
+                          try {
+                            var xfiles = await ImagePicker().pickMultiImage(
+                              maxWidth: 720,
+                              maxHeight: 720,
+                            );
+
+                            if (xfiles.isNotEmpty) {
+                              controller.map.update(
+                                'files',
+                                (value) {
+                                  for (var xfile in xfiles) {
+                                    if ((value as List).length < 5) {
+                                      (value).add(File(xfile.path));
+                                    } else {
+                                      Util.toast('You can add up to 5 photos');
+                                      break;
+                                    }
+                                  }
+                                  return value;
+                                },
+                              );
+                            }
+                          } catch (e) {
+                            Util.toast(e);
+                          }
+                        },
+                      ),
+                    ],
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 15.0,
+                        horizontal: 15.0,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: kAppTheme.hintColor),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.add_photo_alternate,
+                            color: Colors.grey,
+                          ),
+                          const Gap(10),
+                          Text(
+                            'Add photos',
+                            style: TextStyle(color: kAppTheme.hintColor),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const Gap(20),
+                  
+                  // Photos preview
+                  Obx(() {
+                    if ((controller.map['files'] as List).isNotEmpty) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Selected Photos',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const Gap(10),
+                          Wrap(
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: List.generate(
+                              (controller.map['files'] as List).length,
+                              (index) => GestureDetector(
+                                onTap: () async => await Get.to(
+                                  () => LocalFilePreviewWidget(
+                                    file: (controller.map['files'] as List)[index],
+                                  ),
+                                ),
+                                child: Stack(
+                                  children: [
+                                    Container(
+                                      height: 80,
+                                      width: 80,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10.0),
+                                        image: DecorationImage(
+                                          image: MemoryImage(
+                                            (controller.map['files'] as List)[index] is File
+                                                ? File((controller.map['files'] as List)[index].path).readAsBytesSync()
+                                                : (controller.map['files'] as List)[index] as Uint8List,
+                                          ),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: -5,
+                                      right: -5,
+                                      child: IconButton(
+                                        icon: const Icon(
+                                          Icons.cancel,
+                                          color: Colors.red,
+                                          size: 20,
+                                        ),
+                                        onPressed: () => controller.map.update(
+                                          'files',
+                                          (value) {
+                                            (value as List).removeAt(index);
+                                            return value;
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const Gap(20),
+                        ],
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  }),
+                  
+                  // Submit button
+                  SizedBox(
+                    width: double.infinity,
+                    child: Obx(
+                      () => ElevatedButtonWidget(
+                        onPressed: controller.isSubmitting.isTrue 
+                            ? null 
+                            : () async => await controller.submit(),
+                        child: controller.isSubmitting.isTrue
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                              )
+                            : const Text('Submit Application'),
+                      ),
+                    ),
+                  ),
+                  const Gap(40), // Extra space at bottom
+                ],
               ),
-              const SizedBox(
-                height: 16,
-              ),
-              ElevatedButtonWidget(
-                onPressed: () async {
-                  await controller.submit();
-                },
-                child: Obx(
-                  () => controller.isSubmitting.isTrue
-                      ? const ProgressWidget()
-                      : const Text('Apply'),
-                ),
-              ),
-              const SizedBox(
-                height: 32,
-              ),
-            ],
+            ),
           ),
-        ),
-      );
+        ],
+      ),
+    );
+  }
 }

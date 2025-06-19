@@ -63,25 +63,9 @@ class DumpingItemWidget extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Container(
-                      margin: const EdgeInsets.all(10.0),
-                      padding: const EdgeInsets.all(10.0),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(.4),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: const Row(
-                        children: [
-                          Icon(
-                            Icons.delete,
-                            color: Colors.white,
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
-                if (dumping.file!.type == 'video')
+                if (dumping.file != null && dumping.file!.type == 'video')
                   Positioned(
                     bottom: 0,
                     top: 0,
@@ -112,9 +96,9 @@ class DumpingItemWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            dumping.message!.length > 100
+                            dumping.message != null && dumping.message!.length > 100
                                 ? '${dumping.message!.substring(0, 100)}...'
-                                : dumping.message!,
+                                : dumping.message ?? 'No message',
                             maxLines: 2,
                             style: const TextStyle(
                               color: Colors.white,
@@ -135,7 +119,7 @@ class DumpingItemWidget extends StatelessWidget {
                                   SizedBox(
                                     width: 150,
                                     child: Text(
-                                      dumping.area!,
+                                      dumping.area ?? 'Unknown location',
                                       softWrap: true,
                                       style:
                                           const TextStyle(color: Colors.white),

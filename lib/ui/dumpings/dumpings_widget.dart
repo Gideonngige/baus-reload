@@ -29,7 +29,12 @@ class DumpingsWidget extends ResponsiveWidget<DumpingsController> {
           elevation: 1,
           leading: IconButton(
             onPressed: () {
-              Get.back();
+              try {
+                Get.back();
+              } catch (e) {
+                // Fallback navigation
+                Get.offAllNamed('/home');
+              }
             },
             icon: const Icon(
               Icons.chevron_left,
