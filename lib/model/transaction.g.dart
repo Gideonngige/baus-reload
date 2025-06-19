@@ -26,3 +26,10 @@ Transaction _$TransactionFromJson(Map<String, dynamic> json) => Transaction()
   ..currency = json['currency'] as String?
   ..phoneNumber = json['phoneNumber'] as String?
   ..status = json['status'] as String?;
+
+WalletData _$WalletDataFromJson(Map<String, dynamic> json) => WalletData(
+      balance: (json['balance'] as num?)?.toDouble(),
+      transactions: (json['transactions'] as List<dynamic>?)
+          ?.map((e) => Transaction.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );

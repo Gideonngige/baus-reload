@@ -16,5 +16,14 @@ class Transaction extends BaseObject {
   String? status;
 
   static Transaction fromJson(dynamic json) => _$TransactionFromJson(json);
+}
 
+@JsonSerializable()
+class WalletData {
+  double? balance;
+  List<Transaction>? transactions;
+
+  WalletData({this.balance, this.transactions});
+
+  factory WalletData.fromJson(Map<String, dynamic> json) => _$WalletDataFromJson(json);
 }
