@@ -4,6 +4,7 @@ import 'package:baustaka/ui/_/title_text.dart';
 import 'package:baustaka/ui/booking/booking_controller.dart';
 import 'package:baustaka/ui/booking/booking_details_widget.dart';
 import 'package:baustaka/ui/booking/booking_payment_widget.dart';
+import 'package:baustaka/ui/booking/booking_product_widget.dart';
 import 'package:baustaka/ui/booking/booking_summary_widget.dart';
 import 'package:baustaka/ui/booking/booking_waste_widget.dart';
 import 'package:flutter/material.dart';
@@ -39,8 +40,15 @@ class BookingWidget extends ResponsiveWidget<BookingController> {
         () => PopScope(
           onPopInvokedWithResult: (popped, result) async {
             switch (controller.bookingState.value) {
-              case BookingState.kDetails:
+              case BookingState.kProduct:
                 await cancel();
+                break;
+              case BookingState.kDetails:
+                if (withProduct == 'yes' && type == 'disposal') {
+                  controller.bookingState.value = BookingState.kProduct;
+                } else {
+                  await cancel();
+                }
                 break;
               case BookingState.kWaste:
                 controller.bookingState.value = BookingState.kDetails;
@@ -51,8 +59,6 @@ class BookingWidget extends ResponsiveWidget<BookingController> {
               case BookingState.kSummary:
                 controller.bookingState.value = BookingState.kPayment;
                 break;
-              default:
-                return;
             }
           },
           child: Scaffold(
@@ -78,6 +84,13 @@ class BookingWidget extends ResponsiveWidget<BookingController> {
                 //   type: type,
                 //   withProduct: withProduct,
                 // ),
+                if (controller.bookingState.value == BookingState.kProduct)
+                  Expanded(
+                    child: BookingProductWidget(
+                      type: type,
+                      withProduct: withProduct,
+                    ),
+                  ),
                 if (controller.bookingState.value == BookingState.kDetails)
                   Expanded(
                     child: BookingDetailsWidget(

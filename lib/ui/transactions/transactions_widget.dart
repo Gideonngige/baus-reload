@@ -21,9 +21,10 @@ class TransactionsWidget extends StatelessWidget {
         backgroundColor: kAppTheme.primaryColor,
         foregroundColor: Colors.white,
         elevation: 0,
+        automaticallyImplyLeading: true,
         leading: IconButton(
           onPressed: () => Get.back(),
-          icon: const Icon(Icons.chevron_left, size: 30),
+          icon: const Icon(Icons.chevron_left, size: 30, color: Colors.white),
         ),
         title: const Text(
           'Wallet', 

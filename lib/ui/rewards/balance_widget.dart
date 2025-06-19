@@ -77,7 +77,7 @@ class PointsBalanceWidget extends ResponsiveWidget<RewardsController> {
                                 ),
                                 const Gap(10),
                                 Text(
-                                  '${controller.user.value?.points}',
+                                  '${controller.stateController.user?.points ?? 0}',
                                   style: const TextStyle(
                                       color: Color.fromARGB(255, 255, 231, 11)),
                                 ),

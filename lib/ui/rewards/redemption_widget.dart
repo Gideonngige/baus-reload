@@ -68,7 +68,7 @@ class RedemptionWidget extends ResponsiveWidget<RewardsController> {
                 child: SizedBox(
                   width: MediaQuery.of(screen.context).size.width * .8,
                   child: Text(
-                    'Your point balance is ${controller.user.value?.points} worth Ksh 240. How many to be redeemed?',
+                    'Your point balance is ${controller.stateController.user?.points ?? 0} worth Ksh 240. How many to be redeemed?',
                     style: const TextStyle(
                       fontSize: 18,
                     ),
@@ -107,7 +107,7 @@ class RedemptionWidget extends ResponsiveWidget<RewardsController> {
                     ),
                     child: Center(
                       child: Text(
-                        '${controller.user.value?.points}',
+                        '${controller.stateController.user?.points ?? 0}',
                         style: const TextStyle(
                           fontSize: 18,
                         ),
@@ -168,7 +168,7 @@ class RedemptionWidget extends ResponsiveWidget<RewardsController> {
                           builder: (context) {
                             return AlertDialog(
                               content: Text(
-                                'You have successfully redeemed ${controller.user.value?.points} points. You have received Ksh 160. Check balance for confirmation',
+                                'You have successfully redeemed ${controller.stateController.user?.points ?? 0} points. You have received Ksh 160. Check balance for confirmation',
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(fontSize: 18),
                               ),

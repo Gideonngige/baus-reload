@@ -106,7 +106,9 @@ class RewardsWidget extends ResponsiveWidget<RewardsController> {
             child: NotificationListener<ScrollNotification>(
               onNotification: (scrollInfo) {
                 if (scrollInfo.metrics.pixels ==
-                    scrollInfo.metrics.maxScrollExtent) controller.fetch(false);
+                    scrollInfo.metrics.maxScrollExtent) {
+                  controller.fetch(false);
+                }
                 return false;
               },
               child: controller.rewards.isNotEmpty
@@ -153,7 +155,7 @@ class RewardsWidget extends ResponsiveWidget<RewardsController> {
                                               Text.rich(
                                                 TextSpan(
                                                   text:
-                                                      '${controller.user.value!.points} points ',
+                                                      '${controller.stateController.user?.points ?? 0} points ',
                                                   style: const TextStyle(
                                                     color: Colors.white,
                                                     fontWeight: FontWeight.bold,

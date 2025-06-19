@@ -21,6 +21,7 @@ import 'package:google_place/google_place.dart';
 import 'package:google_maps_webservice/geocoding.dart' as geocoding;
 
 enum BookingState {
+  kProduct,
   kDetails,
   kWaste,
   kPayment,
@@ -122,6 +123,12 @@ class BookingController extends GetxController {
 
     if (withProduct == 'yes' && type == 'disposal') {
       data.value['frequency'] = 'monthly';
+      // For subscriptions, set default categories since waste selection step might be skipped
+      data.value['categories'] = ['plastic']; // Default to plastic for subscriptions
+      // Add empty files array to prevent API validation errors
+      data.value['files'] = [];
+      // Start with product selection for subscriptions
+      bookingState.value = BookingState.kProduct;
     }
 
     ever(userSocket.picker, (value) {
@@ -215,7 +222,7 @@ class BookingController extends GetxController {
 
       station.value = result!.station;
 
-      data.value['station'] = station.value!.id;
+      data.value['station'] = station.value?.id;
 
       prices.addAll(result.prices!);
 
@@ -284,8 +291,8 @@ class BookingController extends GetxController {
       if (details != null && details.result != null) {
         data.update((val) {
           val!['area'] = prediction.description;
-          val['latitude'] = details.result!.geometry!.location!.lat;
-          val['longitude'] = details.result!.geometry!.location!.lng;
+          val['latitude'] = details.result?.geometry?.location?.lat;
+          val['longitude'] = details.result?.geometry?.location?.lng;
         });
 
         updateLocation();
