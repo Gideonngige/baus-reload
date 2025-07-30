@@ -68,9 +68,7 @@ class ProfileWidget extends GetResponsiveView<ProfileController> {
                   ),
                   onChanged: (value) => controller.map['displayName'] = value,
                   keyboardType: TextInputType.name,
-                  controller: TextEditingController(
-                    text: controller.map['displayName'],
-                  ),
+                  controller: controller.displayNameController,
                   textAlignVertical: TextAlignVertical.center,
                 ),
               ),
@@ -131,9 +129,7 @@ class ProfileWidget extends GetResponsiveView<ProfileController> {
                   ),
                   onChanged: (value) => controller.map['username'] = value,
                   keyboardType: TextInputType.text,
-                  controller: TextEditingController(
-                    text: controller.map['username'],
-                  ),
+                  controller: controller.usernameController,
                   textAlignVertical: TextAlignVertical.center,
                   maxLength: 64,
                 ),
@@ -170,9 +166,7 @@ class ProfileWidget extends GetResponsiveView<ProfileController> {
                         textCapitalization: TextCapitalization.sentences,
                         maxLines: null,
                         maxLength: 360,
-                        controller: TextEditingController(
-                          text: controller.map['description'],
-                        ),
+                        controller: controller.descriptionController,
                       ),
                     ),
                   ],
