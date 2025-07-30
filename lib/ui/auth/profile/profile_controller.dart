@@ -4,6 +4,7 @@ import 'package:baustaka/config/env.dart';
 import 'package:baustaka/db/user_db.dart';
 import 'package:baustaka/helper/session.dart';
 import 'package:baustaka/helper/util.dart';
+import 'package:baustaka/ui/main/main_controller.dart';
 import 'package:baustaka/ui/state/state_controller.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -213,6 +214,8 @@ class ProfileController extends GetxController {
     map.refresh();
   }
 
+
+
   Future<void> add() async {
     if (isAdding.isTrue) return;
     isAdding.value = true;
@@ -282,7 +285,27 @@ class ProfileController extends GetxController {
         // description: description ?? 'Update from user',
       );
 
-      Get.back(result: true);
+      // Check if we're in the bottom navigation context
+      if (action == 'bottom_nav') {
+        // Navigate to home tab in the nested navigator
+        Navigator.pushNamedAndRemoveUntil(
+          Get.nestedKey(1)!.currentContext!,
+          '/home',
+          (route) => false,
+        );
+        
+        // Update the main controller's currentPage to reflect home state (value 2)
+        try {
+          final mainController = Get.find<MainController>();
+          mainController.currentPage.value = 2;
+        } catch (e) {
+          print('Could not find MainController: $e');
+        }
+      } else {
+        // Regular navigation (sidebar case)
+        Get.back(result: true);
+      }
+      
       Util.toast('Account updated');
     } catch (e) {
       Util.toast(e.toString());

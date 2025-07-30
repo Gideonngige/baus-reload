@@ -39,7 +39,7 @@ class MainWidget extends GetResponsiveView<MainController> {
                 Widget page;
                 switch (settings.name) {
                   case '/profile':
-                    page = ProfileWidget();
+                    page = ProfileWidget(action: 'bottom_nav');
                     break;
                   case '/blogs':
                     page = BlogsWidget();
