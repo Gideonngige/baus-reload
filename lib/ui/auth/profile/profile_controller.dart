@@ -1,6 +1,7 @@
 // import 'package:baustaka/api/auth_api.dart';
 import 'package:baustaka/api/user_api.dart';
 import 'package:baustaka/config/env.dart';
+import 'package:baustaka/db/user_db.dart';
 import 'package:baustaka/helper/session.dart';
 import 'package:baustaka/helper/util.dart';
 import 'package:baustaka/ui/state/state_controller.dart';
@@ -21,6 +22,9 @@ class ProfileController extends GetxController {
   ProfileController({required this.action});
 
   late TextEditingController phoneController;
+  late TextEditingController displayNameController;
+  late TextEditingController usernameController;
+  late TextEditingController descriptionController;
 
   bool get isPhoneUser {
     final fUser = FirebaseAuth.instance.currentUser;
@@ -33,13 +37,19 @@ class ProfileController extends GetxController {
   void onInit() {
     super.onInit();
     phoneController = TextEditingController();
+    displayNameController = TextEditingController();
+    usernameController = TextEditingController();
+    descriptionController = TextEditingController();
     _loadUserData();
   }
 
   @override
   void onClose() {
-    // Dispose the phoneController when the controller is closed
+    // Dispose all controllers when the controller is closed
     phoneController.dispose();
+    displayNameController.dispose();
+    usernameController.dispose();
+    descriptionController.dispose();
     super.onClose();
   }
 
@@ -114,35 +124,92 @@ class ProfileController extends GetxController {
 
 
   void _loadUserData() async {
-    // 1) Try to load from Firestore
-    final fUser = FirebaseAuth.instance.currentUser;
-    if (fUser == null) return;
+    try {
+      // 1) First try to load from local cache for immediate display
+      final cachedUser = await UserDb.getCachedUser();
+      if (cachedUser != null) {
+        _populateFields(
+          displayName: cachedUser.displayName ?? '',
+          username: cachedUser.username ?? '',
+          phoneNumber: cachedUser.phoneNumber ?? '',
+          description: cachedUser.description ?? '',
+        );
+        print('Profile fields populated from cached data');
+      }
 
-    final docSnapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(fUser.uid)
-        .get();
+      // 2) Get current Firebase user
+      final fUser = FirebaseAuth.instance.currentUser;
+      if (fUser == null) return;
 
-    // 2) If doc exists, populate map:
-    if (docSnapshot.exists) {
-      final data = docSnapshot.data();
+      // 3) Try to load from Firestore for latest data
+      final docSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(fUser.uid)
+          .get();
 
-      map['displayName'] = fUser.displayName ?? data?['displayName'] ?? '';
+      String displayName = '';
+      String username = '';
+      String phoneNumber = '';
+      String description = '';
 
-      map['username'] =
-          data?['username'] ?? (fUser.email?.split('@').first) ?? '';
+      // 4) Build comprehensive data from all sources
+      if (docSnapshot.exists) {
+        final data = docSnapshot.data();
 
-      map['phoneNumber'] = data?['phoneNumber'] ?? fUser.phoneNumber;
+        displayName = fUser.displayName ?? data?['displayName'] ?? '';
+        username = data?['username'] ?? (fUser.email?.split('@').first) ?? '';
+        phoneNumber = data?['phoneNumber'] ?? fUser.phoneNumber ?? '';
+        description = data?['description'] ?? '';
+      } else {
+        displayName = fUser.displayName ?? '';
+        phoneNumber = fUser.phoneNumber ?? '';
+        username = fUser.email?.split('@').first ?? '';
+        description = '';
+      }
 
-      map['description'] = data?['description'] ?? '';
-    } else {
-      map['displayName'] = fUser.displayName ?? '';
-      map['phoneNumber'] = fUser.phoneNumber;
-      map['username'] = fUser.email?.split('@').first ?? '';
-      map['description'] = '';
+      // 5) Populate all fields with the comprehensive data
+      _populateFields(
+        displayName: displayName,
+        username: username,
+        phoneNumber: phoneNumber,
+        description: description,
+      );
+
+      print('Profile fields populated from Firebase/Firestore data');
+    } catch (e) {
+      print('Error loading user data: $e');
+      // If there's an error, try to use whatever cached data we have
+      final cachedUser = await UserDb.getCachedUser();
+      if (cachedUser != null) {
+        _populateFields(
+          displayName: cachedUser.displayName ?? '',
+          username: cachedUser.username ?? '',
+          phoneNumber: cachedUser.phoneNumber ?? '',
+          description: cachedUser.description ?? '',
+        );
+      }
     }
+  }
 
-    phoneController.text = map['phoneNumber'] ?? '';
+  void _populateFields({
+    required String displayName,
+    required String username,
+    required String phoneNumber,
+    required String description,
+  }) {
+    // Update the reactive map
+    map['displayName'] = displayName;
+    map['username'] = username;
+    map['phoneNumber'] = phoneNumber;
+    map['description'] = description;
+
+    // Update all text controllers
+    displayNameController.text = displayName;
+    usernameController.text = username;
+    phoneController.text = phoneNumber;
+    descriptionController.text = description;
+
+    // Refresh the UI
     map.refresh();
   }
 
