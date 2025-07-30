@@ -17,7 +17,6 @@ class EmailController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    showUpdateAlert();
     
     // Check if email was passed in arguments (for users who just linked their email)
     if (Get.arguments != null && Get.arguments is Map && Get.arguments['email'] != null) {
@@ -26,23 +25,7 @@ class EmailController extends GetxController {
       Util.toast('Please sign in with your newly linked email and password');
     }
   }
-  void showUpdateAlert() {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Important Notice'),
-        content: const Text(
-          'If you are updating from the previous version, kindly use the phone icon to sign in, otherwise, use any other sign method.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-      barrierDismissible: false, // Prevent dismissing by tapping outside
-    );
-  }
+
   var isSigningIn = false.obs;
   var obscureText = true.obs;
 
