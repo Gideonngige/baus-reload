@@ -132,27 +132,7 @@ class PostWidget extends ResponsiveWidget<PostController> {
                               fontWeight: FontWeight.bold,
                             ),
                       ),
-                      trailing: post.client == 'residential'
-                          ? Container(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 8,
-                                horizontal: 16,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Theme.of(screen.context).primaryColor,
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(8),
-                                ),
-                              ),
-                              child: Text(
-                                'Ksh ${post.price}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            )
-                          : null,
+                      trailing: null, // Price removed for residential customers
                     ),
                     ListTile(
                       title: Text(
