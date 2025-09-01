@@ -44,7 +44,7 @@ class BookingController extends GetxController {
   Rx<Map<String, dynamic>> data = Rx({
     'date': DateTime.now(),
     'frequency': 'one-time',
-    'total': 1,
+    'total': 1.0,
     'categories': List<String>.empty(
       growable: true,
     ),
@@ -80,7 +80,7 @@ class BookingController extends GetxController {
 
   TextEditingController phoneNumber = TextEditingController(text: '');
 
-  TextEditingController total = TextEditingController(text: '1');
+  TextEditingController total = TextEditingController(text: '1.0');
 
   // Enhanced location search functionality
   TextEditingController searchController = TextEditingController();

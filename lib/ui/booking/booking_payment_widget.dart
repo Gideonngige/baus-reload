@@ -99,18 +99,7 @@ class BookingPaymentWidget extends ResponsiveWidget<BookingController> {
                                   fontSize: 18,
                                 ),
                               ),
-                              if (controller.data.value['client'] ==
-                                  'residential')
-                                Text(
-                                  'Ksh ${e.cost}',
-                                  style: TextStyle(
-                                    color:
-                                        e.mode == controller.data.value['mode']
-                                            ? Colors.green
-                                            : Colors.black,
-                                    fontSize: 18,
-                                  ),
-                                ),
+                              // Prices removed for residential customers
                             ],
                           ),
                         ),

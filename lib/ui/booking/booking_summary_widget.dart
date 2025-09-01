@@ -153,22 +153,7 @@ class BookingSummaryWidget extends ResponsiveWidget<BookingController> {
                         )
                       ],
                     ),
-                    if (controller.data.value['client'] == 'residential')
-                      Container(
-                        padding: const EdgeInsets.all(10.0),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: controller.color,
-                        ),
-                        child: Text(
-                          'Ksh ${controller.data.value['price']}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
-                        ),
-                      ),
+                    // Price removed for residential customers
                   ],
                 ),
               ),

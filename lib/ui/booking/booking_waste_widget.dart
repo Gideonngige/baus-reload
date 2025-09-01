@@ -234,13 +234,13 @@ class BookingWasteWidget extends ResponsiveWidget<BookingController> {
                     try {
                       var val = controller.data.value;
                       try {
-                        val['total'] = int.tryParse(value);
+                        val['total'] = double.tryParse(value);
 
-                        if (val['total'] == 0) {
-                          throw 'Value cannot be 0';
+                        if (val['total'] == null || val['total'] <= 0) {
+                          throw 'Value must be greater than 0';
                         }
                       } catch (e) {
-                        val['total'] = 1;
+                        val['total'] = 1.0;
                       }
                     } catch (e) {
                       if (kDebugMode) {
@@ -248,7 +248,7 @@ class BookingWasteWidget extends ResponsiveWidget<BookingController> {
                       }
                     }
                   },
-                  keyboardType: TextInputType.number,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   controller: controller.total,
                 ),
                 const SizedBox(
