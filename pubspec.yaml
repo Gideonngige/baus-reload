@@ -63,6 +63,15 @@ dependencies:
   google_place: ^0.4.7
   crop_your_image: ^2.0.0
   pin_code_fields: ^8.0.1
+  # marketplace
+  shared_preferences: ^2.3.2
+  geocoding: ^3.0.0
+  carousel_slider: 4.2.0
+  open_file: ^3.3.2
+  pdf: ^3.10.7
+  google_fonts: ^4.0.4
+  fl_chart: ^0.68.0
+  http: ^0.13.6
 
 dev_dependencies:
   flutter_test:
@@ -79,6 +88,7 @@ flutter:
   - .env
   - assets/icons/
   - assets/images/
+  - assets/images/marketplace/
   fonts:
   - family: Medium
     fonts:
