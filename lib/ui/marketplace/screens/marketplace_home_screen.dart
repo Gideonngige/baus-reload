@@ -9,6 +9,7 @@ import 'create_listing_step1.dart';
 import 'chat_screen.dart';
 import 'buyer_orders_screen.dart';
 import 'seller_dashboard_screen.dart';
+import '../widgets/message_pop.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
@@ -84,10 +85,12 @@ class _MarketplaceHomeScreenState extends State<MarketplaceHomeScreen> {
         });
       } else {
         print('Failed to load listings: ${response.body}');
+        showBaustakaMessage(context, 'Failed to load listings.');
         setState(() => isLoading = false);
       }
     } catch (e) {
       print('Error fetching listings: $e');
+      showBaustakaMessage(context, 'An error occured while fetching listings');
       setState(() => isLoading = false);
     }
   }
