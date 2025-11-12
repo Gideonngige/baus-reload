@@ -18,6 +18,7 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:baustaka/ui/marketplace/screens/marketplace_home_screen.dart';
 
 class HomeWidget extends ResponsiveWidget<HomeController> {
   HomeWidget({super.key});
@@ -276,6 +277,13 @@ class HomeWidget extends ResponsiveWidget<HomeController> {
                     onTap: () async {
                       Navigator.of(screen.context).pop();
                       await Get.toNamed(Routes.kAddChamp);
+                    },
+                  ),
+                  _drawerListTile(
+                    icon: Icons.storefront,
+                    label: 'Marketplace',
+                    onTap: () async {
+                      await Get.to(() => MarketplaceHomeScreen());
                     },
                   ),
                   _drawerListTileWithTrailingIcon(
