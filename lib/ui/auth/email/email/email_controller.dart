@@ -12,6 +12,7 @@ import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EmailController extends GetxController {
   @override
@@ -54,6 +55,17 @@ class EmailController extends GetxController {
       final data = response.data;
       // You could store it in Session if you want:
       // Session.serverUser = data['user'];
+
+      //to -> marketplace
+      final prefs = await SharedPreferences.getInstance();
+      if (token != null && data != null) {
+        await prefs.setString('token', token);
+        prefs.setString('user', jsonEncode(response.data['user']));
+      } else {
+        print("Token or data are null — skipping cache save");
+      }
+      
+      print("Firebase token $token");
 
       // Or just log it:
       print('Server user: ${data['user']}');
