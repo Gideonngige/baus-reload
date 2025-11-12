@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'create_order_screen.dart';
+import '../widgets/message_pop.dart';
 
 class AllListingsScreen extends StatefulWidget {
   const AllListingsScreen({super.key});
@@ -44,14 +45,10 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
           listings = data;
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load listings: ${response.body}')),
-        );
+        showBaustakaMessage(context, 'Failed to load listings.');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+        showBaustakaMessage(context, 'An error occurred while fetching listings.');
     } finally {
       setState(() => isLoading = false);
     }

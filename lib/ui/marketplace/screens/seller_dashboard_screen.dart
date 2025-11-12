@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../widgets/message_pop.dart';
 
 class SellerDashboardScreen extends StatefulWidget {
   const SellerDashboardScreen({super.key});
@@ -52,10 +53,12 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
         });
       } else {
         setState(() => isLoading = false);
+        showBaustakaMessage(context, 'Failed to fetch dashboard.');
         print("Failed to fetch dashboard: ${response.body}");
       }
     } catch (e) {
       print("Error fetching dashboard: $e");
+      showBaustakaMessage(context, 'Error fetching dashboard: $e');
       setState(() => isLoading = false);
     }
   }

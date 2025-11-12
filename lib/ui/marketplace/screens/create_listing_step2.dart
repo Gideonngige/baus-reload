@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../widgets/message_pop.dart';
 
 class CreateListingStep2 extends StatefulWidget {
   final String title;
@@ -47,14 +48,20 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
 }
 
   Future<void> _submitListing() async {
+   final price = _priceController.text.trim();
+  final weight = _weightController.text.trim();
+
+    if (price.isEmpty || weight.isEmpty) {
+    setState(() => isLoading = false);
+    showBaustakaMessage(context, 'Fill in all the fields!.');
+    return;
+  }
+
   setState(() => isLoading = true);
 
   final prefs = await SharedPreferences.getInstance();
-//   final token = prefs.getString('token');
-//   final storedUser = prefs.getString('user');
-
-  final token = 'dummy_token_12345';
-final storedUser = '{"id": 1, "name": "Test Seller", "email": "seller@test.com"}';
+  final token = prefs.getString('token');
+  final storedUser = prefs.getString('user');
 
   final cachedLocation = await getCachedLocation();
 
@@ -65,23 +72,12 @@ final storedUser = '{"id": 1, "name": "Test Seller", "email": "seller@test.com"}
 
   if (token == null || storedUser == null) return;
 
-  final price = _priceController.text.trim();
-  final weight = _weightController.text.trim();
-
-  if (price.isEmpty || weight.isEmpty) {
-    setState(() => isLoading = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Fill in all the fields!")),
-    );
-    return;
-  }
-
   final user = jsonDecode(storedUser);
   final sellerId = user['id'];
-  final url = Uri.parse('https://baustaka-backend.onrender.com/api/listings/create');
+  final url = Uri.parse('http://192.168.100.5:5363/v1/listings/');
 
   try {
-    // ✅ Create a multipart request
+    // Create a multipart request
     var request = http.MultipartRequest('POST', url);
 
     // Add headers
@@ -97,7 +93,7 @@ final storedUser = '{"id": 1, "name": "Test Seller", "email": "seller@test.com"}
     request.fields['longitude'] = (longitude ?? 37.7211678).toString();
     request.fields['sellerId'] = sellerId.toString();
 
-    // ✅ Attach image file if selected
+    //Attach image file if selected
     if (widget.imageFile != null) {
       request.files.add(await http.MultipartFile.fromPath(
         'image',
@@ -112,22 +108,16 @@ final storedUser = '{"id": 1, "name": "Test Seller", "email": "seller@test.com"}
     setState(() => isLoading = false);
 
     if (response.statusCode == 201) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Listing uploaded successfully!')),
-      );
-      Navigator.pop(context);
+        showBaustakaMessage(context, 'Listing uploaded successfully!.');
+        Navigator.pop(context);
     } else {
-      print("Failed response: ${response.body}");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed: ${response.body}')),
-      );
+        showBaustakaMessage(context, 'Failed to upload listing.');
+        print("Failed response: ${response.body}");
     }
   } catch (e) {
     setState(() => isLoading = false);
+    showBaustakaMessage(context, 'An error occurred while uploading listing!.');
     print("Error uploading: $e");
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error: $e')),
-    );
   }
 }
 

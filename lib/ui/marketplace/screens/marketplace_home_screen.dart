@@ -284,12 +284,7 @@ location = locationName;
             final prefs = await SharedPreferences.getInstance();
             await prefs.clear();
             Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Logged out successfully'),
-                backgroundColor: Colors.green[800],
-              ),
-            );
+            showBaustakaMessage(context, 'Logged out successfully.');
           },
         ),
       ],
@@ -502,32 +497,34 @@ location = locationName;
                     const SizedBox(height: 20),
 
                     // View All Button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const AllListingsScreen()),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green[800],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        child: const Text(
-                          'View All Listings',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 17,
-                              fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ),
+                    // View All Button (only show if listings exist)
+if (listings.isNotEmpty)
+  SizedBox(
+    width: double.infinity,
+    height: 50,
+    child: ElevatedButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const AllListingsScreen()),
+        );
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.green[800],
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10)),
+      ),
+      child: const Text(
+        'View All Listings',
+        style: TextStyle(
+            color: Colors.white,
+            fontSize: 17,
+            fontWeight: FontWeight.w600),
+      ),
+    ),
+  ),
+
                   ],
                 ),
               ),

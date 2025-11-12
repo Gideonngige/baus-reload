@@ -3,6 +3,7 @@ import 'tracking_screen.dart';
 import 'dart:convert'; // for jsonDecode
 import 'package:http/http.dart' as http; // for API calls
 import 'package:shared_preferences/shared_preferences.dart'; // for prefs
+import '../widgets/message_pop.dart';
 
 
 class BuyerOrdersScreen extends StatefulWidget {
@@ -57,11 +58,13 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
         });
       }else{
         setState(() => isLoading = false);
+        showBaustakaMessage(context, 'Failed to load orders.');
         print('Failed to load orders: ${response.body}');
       }
 
     }catch(e){
       print('Error fetching orders: $e');
+      showBaustakaMessage(context, 'Error fetching orders.');
       setState(() => isLoading = false);
     }
   }

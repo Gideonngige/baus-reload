@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../widgets/message_pop.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -27,20 +28,25 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _loadUserDataAndMessages() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userString = prefs.getString('user');
-    final storedToken = prefs.getString('token');
+  final prefs = await SharedPreferences.getInstance();
+  final userString = prefs.getString('user');
+  final storedToken = prefs.getString('token');
 
-
-    if (userString != null && token != null) {
-      final user = jsonDecode(userString);
-      setState(() {
-        userId = user['_id'];
-        token = storedToken;
-      });
-      await _fetchMessages();
-    }
+  if (userString != null && storedToken != null) {  // <- use storedToken here
+    final user = jsonDecode(userString);
+    setState(() {
+      userId = user['_id'];
+      token = storedToken; // assign token here
+    });
+    await _fetchMessages();
+  } else {
+    // If no user/token, stop loading
+    setState(() {
+      _isLoading = false;
+    });
   }
+}
+
 
   Future<void> _fetchMessages() async {
     if (userId == null) return;
@@ -61,12 +67,14 @@ class _ChatScreenState extends State<ChatScreen> {
           _isLoading = false;
         });
       } else {
+        showBaustakaMessage(context, 'Failed to load messages.');
         print('Failed to load messages: ${response.body}');
         setState(() => _isLoading = false);
       }
     } catch (e) {
-      print('Error fetching messages: $e');
-      setState(() => _isLoading = false);
+        showBaustakaMessage(context, 'Error fetching messages: $e.');
+        print('Error fetching messages: $e');
+        setState(() => _isLoading = false);
     }
   }
 
@@ -95,10 +103,12 @@ class _ChatScreenState extends State<ChatScreen> {
           _messageController.clear();
         });
       } else {
+        showBaustakaMessage(context, 'Message not sent: ${response.body}.');
         print("Failed to send message: ${response.body}");
       }
     } catch (e) {
-      print("Error sending message: $e");
+        showBaustakaMessage(context, 'Error sending message: $e.');
+        print("Error sending message: $e");
     }
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'purchase_summary_screen.dart';
+import '../widgets/message_pop.dart';
 
 class CreateOrderScreen extends StatefulWidget {
   final Map<String, dynamic> item; // item details (from listing)
@@ -26,12 +27,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     final qtyText = _quantityController.text.trim();
 
     if (qtyText.isEmpty || double.tryParse(qtyText) == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please enter a valid quantity."),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
+        showBaustakaMessage(context, 'Please enter a valid quantity.');
       return;
     }
 
@@ -42,16 +38,11 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
 
     try {
       final prefs = await SharedPreferences.getInstance();
-    //   final token = prefs.getString('token');
-    //   final storedUser = prefs.getString('user');
-
-      final token = 'dummy_token_12345';
-final storedUser = '{"id": 1, "name": "Test Seller", "email": "seller@test.com"}';
+      final token = prefs.getString('token');
+      final storedUser = prefs.getString('user');
 
       if (token == null || storedUser == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please sign in again.")),
-        );
+        showBaustakaMessage(context, 'Please sign  in again.');
         return;
       }
 
@@ -84,12 +75,7 @@ final storedUser = '{"id": 1, "name": "Test Seller", "email": "seller@test.com"}
       setState(() => isLoading = false);
 
       if (response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Order placed successfully!"),
-            backgroundColor: Colors.green[800],
-          ),
-        );
+        showBaustakaMessage(context, 'Order placed successfully.');
 
         // Navigate to purchase summary screen
         Navigator.pushReplacement(
@@ -105,15 +91,11 @@ final storedUser = '{"id": 1, "name": "Test Seller", "email": "seller@test.com"}
         );
       } else {
         final error = jsonDecode(response.body);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed: ${error['message'] ?? 'Error'}")),
-        );
+        showBaustakaMessage(context, 'Failed to place order: $error.');
       }
     } catch (e) {
       setState(() => isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
-      );
+      showBaustakaMessage(context, 'Error placing order: $e.');
     }
   }
 

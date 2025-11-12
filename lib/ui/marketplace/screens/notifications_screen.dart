@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../widgets/message_pop.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -49,17 +50,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         });
       } else {
         setState(() => isLoading = false);
+        showBaustakaMessage(context, 'Failed to load notifications.');
         print('Failed to load notifications: ${response.body}');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load notifications')),
-        );
       }
     } catch (e) {
       setState(() => isLoading = false);
+      showBaustakaMessage(context, 'An error occurred while fetching notifications.');
       print('Error fetching notifications: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
     }
   }
 
@@ -80,10 +77,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           if (index != -1) notifications[index]['isRead'] = true;
         });
       } else {
+        showBaustakaMessage(context, 'Failed to mark notification as read');
         print('Failed to mark notification as read');
       }
     } catch (e) {
-      print('Error marking as read: $e');
+        showBaustakaMessage(context, 'Error marking as read: $e');
+        print('Error marking as read: $e');
     }
   }
 
