@@ -48,13 +48,17 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
       }
 
       final user = jsonDecode(storedUser);
+      var phone = user['phoneNumber'];
+      if (phone.startsWith('+')) {
+        phone = phone.substring(1);
+      }
       final buyer = user['_id'];
       final listing = item['_id'];
       final price = double.tryParse(item['price'].toString()) ?? 0;
       final totalPrice = price * quantity;
 
       // Make API request
-      final url = Uri.parse('http://192.168.100.5:5363/v1/orders/');
+      final url = Uri.parse('http://192.168.100.5:5363/v1/mpesa/stkpush/');
       final response = await http.post(
         url,
         headers: {
@@ -62,6 +66,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
+          'phone': phone,
           'quantity': quantity,
           'totalPrice': totalPrice,
           'paymentMethod': 'M-Pesa',

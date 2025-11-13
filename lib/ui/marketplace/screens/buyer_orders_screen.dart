@@ -18,6 +18,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
   bool isLoading = true;
   String? token;
   Map<String, dynamic>? user;
+  String baseUrl = 'http://192.168.100.5:5363';
 
   @override
   void initState(){
@@ -30,6 +31,9 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
       final prefs = await SharedPreferences.getInstance();
       final storedToken = prefs.getString('token');
       final storedUser = prefs.getString('user');
+
+      print('Stored Token: $storedToken');
+      print('Stored User: $storedUser');
 
       if(storedToken == null || storedUser == null){
         setState(() => isLoading = false); 
@@ -52,8 +56,10 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
 
       if(response.statusCode == 200 || response.statusCode == 201){
         final data = jsonDecode(response.body);
+        print('Orders: $data');
         setState((){
-          orders = data['orders'];
+          orders = data;
+          print('Orders2: $orders');
           isLoading = false;
         });
       }else{
@@ -64,7 +70,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
 
     }catch(e){
       print('Error fetching orders: $e');
-      showBaustakaMessage(context, 'Error fetching orders.');
+      showBaustakaMessage(context, 'Error fetching orders.$e');
       setState(() => isLoading = false);
     }
   }
@@ -136,7 +142,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
         ClipRRect(
           borderRadius: BorderRadius.circular(10),
           child: Image.network(
-            order['Listing']['image'] , // you can later use order['image']
+            '$baseUrl${order['listing']['image']}' ?? 'https://via.placeholder.com/150',
             width: 70,
             height: 70,
             fit: BoxFit.cover,
@@ -147,7 +153,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(order['Listing']['title'] ?? 'Unknown Item',
+              Text(order['listing']['title'] ?? 'Unknown Item',
                   style: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w700)),
               const SizedBox(height: 5),

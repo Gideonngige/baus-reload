@@ -16,6 +16,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
   Map<String, dynamic>? dashboardData;
   bool isLoading = true;
   String? sellerName;
+  String baseUrl = 'http://192.168.100.5:5363';
 
   @override
   void initState() {
@@ -251,7 +252,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
                     item["status"] == "available"
                         ? Colors.green
                         : Colors.orange,
-                    image: item["image"],
+                    image: '$baseUrl${item['image']}' ?? 'https://via.placeholder.com/150',
                   );
                 }).toList(),
               ),
