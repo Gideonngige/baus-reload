@@ -19,7 +19,7 @@ class _ChatScreenState extends State<ChatScreen> {
   String? token;
 
   // 🔹 Replace with your backend base URL
-  final String baseUrl = "http://192.168.100.5:5363/v1/chat/message/";
+  final String baseUrl = "http://192.168.100.5:5363/v1/chat";
 
   @override
   void initState() {
@@ -53,7 +53,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/$userId'),
+        Uri.parse('$baseUrl/message/$userId'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -90,8 +90,8 @@ class _ChatScreenState extends State<ChatScreen> {
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          "senderId": userId,
-          "receiverId": 9, // assuming admin user has ID = 1
+          "sender": userId,
+          "receiver": "685a67c58564d3fd46253aaa", // assuming admin user has ID = 1
           "message": text,
         }),
       );

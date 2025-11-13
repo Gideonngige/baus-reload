@@ -40,6 +40,8 @@ class _MarketplaceHomeScreenState extends State<MarketplaceHomeScreen> {
   String? location;
   Map<String, dynamic>? user;
 
+  String baseUrl = 'http://192.168.100.5:5363';
+
   @override
   void initState() {
     super.initState();
@@ -150,8 +152,6 @@ class _MarketplaceHomeScreenState extends State<MarketplaceHomeScreen> {
   Placemark place = placemarks[0];
   // String locationName = place.locality ?? place.subLocality ?? place.name ?? "";
   String locationName = [
-  place.name,         // street name or building
-  place.subLocality,  // neighborhood
   place.locality,     // city/town
   place.administrativeArea, // state/province
   place.country       // country
@@ -441,8 +441,7 @@ location = locationName;
                                       ClipRRect(
                                         borderRadius: BorderRadius.circular(8),
                                         child: Image.network(
-                                          item['image'] ??
-                                              'https://via.placeholder.com/70',
+                                          item['image'] != null ? '$baseUrl${item['image']}' : 'https://via.placeholder.com/70',
                                           width: 70,
                                           height: 70,
                                           fit: BoxFit.cover,

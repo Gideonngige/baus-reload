@@ -16,6 +16,7 @@ class CreateOrderScreen extends StatefulWidget {
 class _CreateOrderScreenState extends State<CreateOrderScreen> {
   final TextEditingController _quantityController = TextEditingController();
   bool isLoading = false;
+  String baseUrl = 'http://192.168.100.5:5363';
 
   @override
   void dispose() {
@@ -47,13 +48,13 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
       }
 
       final user = jsonDecode(storedUser);
-      final buyerId = user['id'];
-      final listingId = item['id'];
+      final buyer = user['_id'];
+      final listing = item['_id'];
       final price = double.tryParse(item['price'].toString()) ?? 0;
       final totalPrice = price * quantity;
 
       // Make API request
-      final url = Uri.parse('https://baustaka-backend.onrender.com/api/orders/create');
+      final url = Uri.parse('http://192.168.100.5:5363/v1/orders/');
       final response = await http.post(
         url,
         headers: {
@@ -67,14 +68,14 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
           'latitude': -1.2921,
           'longitude': 36.8219,
           'locationName': 'Nairobi, Kenya',
-          'buyerId': buyerId,
-          'listingId': listingId,
+          'buyer': buyer,
+          'listing': listing,
         }),
       );
 
       setState(() => isLoading = false);
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
         showBaustakaMessage(context, 'Order placed successfully.');
 
         // Navigate to purchase summary screen
@@ -91,11 +92,11 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
         );
       } else {
         final error = jsonDecode(response.body);
-        showBaustakaMessage(context, 'Failed to place order: $error.');
+        showBaustakaMessage(context, 'Failed to place order!.');
       }
     } catch (e) {
       setState(() => isLoading = false);
-      showBaustakaMessage(context, 'Error placing order: $e.');
+      showBaustakaMessage(context, 'Error placing order!.');
     }
   }
 
@@ -129,7 +130,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
             // Image
             Center(
               child: Image.network(
-                item['image'] ?? 'https://via.placeholder.com/150',
+                '$baseUrl${item['image']}' ?? 'https://via.placeholder.com/150',
                 height: 120,
                 fit: BoxFit.cover,
               ),

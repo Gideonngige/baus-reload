@@ -73,7 +73,7 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
   if (token == null || storedUser == null) return;
 
   final user = jsonDecode(storedUser);
-  final sellerId = user['id'];
+  final sellerId = user['_id'];
   final url = Uri.parse('http://192.168.100.5:5363/v1/listings/');
 
   try {

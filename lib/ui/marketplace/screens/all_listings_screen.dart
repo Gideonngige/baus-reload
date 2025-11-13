@@ -17,6 +17,7 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
   List<dynamic> listings = [];
   bool isLoading = true;
   String searchQuery = '';
+  String baseUrl = 'http://192.168.100.5:5363';
 
   @override
   void initState() {
@@ -175,7 +176,7 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
                                           topRight: Radius.circular(12),
                                         ),
                                         child: Image.network(
-                                          item['image'] ?? '',
+                                          item['image'] != null ? '$baseUrl${item['image']}' : '',
                                           height: 120,
                                           width: double.infinity,
                                           fit: BoxFit.cover,
