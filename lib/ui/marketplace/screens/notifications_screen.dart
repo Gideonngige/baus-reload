@@ -60,10 +60,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  Future<void> markAsRead(int id) async {
+  Future<void> markAsRead(String id) async {
     try {
-      final url = Uri.parse('https://baustaka-backend.onrender.com/api/notifications/$id/read');
-      final response = await http.patch(
+      final url = Uri.parse('http://192.168.100.5:5363/v1/notifications/read/$id');
+      final response = await http.put(
         url,
         headers: {
           'Authorization': 'Bearer $token',
@@ -73,7 +73,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
       if (response.statusCode == 200) {
         setState(() {
-          final index = notifications.indexWhere((n) => n['id'] == id);
+          final index = notifications.indexWhere((n) => n['_id'] == id);
           if (index != -1) notifications[index]['isRead'] = true;
         });
       } else {
@@ -89,7 +89,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   void markAllAsRead() {
     setState(() {
       for (var n in notifications) {
-        n['is_read'] = true;
+        n['isRead'] = true;
       }
     });
   }
@@ -137,7 +137,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     return Container(
                       margin: const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
-                        color: n['is_read'] == true
+                        color: n['isRead'] == true
                             ? Colors.white
                             : Colors.green.withOpacity(0.05),
                         borderRadius: BorderRadius.circular(12),
@@ -158,7 +158,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           n['message'] ?? 'No message',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: n['is_read'] == true
+                            color: n['isRead'] == true
                                 ? Colors.black87
                                 : Colors.green.shade800,
                           ),
@@ -167,7 +167,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           n['createdAt'] ?? '',
                           style: const TextStyle(color: Colors.grey),
                         ),
-                        onTap: () => markAsRead(n['id']),
+                        onTap: () => markAsRead(n['_id']),
                       ),
                     );
                   },

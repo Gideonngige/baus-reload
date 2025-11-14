@@ -30,7 +30,6 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
       final userString = prefs.getString('user');
       final token = prefs.getString('token');
 
-
       if (userString == null || token == null) {
         setState(() => isLoading = false);
         return;
@@ -39,9 +38,8 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
       final user = jsonDecode(userString);
       final sellerId = user['_id'];
       sellerName = user['displayName'];
-      print("Seller ID: $sellerId");
 
-      final url = Uri.parse("http://192.168.100.5:5363/v1/seller/dashboard/$sellerId/");
+      final url = Uri.parse("$baseUrl/v1/seller/dashboard/$sellerId/");
 
       final response = await http.get(url, headers: {
         'Authorization': 'Bearer $token',
@@ -66,21 +64,6 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator(color: Colors.green)),
-      );
-    }
-
-    if (dashboardData == null) {
-      return const Scaffold(
-        body: Center(child: Text("No dashboard data available.")),
-      );
-    }
-
-    final recentListings = dashboardData!["recentListings"] ?? [];
-    final monthlySales = dashboardData!["monthlySales"] ?? [];
-
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
@@ -97,174 +80,169 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
         backgroundColor: Colors.green[800],
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 🟢 Welcome Section
-            Text(
-              'Hi, ${sellerName ?? 'User'} 👋',
-              // "Seller",
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 6),
-            const Text(
-              'Here’s your sales summary for this month.',
-              style: TextStyle(color: Colors.grey, fontSize: 15),
-            ),
-
-            const SizedBox(height: 25),
-
-            // 🔹 Top Stats
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildStatCard(
-                  title: "Total Sales",
-                  value: "Ksh. ${dashboardData!["totalSales"] ?? 0}",
-                  icon: Icons.attach_money_rounded,
-                  color: Colors.green,
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator(color: Colors.green))
+          : dashboardData == null
+              ? const Center(child: Text("No dashboard data available."))
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: _buildDashboardContent(),
                 ),
-                _buildStatCard(
-                  title: "Total KG Sold",
-                  value: "${dashboardData!["totalKgSold"] ?? 0} kg",
-                  icon: Icons.scale_rounded,
-                  color: Colors.orange,
-                ),
-              ],
-            ),
-            const SizedBox(height: 15),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildStatCard(
-                  title: "Pending Orders",
-                  value: "${dashboardData!["pendingOrders"] ?? 0}",
-                  icon: Icons.pending_actions_rounded,
-                  color: Colors.blue,
-                ),
-                _buildStatCard(
-                  title: "Completed",
-                  value: "${dashboardData!["completedOrders"] ?? 0}",
-                  icon: Icons.check_circle_outline,
-                  color: Colors.purple,
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 30),
-
-            // Bar Chart
-            const Text(
-              "Monthly Sales Overview",
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87),
-            ),
-            const SizedBox(height: 15),
-            Container(
-              height: 220,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      blurRadius: 6,
-                      offset: const Offset(0, 3))
-                ],
-              ),
-              child: BarChart(
-  BarChartData(
-    alignment: BarChartAlignment.spaceAround,
-    gridData: const FlGridData(show: false),
-    borderData: FlBorderData(show: false),
-    titlesData: FlTitlesData(
-      leftTitles:
-          const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-      rightTitles:
-          const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-      topTitles:
-          const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-      bottomTitles: AxisTitles(
-        sideTitles: SideTitles(
-          showTitles: true,
-          reservedSize: 30,
-          getTitlesWidget: (value, meta) {
-            if (value.toInt() < monthlySales.length) {
-              return Text(
-                monthlySales[value.toInt()]["month"] ?? "",
-                style: const TextStyle(color: Colors.grey, fontSize: 12),
-              );
-            }
-            return const Text("");
-          },
-        ),
-      ),
-    ),
-    // ✅ FIXED HERE ↓↓↓
-    barGroups: monthlySales.asMap().entries.map((entry) {
-      final index = entry.key;
-      final sale = entry.value;
-      return BarChartGroupData(x: index, barRods: [
-        BarChartRodData(
-          toY: (sale["sales"] ?? 0).toDouble(),
-          color: Colors.green,
-          width: 18,
-          borderRadius: BorderRadius.circular(6),
-        ),
-      ]);
-    }).toList().cast<BarChartGroupData>(), // 👈 Add this cast
-  ),
-),
-
-            ),
-
-            const SizedBox(height: 30),
-
-            //  Recent Listings
-            const Text(
-              "Recent Listings",
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87),
-            ),
-            const SizedBox(height: 15),
-
-            if (recentListings.isEmpty)
-              const Center(child: Text("No listings available"))
-            else
-              Column(
-                children: recentListings.map<Widget>((item) {
-                  return _buildListingTile(
-                    item["title"] ?? "Unknown",
-                    "Ksh. ${item["price"] ?? 0}",
-                    "${item["weight"] ?? 0} kg",
-                    item["status"] ?? "N/A",
-                    item["status"] == "available"
-                        ? Colors.green
-                        : Colors.orange,
-                    image: '$baseUrl${item['image']}' ?? 'https://via.placeholder.com/150',
-                  );
-                }).toList(),
-              ),
-
-            const SizedBox(height: 30),
-          ],
-        ),
-      ),
     );
   }
 
-  //  Helper: Stat Card
+  //  Dashboard Content
+  Widget _buildDashboardContent() {
+    final recentListings = dashboardData!["recentListings"] ?? [];
+    final monthlySales = dashboardData!["monthlySales"] ?? [];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Welcome Section
+        Text(
+          'Hi, ${sellerName ?? 'User'} 👋',
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 6),
+        const Text(
+          'Here’s your sales summary for this month.',
+          style: TextStyle(color: Colors.grey, fontSize: 15),
+        ),
+        const SizedBox(height: 25),
+
+        // Top Stats
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildStatCard(
+              title: "Total Sales",
+              value: "Ksh. ${dashboardData!["totalSales"] ?? 0}",
+              icon: Icons.attach_money_rounded,
+              color: Colors.green,
+            ),
+            _buildStatCard(
+              title: "Total KG Sold",
+              value: "${dashboardData!["totalKgSold"] ?? 0} kg",
+              icon: Icons.scale_rounded,
+              color: Colors.orange,
+            ),
+          ],
+        ),
+        const SizedBox(height: 15),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildStatCard(
+              title: "Pending Orders",
+              value: "${dashboardData!["pendingOrders"] ?? 0}",
+              icon: Icons.pending_actions_rounded,
+              color: Colors.blue,
+            ),
+            _buildStatCard(
+              title: "Completed",
+              value: "${dashboardData!["completedOrders"] ?? 0}",
+              icon: Icons.check_circle_outline,
+              color: Colors.purple,
+            ),
+          ],
+        ),
+        const SizedBox(height: 30),
+
+        // Bar Chart
+        const Text(
+          "Monthly Sales Overview",
+          style: TextStyle(
+              fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black87),
+        ),
+        const SizedBox(height: 15),
+        Container(
+          height: 220,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3))
+            ],
+          ),
+          child: BarChart(
+            BarChartData(
+              alignment: BarChartAlignment.spaceAround,
+              gridData: const FlGridData(show: false),
+              borderData: FlBorderData(show: false),
+              titlesData: FlTitlesData(
+                leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 30,
+                    getTitlesWidget: (value, meta) {
+                      if (value.toInt() < monthlySales.length) {
+                        return Text(
+                          monthlySales[value.toInt()]["month"] ?? "",
+                          style: const TextStyle(color: Colors.grey, fontSize: 12),
+                        );
+                      }
+                      return const Text("");
+                    },
+                  ),
+                ),
+              ),
+              barGroups: monthlySales.asMap().entries.map((entry) {
+                final index = entry.key;
+                final sale = entry.value;
+                return BarChartGroupData(x: index, barRods: [
+                  BarChartRodData(
+                    toY: (sale["sales"] ?? 0).toDouble(),
+                    color: Colors.green,
+                    width: 18,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ]);
+              }).toList().cast<BarChartGroupData>(),
+            ),
+          ),
+        ),
+        const SizedBox(height: 30),
+
+        // Recent Listings
+        const Text(
+          "Recent Listings",
+          style: TextStyle(
+              fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black87),
+        ),
+        const SizedBox(height: 15),
+        if (recentListings.isEmpty)
+          const Center(child: Text("No listings available"))
+        else
+          Column(
+            children: recentListings.map<Widget>((item) {
+              return _buildListingTile(
+                item["title"] ?? "Unknown",
+                "Ksh. ${item["price"] ?? 0}",
+                "${item["weight"] ?? 0} kg",
+                item["status"] ?? "N/A",
+                item["status"] == "available" ? Colors.green : Colors.orange,
+                image: '$baseUrl${item['image']}' ?? 'https://via.placeholder.com/150',
+              );
+            }).toList(),
+          ),
+        const SizedBox(height: 30),
+      ],
+    );
+  }
+
+  // 🔹 Stat Card
   Widget _buildStatCard({
     required String title,
     required String value,
@@ -312,7 +290,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
     );
   }
 
-  // 🔹 Helper: Listing Tile
+  // Listing Tile
   Widget _buildListingTile(
       String name, String price, String weight, String status, Color statusColor,
       {String? image}) {

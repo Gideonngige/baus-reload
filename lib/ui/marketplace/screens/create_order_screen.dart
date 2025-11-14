@@ -114,6 +114,7 @@ void _pollPaymentStatus(
   Timer.periodic(pollInterval, (timer) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
+    print("CheckOutRequestId: $checkoutRequestID");
 
     final url = Uri.parse('$baseUrl/v1/mpesa/stkpush/status');
     final response = await http.post(
