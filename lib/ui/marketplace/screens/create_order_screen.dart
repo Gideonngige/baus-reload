@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -25,85 +26,138 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
   }
 
   Future<void> _handleBuyNow() async {
-    final qtyText = _quantityController.text.trim();
+  final qtyText = _quantityController.text.trim();
 
-    if (qtyText.isEmpty || double.tryParse(qtyText) == null) {
-        showBaustakaMessage(context, 'Please enter a valid quantity.');
+  if (qtyText.isEmpty || double.tryParse(qtyText) == null) {
+    showBaustakaMessage(context, 'Please enter a valid quantity.');
+    return;
+  }
+
+  final quantity = double.parse(qtyText);
+  final item = widget.item;
+
+  setState(() => isLoading = true);
+
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final storedUser = prefs.getString('user');
+
+    if (token == null || storedUser == null) {
+      showBaustakaMessage(context, 'Please sign in again.');
       return;
     }
 
-    final quantity = double.parse(qtyText);
-    final item = widget.item;
+    final user = jsonDecode(storedUser);
+    var phone = user['phoneNumber'];
+    if (phone.startsWith('+')) phone = phone.substring(1);
 
-    setState(() => isLoading = true);
+    final buyer = user['_id'];
+    final listing = item['_id'];
+    final price = double.tryParse(item['price'].toString()) ?? 0;
+    final totalPrice = price * quantity;
 
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      final storedUser = prefs.getString('user');
+    // 🔹 STEP 1: Initiate STK PUSH
+    final url = Uri.parse('$baseUrl/v1/mpesa/stkpush/');
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'phone': phone,
+        'quantity': quantity,
+        'totalPrice': totalPrice,
+        'paymentMethod': 'M-Pesa',
+        'latitude': -1.2921,
+        'longitude': 36.8219,
+        'locationName': 'Nairobi, Kenya',
+        'buyer': buyer,
+        'listing': listing,
+      }),
+    );
 
-      if (token == null || storedUser == null) {
-        showBaustakaMessage(context, 'Please sign  in again.');
-        return;
-      }
+    setState(() => isLoading = false);
 
-      final user = jsonDecode(storedUser);
-      var phone = user['phoneNumber'];
-      if (phone.startsWith('+')) {
-        phone = phone.substring(1);
-      }
-      final buyer = user['_id'];
-      final listing = item['_id'];
-      final price = double.tryParse(item['price'].toString()) ?? 0;
-      final totalPrice = price * quantity;
-
-      // Make API request
-      final url = Uri.parse('http://192.168.100.5:5363/v1/mpesa/stkpush/');
-      final response = await http.post(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'phone': phone,
-          'quantity': quantity,
-          'totalPrice': totalPrice,
-          'paymentMethod': 'M-Pesa',
-          'latitude': -1.2921,
-          'longitude': 36.8219,
-          'locationName': 'Nairobi, Kenya',
-          'buyer': buyer,
-          'listing': listing,
-        }),
-      );
-
-      setState(() => isLoading = false);
-
-      if (response.statusCode == 200) {
-        showBaustakaMessage(context, 'Order placed successfully.');
-
-        // Navigate to purchase summary screen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => PurchaseSummaryScreen(
-              itemName: item['title'] ?? 'Item name',
-              price: double.tryParse(item['price'].toString()) ?? 0,
-              quantity: quantity.toInt(),
-              paymentMethod: 'M-Pesa',
-            ),
-          ),
-        );
-      } else {
-        final error = jsonDecode(response.body);
-        showBaustakaMessage(context, 'Failed to place order!.');
-      }
-    } catch (e) {
-      setState(() => isLoading = false);
-      showBaustakaMessage(context, 'Error placing order!.');
+    if (response.statusCode != 200) {
+      showBaustakaMessage(context, 'Failed to initiate payment.');
+      return;
     }
+
+    final data = jsonDecode(response.body);
+    print(data);
+
+    // 🔹 This must come from backend
+    final checkoutRequestID = data['CheckoutRequestID'];
+    if (checkoutRequestID == null) {
+      showBaustakaMessage(context, 'Missing checkoutRequestID from server.');
+      return;
+    }
+
+    showBaustakaMessage(context, "Enter your M-Pesa PIN...");
+
+    // 🔹 STEP 2: Start Polling Payment Status
+    _pollPaymentStatus(checkoutRequestID, quantity, item);
+
+  } catch (e) {
+    setState(() => isLoading = false);
+    showBaustakaMessage(context, 'Error placing order: $e');
   }
+}
+
+// function to poll
+void _pollPaymentStatus(
+    String checkoutRequestID, double quantity, Map<String, dynamic> item) {
+  const pollInterval = Duration(seconds: 3);
+
+  Timer.periodic(pollInterval, (timer) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final url = Uri.parse('$baseUrl/v1/mpesa/stkpush/status');
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        "CheckoutRequestID": checkoutRequestID,
+      }),
+    );
+
+    if (response.statusCode != 200) return;
+
+    final data = jsonDecode(response.body);
+
+    final status = data['status'];
+
+    if (status == "pending") return; // keep polling
+
+    // stop polling
+    timer.cancel();
+
+    if (status == "successful") {
+      showBaustakaMessage(context, "Payment Successful!");
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => PurchaseSummaryScreen(
+            itemName: item['title'],
+            price: double.tryParse(item['price'].toString()) ?? 0,
+            quantity: quantity.toInt(),
+            paymentMethod: 'M-Pesa',
+          ),
+        ),
+      );
+    } else {
+      showBaustakaMessage(context, "Payment Failed. Try again.");
+    }
+  });
+}
+
 
   @override
   Widget build(BuildContext context) {

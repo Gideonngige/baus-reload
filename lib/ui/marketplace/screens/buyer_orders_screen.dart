@@ -32,8 +32,8 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
       final storedToken = prefs.getString('token');
       final storedUser = prefs.getString('user');
 
-      print('Stored Token: $storedToken');
-      print('Stored User: $storedUser');
+      // print('Stored Token: $storedToken');
+      // print('Stored User: $storedUser');
 
       if(storedToken == null || storedUser == null){
         setState(() => isLoading = false); 
@@ -56,10 +56,8 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
 
       if(response.statusCode == 200 || response.statusCode == 201){
         final data = jsonDecode(response.body);
-        print('Orders: $data');
         setState((){
           orders = data;
-          print('Orders2: $orders');
           isLoading = false;
         });
       }else{
