@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:baustaka/config/palette.dart';
 
 void showBaustakaMessage(BuildContext context, String message) {
   final overlay = Overlay.of(context);
@@ -13,7 +14,7 @@ void showBaustakaMessage(BuildContext context, String message) {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           decoration: BoxDecoration(
-            color: Colors.green[800],
+            color: Palette.primaryLight,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
@@ -26,7 +27,7 @@ void showBaustakaMessage(BuildContext context, String message) {
           child: Text(
             message,
             style: const TextStyle(
-              color: Colors.white,
+              color: Palette.primary,
               fontWeight: FontWeight.bold,
             ),
           ),

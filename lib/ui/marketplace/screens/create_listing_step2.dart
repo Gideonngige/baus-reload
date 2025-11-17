@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/message_pop.dart';
+import 'package:baustaka/config/palette.dart';
 
 class CreateListingStep2 extends StatefulWidget {
   final String title;
@@ -131,7 +132,7 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
             "Step 2: Pricing & Location",
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
-        backgroundColor: Colors.green[800],
+        backgroundColor: Palette.primary,
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -154,7 +155,7 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Text("Upload Listing", style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[800],
+                  backgroundColor: Palette.primary,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
                   textStyle: const TextStyle(
@@ -173,11 +174,11 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
       controller: controller,
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
-        prefixIcon: Icon(icon, color: Colors.green[800]),
+        prefixIcon: Icon(icon, color: Palette.primary),
         label: Text(
           label,
           style: GoogleFonts.poppins(
-            color: Colors.green[800],
+            color: Palette.primary,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -185,11 +186,11 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
         fillColor: Colors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.green),
+          borderSide: BorderSide(color: Palette.primary),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.green, width: 1.5),
+          borderSide: const BorderSide(color: Palette.primary, width: 1.5),
         ),
       ),
     );

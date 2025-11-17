@@ -5,6 +5,7 @@ import 'package:pdf/pdf.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:open_file/open_file.dart';
+import 'package:baustaka/config/palette.dart';
 
 
 class PurchaseSummaryScreen extends StatelessWidget {
@@ -37,7 +38,7 @@ class PurchaseSummaryScreen extends StatelessWidget {
                     ),
                 ),
                 centerTitle: true,
-                backgroundColor: Colors.green[800],
+                backgroundColor: Palette.primary,
                 iconTheme: const IconThemeData(color: Colors.white),
             ),
             
@@ -51,7 +52,7 @@ class PurchaseSummaryScreen extends StatelessWidget {
         Center(
           child: Icon(
             Icons.check_circle_outline_rounded,
-            color: Colors.green[800],
+            color: Palette.primary,
             size: 100,
           ),
         ),
@@ -128,7 +129,7 @@ class PurchaseSummaryScreen extends StatelessWidget {
               ),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green[800],
+              backgroundColor: Palette.primary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),

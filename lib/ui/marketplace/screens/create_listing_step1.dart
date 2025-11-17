@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'create_listing_step2.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:baustaka/config/palette.dart';
 
 class CreateListingStep1 extends StatefulWidget {
   const CreateListingStep1({super.key});
@@ -43,7 +44,7 @@ class _CreateListingStep1State extends State<CreateListingStep1> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        backgroundColor: Colors.green[800],
+        backgroundColor: Palette.primary,
         elevation: 1,
         centerTitle: true,
         title: Text(
@@ -66,7 +67,7 @@ class _CreateListingStep1State extends State<CreateListingStep1> {
                 style: GoogleFonts.poppins(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
-                  color: Colors.green[800],
+                  color: Palette.primary,
                 ),
               ),
               const SizedBox(height: 6),
@@ -86,18 +87,18 @@ class _CreateListingStep1State extends State<CreateListingStep1> {
                         decoration: BoxDecoration(
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(15),
-                          border: Border.all(color: Colors.green),
+                          border: Border.all(color: Palette.primary),
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(Icons.add_photo_alternate_outlined,
-                                size: 60, color: Colors.green[800]),
+                                size: 60, color: Palette.primary),
                             const SizedBox(height: 10),
                             Text(
                               "Tap to upload image",
                               style: GoogleFonts.poppins(
-                                  color: Colors.green[800],
+                                  color: Palette.primary,
                                   fontWeight: FontWeight.w500),
                             ),
                           ],
@@ -158,14 +159,14 @@ class _CreateListingStep1State extends State<CreateListingStep1> {
         fillColor: Colors.white,
         prefixIcon: Icon(icon, color: Colors.green[800]),
         labelText: label,
-        labelStyle: GoogleFonts.poppins(color: Colors.green[800]),
+        labelStyle: GoogleFonts.poppins(color: Palette.primary),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.green),
+          borderSide: BorderSide(color: Palette.primary),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.green, width: 1.5),
+          borderSide: BorderSide(color: Palette.primary, width: 1.5),
         ),
       ),
     );
@@ -178,7 +179,7 @@ class _CreateListingStep1State extends State<CreateListingStep1> {
       child: ElevatedButton(
         onPressed: _goToNextStep,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.green[800],
+          backgroundColor: Palette.primary,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           elevation: 3,

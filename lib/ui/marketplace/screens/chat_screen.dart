@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/message_pop.dart';
+import 'package:baustaka/config/palette.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -118,7 +119,7 @@ class _ChatScreenState extends State<ChatScreen> {
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         elevation: 1,
-        backgroundColor: Colors.green[800],
+        backgroundColor: Palette.primary,
         foregroundColor: Colors.black,
         title: Row(
           children: [
@@ -145,7 +146,7 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           Expanded(
             child: _isLoading
-                ? Center(child: CircularProgressIndicator(color: Colors.green[800]))
+                ? Center(child: CircularProgressIndicator(color: Palette.primary))
                 : _messages.isEmpty
                     ? const Center(child: Text("No messages yet"))
                     : ListView.builder(
@@ -172,7 +173,7 @@ return Column(
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
         decoration: BoxDecoration(
-          color: Colors.green,
+          color: Palette.primary,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(16),
             topRight: Radius.circular(16),
@@ -270,7 +271,7 @@ return Column(
                   const SizedBox(width: 8),
                   CircleAvatar(
                     radius: 24,
-                    backgroundColor: Colors.green[800],
+                    backgroundColor: Palette.primary,
                     child: IconButton(
                       icon: const Icon(Icons.send, color: Colors.white),
                       onPressed: _sendMessage,

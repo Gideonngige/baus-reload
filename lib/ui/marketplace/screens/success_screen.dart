@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:baustaka/config/palette.dart';
 
 class SuccessScreen extends StatelessWidget {
   final String sellerName;
@@ -17,7 +18,7 @@ class SuccessScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        backgroundColor: Colors.green,
+        backgroundColor: Palette.primary,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -45,7 +46,7 @@ class SuccessScreen extends StatelessWidget {
                   const Text(
                     'Step 3 of 3',
                     style: TextStyle(
-                      color: Colors.green,
+                      color: Palette.primary,
                       fontWeight: FontWeight.w600,
                       fontSize: 16,
                     ),
@@ -55,7 +56,7 @@ class SuccessScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                     child: LinearProgressIndicator(
                       value: 1,
-                      color: Colors.green,
+                      color: Palette.primary,
                       backgroundColor: Colors.grey.shade300,
                       minHeight: 8,
                     ),
@@ -76,7 +77,7 @@ class SuccessScreen extends StatelessWidget {
                 child: const Center(
                   child: Icon(
                     Icons.check_circle_rounded,
-                    color: Colors.green,
+                    color: Palette.primary,
                     size: 80,
                   ),
                 ),
@@ -159,7 +160,7 @@ class SuccessScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const Icon(Icons.check_circle, color: Colors.green, size: 26),
+                    const Icon(Icons.check_circle, color: Palette.primary, size: 26),
                   ],
                 ),
               ),
@@ -188,7 +189,7 @@ class SuccessScreen extends StatelessWidget {
                     Navigator.popUntil(context, (route) => route.isFirst);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
+                    backgroundColor: Palette.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

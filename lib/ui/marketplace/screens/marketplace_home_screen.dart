@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:baustaka/helper/session.dart';
+import 'package:baustaka/config/palette.dart';
 
 class MarketplaceHomeScreen extends StatefulWidget {
   const MarketplaceHomeScreen({super.key});
@@ -180,7 +181,7 @@ location = locationName;
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        backgroundColor: Colors.green[800],
+        backgroundColor: Palette.primary,
         elevation: 0,
         title: const Text(
           'Marketplace',
@@ -203,10 +204,10 @@ location = locationName;
           accountEmail: Text(user?['email'] ?? 'marketuser@example.com'),
           currentAccountPicture: CircleAvatar(
             backgroundColor: Colors.white,
-            child: Icon(Icons.person, color: Colors.green[800]),
+            child: Icon(Icons.person, color: Palette.primary),
           ),
           decoration: BoxDecoration(
-            color: Colors.green[800],
+            color: Palette.primary,
           ),
         ),
         ListTile(
@@ -328,7 +329,7 @@ location = locationName;
                             );
                           },
                           icon: const Icon(Icons.notifications_none_rounded,
-                              size: 28, color: Colors.black87),
+                              size: 28, color: Palette.primary),
                         ),
                       ],
                     ),
@@ -404,7 +405,7 @@ location = locationName;
 
                     listings.isEmpty
                         ? const Center(
-                            child: Text('No listings available 😕'),
+                            child: Text('No listings available.'),
                           )
                         : ListView.builder(
                             shrinkWrap: true,
@@ -463,7 +464,7 @@ location = locationName;
                                             Text(
                                               'Ksh. ${item['price']}',
                                               style: TextStyle(
-                                                  color: Colors.green[800],
+                                                  color: Palette.primary,
                                                   fontWeight: FontWeight.w600,
                                                   fontSize: 15),
                                             ),
@@ -510,7 +511,7 @@ if (listings.isNotEmpty)
         );
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.green[800],
+        backgroundColor: Palette.primary,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10)),
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:baustaka/config/palette.dart';
 
 
 class TrackingScreen extends StatefulWidget {
@@ -62,7 +63,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.green[800],
+        backgroundColor: Palette.primary,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -83,7 +84,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               children: [
-                // 🟢 Truck Details
+                // Truck Details
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -131,7 +132,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
 
                 const SizedBox(height: 20),
 
-                // 🟢 Driver Info
+                //  Driver Info
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
@@ -169,7 +170,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                       if (driver != null)
                         Container(
                           decoration: const BoxDecoration(
-                            color: Colors.green,
+                            color: Palette.primary,
                             shape: BoxShape.circle,
                           ),
                           child: IconButton(

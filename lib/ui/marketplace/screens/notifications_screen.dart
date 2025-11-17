@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/message_pop.dart';
+import 'package:baustaka/config/palette.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -107,7 +108,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.green[800],
+        backgroundColor: Palette.primary,
         elevation: 0,
         actions: [
           TextButton(
@@ -121,7 +122,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator(color: Colors.green[800]))
+          ? Center(child: CircularProgressIndicator(color: Palette.primary))
           : notifications.isEmpty
               ? const Center(
                   child: Text(
@@ -152,7 +153,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       child: ListTile(
                         leading: CircleAvatar(
                           backgroundColor: Colors.green.withOpacity(0.15),
-                          child: const Icon(Icons.notifications, color: Colors.green),
+                          child: const Icon(Icons.notifications, color: Palette.primary),
                         ),
                         title: Text(
                           n['message'] ?? 'No message',

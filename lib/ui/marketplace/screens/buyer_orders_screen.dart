@@ -4,6 +4,7 @@ import 'dart:convert'; // for jsonDecode
 import 'package:http/http.dart' as http; // for API calls
 import 'package:shared_preferences/shared_preferences.dart'; // for prefs
 import '../widgets/message_pop.dart';
+import 'package:baustaka/config/palette.dart';
 
 
 class BuyerOrdersScreen extends StatefulWidget {
@@ -95,12 +96,12 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
             "My Orders",
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
-        backgroundColor: Colors.green[800],
+        backgroundColor: Palette.primary,
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: isLoading
-    ? const Center(child: CircularProgressIndicator(color: Colors.green))
+    ? const Center(child: CircularProgressIndicator(color: Palette.primary))
     : orders.isEmpty
         ? const Center(
             child: Text('No orders yet',
@@ -157,7 +158,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
               const SizedBox(height: 5),
               Text("Ksh. ${order['totalPrice'] ?? '0'}",
                   style: const TextStyle(
-                      color: Colors.green, fontWeight: FontWeight.w600)),
+                      color: Palette.primary, fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
               Row(
                 children: [
@@ -191,7 +192,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green[800],
+              backgroundColor: Palette.primary,
               padding:
                   const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               shape: RoundedRectangleBorder(

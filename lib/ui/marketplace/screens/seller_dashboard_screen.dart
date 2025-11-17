@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/message_pop.dart';
+import 'package:baustaka/config/palette.dart';
 
 class SellerDashboardScreen extends StatefulWidget {
   const SellerDashboardScreen({super.key});
@@ -77,11 +78,11 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
         ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.green[800],
+        backgroundColor: Palette.primary,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.green))
+          ? const Center(child: CircularProgressIndicator(color: Palette.primary))
           : dashboardData == null
               ? const Center(child: Text("No dashboard data available."))
               : SingleChildScrollView(
@@ -232,7 +233,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
                 "Ksh. ${item["price"] ?? 0}",
                 "${item["weight"] ?? 0} kg",
                 item["status"] ?? "N/A",
-                item["status"] == "available" ? Colors.green : Colors.orange,
+                item["status"] == "available" ? Palette.primary : Colors.orange,
                 image: '$baseUrl${item['image']}' ?? 'https://via.placeholder.com/150',
               );
             }).toList(),
@@ -339,7 +340,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
             children: [
               Text(price,
                   style: const TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.green)),
+                      fontWeight: FontWeight.bold, color: Palette.primary)),
               const SizedBox(height: 4),
               Row(
                 children: [

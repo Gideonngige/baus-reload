@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'create_order_screen.dart';
 import '../widgets/message_pop.dart';
+import 'package:baustaka/config/palette.dart';
 
 class AllListingsScreen extends StatefulWidget {
   const AllListingsScreen({super.key});
@@ -74,17 +75,17 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
             color: Colors.white,
             ),
         ),
-        backgroundColor: Colors.green[800],
+        backgroundColor: Palette.primary,
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator(color: Colors.green[800]))
+          ? Center(child: CircularProgressIndicator(color: Palette.primary))
           : Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  // 🔍 Search Bar
+                  // Search Bar
                   Row(
                     children: [
                       Expanded(
@@ -112,7 +113,7 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
                       const SizedBox(width: 10),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.green[800],
+                          color: Palette.primary,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: IconButton(
@@ -208,7 +209,7 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
                                               Text(
                                                 'Ksh. ${item['price'] ?? '0'}',
                                                 style: TextStyle(
-                                                  color: Colors.green[800],
+                                                  color: Palette.primary,
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 15,
                                                 ),

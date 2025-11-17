@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'purchase_summary_screen.dart';
 import '../widgets/message_pop.dart';
+import 'package:baustaka/config/palette.dart';
 
 class CreateOrderScreen extends StatefulWidget {
   final Map<String, dynamic> item; // item details (from listing)
@@ -167,7 +168,7 @@ void _pollPaymentStatus(
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        backgroundColor: Colors.green[800],
+        backgroundColor: Palette.primary,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -215,7 +216,7 @@ void _pollPaymentStatus(
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Colors.green[800],
+                color: Palette.primary,
               ),
             ),
 
@@ -228,10 +229,10 @@ void _pollPaymentStatus(
               decoration: InputDecoration(
                 label: Text(
                   'Enter Quantity',
-                  style: TextStyle(color: Colors.green[800]),
+                  style: TextStyle(color: Palette.primary),
                 ),
                 hintText: 'e.g. 5',
-                prefixIcon: Icon(Icons.scale, color: Colors.green[800]),
+                prefixIcon: Icon(Icons.scale, color: Palette.primary),
                 filled: true,
                 fillColor: Colors.white,
                 contentPadding:
@@ -276,7 +277,7 @@ void _pollPaymentStatus(
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green[800],
+                  backgroundColor: Palette.primary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -288,11 +289,11 @@ void _pollPaymentStatus(
 
             // Info
             const Text(
-              "Once you click Buy Now, you'll be redirected to complete payment via M-Pesa.",
+              "Once you click Buy Now, you'll be prompted to enter your M-Pesa PIN to complete payment.",
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.black54,
+                color: Palette.secondary,
                 height: 1.4,
               ),
             ),
