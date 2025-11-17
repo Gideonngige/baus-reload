@@ -27,12 +27,12 @@ android {
     ndkVersion flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
         coreLibraryDesugaringEnabled true
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
 
     sourceSets {
@@ -41,8 +41,8 @@ android {
 
     defaultConfig {
         applicationId rootProject.ext.applicationId
-        minSdkVersion 24
-        targetSdkVersion 36
+        minSdk 24
+        targetSdk 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
@@ -59,15 +59,16 @@ android {
 
     buildTypes {
         release {
-            signingConfig signingConfigs.releaseConfig
-            manifestPlaceholders = [
-                usesCleartextTraffic: "true",
-                appName: rootProject.ext.appName
-            ]
-            minifyEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
+    signingConfig signingConfigs.releaseConfig
+    manifestPlaceholders = [
+        usesCleartextTraffic: "true",
+        appName: rootProject.ext.appName
+    ]
+    minifyEnabled true         // ✅ remove "is"
+    shrinkResources true
+    proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+}
+
         debug {
             manifestPlaceholders = [
                 usesCleartextTraffic: "true",
@@ -83,7 +84,7 @@ flutter {
 
 dependencies {
     implementation "androidx.appcompat:appcompat:1.6.1"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.22"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:2.1.0"
     implementation "androidx.multidex:multidex:2.0.1"
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
 }
