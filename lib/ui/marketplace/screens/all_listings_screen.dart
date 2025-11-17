@@ -104,7 +104,7 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.green, width: 1.5),
+                              borderSide: BorderSide(color: Palette.primary, width: 1.5),
                             ),
                           ),
                           onChanged: (value) => setState(() => searchQuery = value),
@@ -189,7 +189,7 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
                                           ),
                                         ),
                                       ),
-                                      // 👇 FIXED SECTION
+                                      
                                       Expanded(
                                         child: Padding(
                                           padding: const EdgeInsets.all(10),

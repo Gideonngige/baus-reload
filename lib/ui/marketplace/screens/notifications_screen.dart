@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/message_pop.dart';
 import 'package:baustaka/config/palette.dart';
+import '../helper/format_date.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -161,11 +162,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             fontWeight: FontWeight.bold,
                             color: n['isRead'] == true
                                 ? Colors.black87
-                                : Colors.green.shade800,
+                                : Palette.primary,
                           ),
                         ),
                         subtitle: Text(
-                          n['createdAt'] ?? '',
+                          formatDate(n['createdAt']),
                           style: const TextStyle(color: Colors.grey),
                         ),
                         onTap: () => markAsRead(n['_id']),

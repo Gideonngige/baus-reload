@@ -15,6 +15,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:baustaka/helper/session.dart';
 import 'package:baustaka/config/palette.dart';
+import 'package:baustaka/helper/session.dart';
 
 class MarketplaceHomeScreen extends StatefulWidget {
   const MarketplaceHomeScreen({super.key});
@@ -65,7 +66,7 @@ class _MarketplaceHomeScreenState extends State<MarketplaceHomeScreen> {
         user = jsonDecode(storedUser);
         token = storedToken;
       });
-      await _fetchListings(); // 👈 fetch listings after user is loaded
+      await _fetchListings(); //fetch listings after user is loaded
     }
   }
 
@@ -282,6 +283,7 @@ location = locationName;
           leading: const Icon(Icons.logout),
           title: const Text('Logout'),
           onTap: () async {
+            await Session.logout();
             final prefs = await SharedPreferences.getInstance();
             await prefs.clear();
             Navigator.pop(context);
@@ -301,14 +303,14 @@ location = locationName;
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 👆 Top Bar
+                    //  Top Bar
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [
                             Icon(Icons.location_on,
-                                color: Colors.green[800], size: 24),
+                                color: Palette.primary, size: 24),
                             const SizedBox(width: 5),
                             Text(
                               '$location' ?? 'Meru, Kenya',

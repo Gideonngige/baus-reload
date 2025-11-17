@@ -24,10 +24,10 @@ class _TrackingScreenState extends State<TrackingScreen> {
     super.initState();
 
     final order = widget.order;
-    print("📦 Order received: $order");
+    print("Order received: $order");
 
     final driver = order["Driver"];
-    print("🚚 Driver received: $driver");
+    print("Driver received: $driver");
 
     // Buyer delivery location
     _destinationPoint = LatLng(
@@ -201,7 +201,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
 
                 const SizedBox(height: 20),
 
-                // 🟢 Live Map
+                //  Live Map
                 Container(
                   height: 220,
                   decoration: BoxDecoration(
