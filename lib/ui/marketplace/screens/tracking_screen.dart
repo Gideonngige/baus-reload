@@ -58,7 +58,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
   @override
   Widget build(BuildContext context) {
     final order = widget.order;
-    final driver = order["Driver"];
+    final driver = order["driver"];
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -151,7 +151,8 @@ class _TrackingScreenState extends State<TrackingScreen> {
                     children: [
                       const CircleAvatar(
                         radius: 25,
-                        backgroundImage: AssetImage('assets/profile.jpg'),
+                        backgroundColor: Palette.primary,
+                        child: Icon(Icons.person, color: Colors.white, size: 30),
                       ),
                       const SizedBox(width: 12),
                       Expanded(

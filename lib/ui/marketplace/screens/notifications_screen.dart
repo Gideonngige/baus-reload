@@ -132,48 +132,60 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   ),
                 )
               : ListView.builder(
-                  padding: const EdgeInsets.all(15),
-                  itemCount: notifications.length,
-                  itemBuilder: (context, index) {
-                    final n = notifications[index];
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(
-                        color: n['isRead'] == true
-                            ? Colors.white
-                            : Colors.green.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
-                            blurRadius: 3,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: Colors.green.withOpacity(0.15),
-                          child: const Icon(Icons.notifications, color: Palette.primary),
-                        ),
-                        title: Text(
-                          n['message'] ?? 'No message',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: n['isRead'] == true
-                                ? Colors.black87
-                                : Palette.primary,
-                          ),
-                        ),
-                        subtitle: Text(
-                          formatDate(n['createdAt']),
-                          style: const TextStyle(color: Colors.grey),
-                        ),
-                        onTap: () => markAsRead(n['_id']),
-                      ),
-                    );
-                  },
-                ),
+  padding: const EdgeInsets.all(15),
+  itemCount: notifications.length,
+  itemBuilder: (context, index) {
+    final n = notifications[index];
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 3,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: Colors.green.withOpacity(0.15),
+          child: const Icon(Icons.notifications, color: Palette.primary),
+        ),
+
+        title: Text(
+          n['title'] ?? 'No title',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: n['isRead'] == true ? Colors.black87 : Palette.primary,
+          ),
+        ),
+
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 4),
+            Text(
+              n['message'] ?? 'No message',
+              style: const TextStyle(color: Colors.black),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              formatDate(n['createdAt']),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
+        ),
+
+        onTap: () => markAsRead(n['_id']),
+      ),
+    );
+  },
+)
+
     );
   }
 }

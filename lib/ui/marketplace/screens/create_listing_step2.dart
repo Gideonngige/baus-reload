@@ -6,6 +6,9 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/message_pop.dart';
 import 'package:baustaka/config/palette.dart';
+import 'all_listings_screen.dart';
+import 'package:get/get.dart';
+
 
 class CreateListingStep2 extends StatefulWidget {
   final String title;
@@ -110,7 +113,10 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
 
     if (response.statusCode == 201) {
         showBaustakaMessage(context, 'Listing uploaded successfully!.');
-        Navigator.pop(context);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => AllListingsScreen()),
+        );
     } else {
         showBaustakaMessage(context, 'Failed to upload listing.');
         print("Failed response: ${response.body}");

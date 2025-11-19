@@ -182,7 +182,7 @@ class _CreateListingStep1State extends State<CreateListingStep1> {
           backgroundColor: Palette.primary,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          elevation: 3,
+          elevation: 0,
         ),
         child: Text(
           "Next",

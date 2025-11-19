@@ -92,7 +92,7 @@ class _ChatScreenState extends State<ChatScreen> {
         },
         body: jsonEncode({
           "sender": userId,
-          "receiver": "685a67c58564d3fd46253aaa", // assuming admin user has ID = 1
+          "receiver": "6918541b1611183de12b9d72", // assuming admin user has ID = 1
           "message": text,
         }),
       );
