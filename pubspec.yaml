@@ -72,6 +72,7 @@ dependencies:
   google_fonts: ^4.0.4
   fl_chart: ^0.68.0
   http: ^0.13.6
+  mobile_scanner: ^3.0.0
 
 dev_dependencies:
   flutter_test:
