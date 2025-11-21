@@ -167,6 +167,7 @@ void _pollPaymentStatus(
 
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: Palette.primary,
         elevation: 0,
@@ -183,7 +184,8 @@ void _pollPaymentStatus(
         ),
         centerTitle: true,
       ),
-      body: Padding(
+
+      body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
