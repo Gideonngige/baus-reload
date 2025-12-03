@@ -58,7 +58,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Enter Delivery Token"),
+          title: const Text("Enter Delivery Token", style: TextStyle(fontSize: 18, color: Palette.primary)),
           content: TextField(
             onChanged: (value) => token = value,
             decoration: const InputDecoration(
@@ -342,7 +342,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                     ),
                   ),
                   child: _isMarkingDelivered
-                      ? const CircularProgressIndicator(color: Colors.white)
+                      ? const CircularProgressIndicator(color: Colors.green)
                       : const Text(
                           'Mark as Delivered',
                           style: TextStyle(

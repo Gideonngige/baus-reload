@@ -464,7 +464,7 @@ location = locationName;
                                             ),
                                             const SizedBox(height: 6),
                                             Text(
-                                              'Ksh. ${item['price']}',
+                                              'Ksh. ${item['price']}/kg',
                                               style: TextStyle(
                                                   color: Palette.primary,
                                                   fontWeight: FontWeight.w600,

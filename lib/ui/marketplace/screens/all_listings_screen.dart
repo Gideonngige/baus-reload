@@ -207,7 +207,7 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                               Text(
-                                                'Ksh. ${item['price'] ?? '0'}',
+                                                'Ksh. ${item['price'] ?? '0'}/kg',
                                                 style: TextStyle(
                                                   color: Palette.primary,
                                                   fontWeight: FontWeight.bold,

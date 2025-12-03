@@ -156,7 +156,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
 
         // Bar Chart
         const Text(
-          "Monthly Sales Overview",
+          "Monthly Sales",
           style: TextStyle(
               fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black87),
         ),
