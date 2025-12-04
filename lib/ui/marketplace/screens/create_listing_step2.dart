@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,9 +54,19 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
 
   Future<void> _submitListing() async {
    final price = _priceController.text.trim();
-  final weight = _weightController.text.trim();
+  final double? weight = double.tryParse(_weightController.text.trim());
 
-    if (price.isEmpty || weight.isEmpty) {
+if (weight == null) {
+  setState(() => isLoading = false);
+  showBaustakaMessage(context, "Enter valid weight (e.g. 2.50)");
+  return;
+}
+
+// force 2 decimal places
+final formattedWeight = weight.toStringAsFixed(2);
+
+
+    if (price.isEmpty || weight == null) {
     setState(() => isLoading = false);
     showBaustakaMessage(context, 'Fill in all the fields!.');
     return;
@@ -91,7 +102,7 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
     request.fields['title'] = widget.title;
     request.fields['description'] = widget.description;
     request.fields['price'] = price;
-    request.fields['weight'] = weight;
+    request.fields['weight'] = formattedWeight;
     request.fields['locationName'] = locationName ?? "Meru, Kenya";
     request.fields['latitude'] = (latitude ?? 0.1231765).toString();
     request.fields['longitude'] = (longitude ?? 37.7211678).toString();
@@ -149,7 +160,7 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
             const SizedBox(height: 20),
             _buildTextField(_priceController, "Price (Ksh)", Icons.monetization_on),
             const SizedBox(height: 15),
-            _buildTextField(_weightController, "Weight (kg)", Icons.scale),
+            _buildTextField(_weightController, "Weight (kg)", Icons.scale, allowDecimal: true),
             const Spacer(),
             SizedBox(
               width: double.infinity,
@@ -175,30 +186,44 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, IconData icon) {
-    return TextField(
-      controller: controller,
-      keyboardType: TextInputType.number,
-      decoration: InputDecoration(
-        prefixIcon: Icon(icon, color: Palette.primary),
-        label: Text(
-          label,
-          style: GoogleFonts.poppins(
-            color: Palette.primary,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Palette.primary),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Palette.primary, width: 1.5),
+ Widget _buildTextField(
+    TextEditingController controller,
+    String label,
+    IconData icon, {
+    bool allowDecimal = false,
+  }) {
+  return TextField(
+    controller: controller,
+    keyboardType:
+        allowDecimal ? const TextInputType.numberWithOptions(decimal: true) : TextInputType.number,
+    inputFormatters: allowDecimal
+        ? [
+            FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+          ]
+        : [
+            FilteringTextInputFormatter.digitsOnly,
+          ],
+    decoration: InputDecoration(
+      prefixIcon: Icon(icon, color: Palette.primary),
+      label: Text(
+        label,
+        style: GoogleFonts.poppins(
+          color: Palette.primary,
+          fontWeight: FontWeight.w500,
         ),
       ),
-    );
-  }
+      filled: true,
+      fillColor: Colors.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Palette.primary),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Palette.primary, width: 1.5),
+      ),
+    ),
+  );
+}
+
 }
