@@ -9,6 +9,8 @@ import '../widgets/message_pop.dart';
 import 'package:baustaka/config/palette.dart';
 import 'all_listings_screen.dart';
 import 'package:get/get.dart';
+import 'package:baustaka/config/env.dart';
+import 'package:baustaka/helper/util.dart';
 
 
 class CreateListingStep2 extends StatefulWidget {
@@ -58,7 +60,7 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
 
 if (weight == null) {
   setState(() => isLoading = false);
-  showBaustakaMessage(context, "Enter valid weight (e.g. 2.50)");
+  Util.toast("Enter valid weight (e.g. 2.50)");
   return;
 }
 
@@ -68,7 +70,7 @@ final formattedWeight = weight.toStringAsFixed(2);
 
     if (price.isEmpty || weight == null) {
     setState(() => isLoading = false);
-    showBaustakaMessage(context, 'Fill in all the fields!.');
+    Util.toast("Fill in all the fields!");
     return;
   }
 
@@ -89,7 +91,7 @@ final formattedWeight = weight.toStringAsFixed(2);
 
   final user = jsonDecode(storedUser);
   final sellerId = user['_id'];
-  final url = Uri.parse('http://192.168.100.5:5363/v1/listings/');
+  final url = Uri.parse('${kBaseApiUrl}v1/listings/');
 
   try {
     // Create a multipart request
@@ -123,18 +125,18 @@ final formattedWeight = weight.toStringAsFixed(2);
     setState(() => isLoading = false);
 
     if (response.statusCode == 201) {
-        showBaustakaMessage(context, 'Listing uploaded successfully!.');
+        Util.toast("Listing uploaded successfully!");
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => AllListingsScreen()),
         );
     } else {
-        showBaustakaMessage(context, 'Failed to upload listing.');
+        Util.toast("Failed to upload listing.");
         print("Failed response: ${response.body}");
     }
   } catch (e) {
     setState(() => isLoading = false);
-    showBaustakaMessage(context, 'An error occurred while uploading listing!.');
+    Util.toast("An error occurred while uploading listing!");
     print("Error uploading: $e");
   }
 }

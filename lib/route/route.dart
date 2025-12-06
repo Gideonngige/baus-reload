@@ -55,6 +55,7 @@ import 'package:baustaka/ui_picker/home/home_widget.dart' as home_picker;
 import 'package:baustaka/ui_picker/picker/picker_widget.dart';
 import 'package:baustaka/ui_picker/station/station_widget.dart';
 import 'package:baustaka/ui_picker/stations/stations_widget.dart';
+import 'package:baustaka/ui/driver/driver_home_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -353,4 +354,12 @@ final kRoutes = [
   name: Routes.kAddChamp, // = '/add-champ'
   page: () => AddChampWidget(), // or whatever your add-champ screen is
 ),
+
+GetPage(
+  name: Routes.kDriverHome,
+  page: () => const DriverHomeWidget(),
+),
+
+
+
 ];

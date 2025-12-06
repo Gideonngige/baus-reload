@@ -5,7 +5,9 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'purchase_summary_screen.dart';
 import '../widgets/message_pop.dart';
+import 'package:baustaka/helper/util.dart';
 import 'package:baustaka/config/palette.dart';
+import 'package:baustaka/config/env.dart';
 
 class CreateOrderScreen extends StatefulWidget {
   final Map<String, dynamic> item;
@@ -28,8 +30,6 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
   double? userLat;
   double? userLng;
   String? locationName;
-
-  String baseUrl = "http://192.168.100.5:5363";
 
   @override
   void dispose() {
@@ -68,14 +68,14 @@ Future<void> loadLocation() async {
       final storedUser = prefs.getString("user");
 
       if (storedUser == null) {
-        showBaustakaMessage(context, "Login required");
+        Util.toast("Login required");
         return;
       }
 
       final user = jsonDecode(storedUser);
 
       final response = await http.post(
-        Uri.parse("$baseUrl/v1/shipment/calculate/"),
+        Uri.parse("${kBaseApiUrl}v1/shipment/calculate/"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "buyer_lat": userLat,
@@ -94,7 +94,7 @@ Future<void> loadLocation() async {
       finalTotal = itemTotal + shipmentCost;
 
     } catch (e) {
-      showBaustakaMessage(context, "Failed to calculate shipment");
+      Util.toast("Failed to calculate shipment");
     }
 
     setState(() => loadingShipment = false);
@@ -113,7 +113,7 @@ Future<void> loadLocation() async {
     }
 
     if (shipmentCost <= 0) {
-      showBaustakaMessage(context, "Calculating shipping, please wait...");
+      Util.toast("Calculating shipping, please wait...");
       return;
     }
 
@@ -128,7 +128,7 @@ Future<void> loadLocation() async {
       final storedUser = prefs.getString('user');
 
       if (token == null || storedUser == null) {
-        showBaustakaMessage(context, 'Please sign in again');
+        Util.toast("Please sign in again");
         return;
       }
 
@@ -142,7 +142,7 @@ Future<void> loadLocation() async {
       final buyer = user['_id'];
       final listing = item['_id'];
 
-      final url = Uri.parse("$baseUrl/v1/mpesa/stkpush/");
+      final url = Uri.parse("${kBaseApiUrl}v1/mpesa/stkpush/");
 
       final response = await http.post(
         url,
@@ -167,7 +167,7 @@ Future<void> loadLocation() async {
       setState(() => isLoading = false);
 
       if (response.statusCode != 200) {
-        showBaustakaMessage(context, 'Payment initiation failed.');
+        Util.toast("Payment initiation failed.");
         return;
       }
 
@@ -175,17 +175,17 @@ Future<void> loadLocation() async {
       final checkoutRequestID = data['CheckoutRequestID'];
 
       if (checkoutRequestID == null) {
-        showBaustakaMessage(context, 'Invalid payment response');
+        Util.toast("Invalid payment response.");
         return;
       }
 
-      showBaustakaMessage(context, "Enter M-Pesa PIN");
+      Util.toast("Enter M-Pesa PIN");
 
       _pollPaymentStatus(checkoutRequestID, quantity, item);
 
     } catch (e) {
       setState(() => isLoading = false);
-      showBaustakaMessage(context, "Order Failed");
+      Util.toast("Order Failed");
     }
   }
 
@@ -200,7 +200,7 @@ Future<void> loadLocation() async {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
-      final url = Uri.parse("$baseUrl/v1/mpesa/stkpush/status");
+      final url = Uri.parse("${kBaseApiUrl}v1/mpesa/stkpush/status");
 
       final response = await http.post(
         url,
@@ -221,7 +221,7 @@ Future<void> loadLocation() async {
       timer.cancel();
 
       if (status == "paid") {
-        showBaustakaMessage(context, "Payment Successful");
+        Util.toast("Payment Successful");
 
         Navigator.pushReplacement(
           context,
@@ -236,7 +236,7 @@ Future<void> loadLocation() async {
         );
 
       } else {
-        showBaustakaMessage(context, "Payment Failed");
+        Util.toast("Payment Failed");
       }
     });
   }
@@ -266,7 +266,7 @@ Future<void> loadLocation() async {
         child: Column(
           children: [
 
-            Image.network("$baseUrl${item['image']}", height: 120),
+            Image.network("$kBaseImageUrl${item['image']}", height: 120),
 
             const SizedBox(height: 15),
 

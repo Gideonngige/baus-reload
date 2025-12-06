@@ -16,6 +16,8 @@ import 'package:geocoding/geocoding.dart';
 import 'package:baustaka/helper/session.dart';
 import 'package:baustaka/config/palette.dart';
 import 'package:baustaka/helper/session.dart';
+import 'package:baustaka/config/env.dart';
+import 'package:baustaka/helper/util.dart';
 
 class MarketplaceHomeScreen extends StatefulWidget {
   const MarketplaceHomeScreen({super.key});
@@ -41,8 +43,6 @@ class _MarketplaceHomeScreenState extends State<MarketplaceHomeScreen> {
   String? token;
   String? location;
   Map<String, dynamic>? user;
-
-  String baseUrl = 'http://192.168.100.5:5363';
 
   @override
   void initState() {
@@ -74,7 +74,7 @@ class _MarketplaceHomeScreenState extends State<MarketplaceHomeScreen> {
     try {
       final headers = await Session.headers();
       final response = await http.get(
-        Uri.parse('http://192.168.100.5:5363/v1/listings/'),
+        Uri.parse('${kBaseApiUrl}v1/listings/'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -89,12 +89,12 @@ class _MarketplaceHomeScreenState extends State<MarketplaceHomeScreen> {
         });
       } else {
         print('Failed to load listings: ${response.body}');
-        showBaustakaMessage(context, 'Failed to load listings.');
+        Util.toast('Failed to load listings.');
         setState(() => isLoading = false);
       }
     } catch (e) {
       print('Error fetching listings: $e');
-      showBaustakaMessage(context, 'An error occured while fetching listings');
+      Util.toast('An error occured while fetching listings');
       setState(() => isLoading = false);
     }
   }
@@ -444,7 +444,7 @@ location = locationName;
                                       ClipRRect(
                                         borderRadius: BorderRadius.circular(8),
                                         child: Image.network(
-                                          item['image'] != null ? '$baseUrl${item['image']}' : 'https://via.placeholder.com/70',
+                                          item['image'] != null ? '$kBaseImageUrl${item['image']}' : 'https://via.placeholder.com/70',
                                           width: 70,
                                           height: 70,
                                           fit: BoxFit.cover,

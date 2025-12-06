@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'create_order_screen.dart';
 import '../widgets/message_pop.dart';
 import 'package:baustaka/config/palette.dart';
+import 'package:baustaka/config/env.dart';
+import 'package:baustaka/helper/util.dart';
 
 class AllListingsScreen extends StatefulWidget {
   const AllListingsScreen({super.key});
@@ -18,7 +20,6 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
   List<dynamic> listings = [];
   bool isLoading = true;
   String searchQuery = '';
-  String baseUrl = 'http://192.168.100.5:5363';
 
   @override
   void initState() {
@@ -34,7 +35,7 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
       final token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse('http://192.168.100.5:5363/v1/listings/'),
+        Uri.parse('${kBaseApiUrl}v1/listings/'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -47,10 +48,10 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
           listings = data;
         });
       } else {
-        showBaustakaMessage(context, 'Failed to load listings.');
+        Util.toast('Failed to load listings.');
       }
     } catch (e) {
-        showBaustakaMessage(context, 'An error occurred while fetching listings.');
+        Util.toast('An error occurred while fetching listings.');
     } finally {
       setState(() => isLoading = false);
     }
@@ -177,7 +178,7 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
                                           topRight: Radius.circular(12),
                                         ),
                                         child: Image.network(
-                                          item['image'] != null ? '$baseUrl${item['image']}' : '',
+                                          item['image'] != null ? '$kBaseImageUrl${item['image']}' : '',
                                           height: 120,
                                           width: double.infinity,
                                           fit: BoxFit.cover,

@@ -2,6 +2,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 String kBaseApiUrl = dotenv.env['BASE_API_URL']!;
 
+String kBaseImageUrl = dotenv.env['BASE_IMAGE_URL']!;   
+
 String kBaseSocketUrl = dotenv.env['BASE_SOCKET_URL']!;
 
 String kAppName = dotenv.env['APP_NAME']!;

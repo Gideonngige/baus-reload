@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http; // for API calls
 import 'package:shared_preferences/shared_preferences.dart'; // for prefs
 import '../widgets/message_pop.dart';
 import 'package:baustaka/config/palette.dart';
+import 'package:baustaka/config/env.dart';
+import 'package:baustaka/helper/util.dart';
 
 
 class BuyerOrdersScreen extends StatefulWidget {
@@ -19,7 +21,6 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
   bool isLoading = true;
   String? token;
   Map<String, dynamic>? user;
-  String baseUrl = 'http://192.168.100.5:5363';
 
   @override
   void initState(){
@@ -45,7 +46,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
       user = jsonDecode(storedUser);
 
       final buyerId = user!['_id'];
-      final url = Uri.parse('http://192.168.100.5:5363/v1/orders/$buyerId');
+      final url = Uri.parse('${kBaseApiUrl}v1/orders/$buyerId');
 
       final response = await http.get(
         url,
@@ -63,13 +64,13 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
         });
       }else{
         setState(() => isLoading = false);
-        showBaustakaMessage(context, 'Failed to load orders.');
+        Util.toast('Failed to load orders.');
         print('Failed to load orders: ${response.body}');
       }
 
     }catch(e){
       print('Error fetching orders: $e');
-      showBaustakaMessage(context, 'Error fetching orders.$e');
+      Util.toast('Error fetching orders.$e');
       setState(() => isLoading = false);
     }
   }
@@ -141,7 +142,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
         ClipRRect(
           borderRadius: BorderRadius.circular(10),
           child: Image.network(
-            '$baseUrl${order['listing']['image']}' ?? 'https://via.placeholder.com/150',
+            '$kBaseImageUrl${order['listing']['image']}' ?? 'https://via.placeholder.com/150',
             width: 70,
             height: 70,
             fit: BoxFit.cover,

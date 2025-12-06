@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/message_pop.dart';
 import 'package:baustaka/config/palette.dart';
+import 'package:baustaka/config/env.dart';
+import 'package:baustaka/helper/util.dart';
 
 class SellerDashboardScreen extends StatefulWidget {
   const SellerDashboardScreen({super.key});
@@ -17,7 +19,6 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
   Map<String, dynamic>? dashboardData;
   bool isLoading = true;
   String? sellerName;
-  String baseUrl = 'http://192.168.100.5:5363';
 
   @override
   void initState() {
@@ -40,7 +41,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
       final sellerId = user['_id'];
       sellerName = user['displayName'];
 
-      final url = Uri.parse("$baseUrl/v1/seller/dashboard/$sellerId/");
+      final url = Uri.parse("${kBaseApiUrl}v1/seller/dashboard/$sellerId/");
 
       final response = await http.get(url, headers: {
         'Authorization': 'Bearer $token',
@@ -53,12 +54,12 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
         });
       } else {
         setState(() => isLoading = false);
-        showBaustakaMessage(context, 'Failed to fetch dashboard.');
+        Util.toast('Failed to fetch dashboard.');
         print("Failed to fetch dashboard: ${response.body}");
       }
     } catch (e) {
       print("Error fetching dashboard: $e");
-      showBaustakaMessage(context, 'Error fetching dashboard: $e');
+      Util.toast('Error fetching dashboard: $e');
       setState(() => isLoading = false);
     }
   }
@@ -234,7 +235,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
                 "${item["weight"] ?? 0} kg",
                 item["status"] ?? "N/A",
                 item["status"] == "available" ? Palette.primary : Colors.orange,
-                image: '$baseUrl${item['image']}' ?? 'https://via.placeholder.com/150',
+                image: '$kBaseImageUrl${item['image']}' ?? 'https://via.placeholder.com/150',
               );
             }).toList(),
           ),

@@ -32,6 +32,10 @@ class Routes {
   // Onboarding
   static const kOnboarding = '/onboarding';
 
+  // Driver
+  static const kDriverHome = '/driver-home';
+
+
   // Old
   static const kAddChamp = '/add-champ';
   static const kChamps = '/champs';

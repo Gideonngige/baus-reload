@@ -13,6 +13,9 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:baustaka/db/settings.dart'; // for SettingsDb
+import 'package:baustaka/config/routes.dart'; // for Routes.kDriverHome, Routes.kMain
+
 
 class EmailController extends GetxController {
   @override
@@ -53,6 +56,17 @@ class EmailController extends GetxController {
 
       // This returns { "user": {...} }
       final data = response.data;
+      final roles = List<String>.from(data['user']['roles'] ?? []);
+      final role = roles.isNotEmpty ? roles.first : 'user';
+
+
+      await SettingsDb.setInitialRoute(
+          role == 'driver'
+          ? Routes.kDriverHome
+          : Routes.kMain,
+      );
+
+      print("User Data: $data");
       // You could store it in Session if you want:
       // Session.serverUser = data['user'];
 

@@ -51,71 +51,6 @@ class _TrackingScreenState extends State<TrackingScreen> {
     mapController = controller;
   }
 
-  /// Ask user to input delivery verification token
-  Future<String?> _enterTokenDialog() async {
-    String token = "";
-    return showDialog<String>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Enter Delivery Token", style: TextStyle(fontSize: 18, color: Palette.primary)),
-          content: TextField(
-            onChanged: (value) => token = value,
-            decoration: const InputDecoration(
-              labelText: "Verification Token",
-              border: OutlineInputBorder(),
-            ),
-          ),
-          actions: [
-            TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("Cancel")),
-            TextButton(
-                onPressed: () => Navigator.pop(context, token),
-                child: const Text("Submit")),
-          ],
-        );
-      },
-    );
-  }
-
-  /// Mark order as delivered
-  Future<void> _markAsDelivered() async {
-    final enteredToken = await _enterTokenDialog();
-    if (enteredToken == null || enteredToken.isEmpty) {
-      showBaustakaMessage(context, "Token is required to continue!.");
-      return;
-    }
-
-    setState(() => _isMarkingDelivered = true);
-
-    try {
-      final url = Uri.parse(
-          'http://192.168.100.5:5363/v1/orders/verify-delivery'); // adjust to your backend
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          "orderId": widget.order["_id"],
-          "buyerId": widget.order["buyer"]["_id"],
-          "driverId": widget.order["driver"]["_id"],
-          "verificationToken": enteredToken, //  use the entered token
-        }),
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        showBaustakaMessage(context, "Order marked as delivered!");
-        Navigator.pop(context, true);
-      } else {
-        showBaustakaMessage(context, "Failed: ${response.body}");
-      }
-    } catch (e) {
-      showBaustakaMessage(context, "Error: $e");
-    } finally {
-      setState(() => _isMarkingDelivered = false);
-    }
-  }
-
   Color _getStatusColor(String? status) {
     switch (status) {
       case 'delivered':
@@ -325,34 +260,6 @@ class _TrackingScreenState extends State<TrackingScreen> {
               ],
             ),
           ),
-
-          // MARK AS DELIVERED BUTTON
-          if (order["deliveryStatus"] != "Delivered")
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isMarkingDelivered ? null : _markAsDelivered,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Palette.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: _isMarkingDelivered
-                      ? const CircularProgressIndicator(color: Colors.green)
-                      : const Text(
-                          'Mark as Delivered',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700),
-                        ),
-                ),
-              ),
-            ),
         ],
       ),
     );

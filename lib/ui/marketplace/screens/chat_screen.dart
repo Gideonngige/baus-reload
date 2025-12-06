@@ -4,6 +4,9 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/message_pop.dart';
 import 'package:baustaka/config/palette.dart';
+import 'package:baustaka/config/env.dart';
+import 'package:baustaka/helper/util.dart';
+
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -19,8 +22,6 @@ class _ChatScreenState extends State<ChatScreen> {
   String? userId;
   String? token;
 
-  // 🔹 Replace with your backend base URL
-  final String baseUrl = "http://192.168.100.5:5363/v1/chat";
 
   @override
   void initState() {
@@ -54,7 +55,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/message/$userId'),
+        Uri.parse('${kBaseApiUrl}v1/chat/message/$userId'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -68,12 +69,12 @@ class _ChatScreenState extends State<ChatScreen> {
           _isLoading = false;
         });
       } else {
-        showBaustakaMessage(context, 'Failed to load messages.');
+        Util.toast('Failed to load messages');
         print('Failed to load messages: ${response.body}');
         setState(() => _isLoading = false);
       }
     } catch (e) {
-        showBaustakaMessage(context, 'Error fetching messages: $e.');
+        Util.toast('Error fetching messages: $e');
         print('Error fetching messages: $e');
         setState(() => _isLoading = false);
     }
@@ -85,7 +86,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/send'),
+        Uri.parse('${kBaseApiUrl}v1/chat/send'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -104,11 +105,11 @@ class _ChatScreenState extends State<ChatScreen> {
           _messageController.clear();
         });
       } else {
-        showBaustakaMessage(context, 'Message not sent: ${response.body}.');
+        Util.toast('Message not sent: ${response.body}.');
         print("Failed to send message: ${response.body}");
       }
     } catch (e) {
-        showBaustakaMessage(context, 'Error sending message: $e.');
+        Util.toast('Error sending message: $e.');
         print("Error sending message: $e");
     }
   }

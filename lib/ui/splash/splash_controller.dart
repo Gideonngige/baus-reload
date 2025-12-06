@@ -28,10 +28,10 @@ class SplashController extends GetxController {
       // Instead of always going to kMain, read the "initialRoute" from SettingsDb:
       final route = await SettingsDb.getInitialRoute(); // e.g. '/home_picker'
       // If for some reason route is null or empty, fallback
-      if (route == null || route.isEmpty) {
-        await Get.offAndToNamed(Routes.kMain);
+      if (route == Routes.kDriverHome) {
+          await Get.offAllNamed(Routes.kDriverHome);
       } else {
-        await Get.offAndToNamed(route);
+          await Get.offAllNamed(Routes.kMain);
       }
     } else {
       await Get.offAndToNamed(Routes.kOnboarding);
