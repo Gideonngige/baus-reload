@@ -108,7 +108,7 @@ Future<void> loadLocation() async {
     final qtyText = _quantityController.text.trim();
 
     if (qtyText.isEmpty || double.tryParse(qtyText) == null) {
-      showBaustakaMessage(context, "Enter valid quantity");
+      Util.toast("Enter valid quantity");
       return;
     }
 
@@ -299,7 +299,7 @@ Future<void> loadLocation() async {
     if (q == null || q <= 0) return;
 
     if (q > availableQty) {
-      showBaustakaMessage(context, "Only $availableQty units available");
+      Util.toast("Only $availableQty units available");
       _quantityController.text = availableQty.toInt().toString();
       return;
     }

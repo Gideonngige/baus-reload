@@ -5,13 +5,11 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../widgets/message_pop.dart';
 import 'package:baustaka/config/palette.dart';
 import 'all_listings_screen.dart';
 import 'package:get/get.dart';
 import 'package:baustaka/config/env.dart';
 import 'package:baustaka/helper/util.dart';
-
 
 class CreateListingStep2 extends StatefulWidget {
   final String title;
@@ -30,117 +28,176 @@ class CreateListingStep2 extends StatefulWidget {
 }
 
 class _CreateListingStep2State extends State<CreateListingStep2> {
-  
   final _priceController = TextEditingController();
   final _weightController = TextEditingController();
+
   bool isLoading = false;
-  
+  bool locationLoading = false;
+
+  String selectedLocationName = "Detecting location...";
+  double? selectedLatitude;
+  double? selectedLongitude;
+
   // get cached location
   Future<Map<String, dynamic>> getCachedLocation() async {
-  final prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
 
-  final double? latitude = prefs.getDouble('latitude');
-  final double? longitude = prefs.getDouble('longitude');
-  final String? locationName = prefs.getString('locationName');
+    final double? latitude = prefs.getDouble('latitude');
+    final double? longitude = prefs.getDouble('longitude');
+    final String? locationName = prefs.getString('locationName');
 
-  if (latitude != null && longitude != null && locationName != null) {
-    return {
-      'latitude': latitude,
-      'longitude': longitude,
-      'locationName': locationName,
-    };
-  } else {
-    throw Exception("No cached location found");
-  }
-}
-
-  Future<void> _submitListing() async {
-   final price = _priceController.text.trim();
-  final double? weight = double.tryParse(_weightController.text.trim());
-
-if (weight == null) {
-  setState(() => isLoading = false);
-  Util.toast("Enter valid weight (e.g. 2.50)");
-  return;
-}
-
-// force 2 decimal places
-final formattedWeight = weight.toStringAsFixed(2);
-
-
-    if (price.isEmpty || weight == null) {
-    setState(() => isLoading = false);
-    Util.toast("Fill in all the fields!");
-    return;
+    if (latitude != null && longitude != null && locationName != null) {
+      return {
+        'latitude': latitude,
+        'longitude': longitude,
+        'locationName': locationName,
+      };
+    } else {
+      throw Exception("No cached location found");
+    }
   }
 
-  setState(() => isLoading = true);
+  @override
+  void initState() {
+    super.initState();
+    _loadLocation();
+  }
 
-  final prefs = await SharedPreferences.getInstance();
-  final token = prefs.getString('token');
-  final storedUser = prefs.getString('user');
+  Future<void> _loadLocation() async {
+    try {
+      final loc = await getCachedLocation();
+      setState(() {
+        selectedLatitude = loc['latitude'];
+        selectedLongitude = loc['longitude'];
+        selectedLocationName = loc['locationName'];
+      });
+    } catch (_) {
+      setState(() => selectedLocationName = "Location not set");
+    }
+  }
 
-  final cachedLocation = await getCachedLocation();
+  Future<void> _useCurrentLocation() async {
+    setState(() => locationLoading = true);
 
-  final latitude = cachedLocation['latitude'];
-  final longitude = cachedLocation['longitude'];
-  final locationName = cachedLocation['locationName'];
-
-
-  if (token == null || storedUser == null) return;
-
-  final user = jsonDecode(storedUser);
-  final sellerId = user['_id'];
-  final url = Uri.parse('${kBaseApiUrl}v1/listings/');
-
-  try {
-    // Create a multipart request
-    var request = http.MultipartRequest('POST', url);
-
-    // Add headers
-    request.headers['Authorization'] = 'Bearer $token';
-
-    // Add text fields
-    request.fields['title'] = widget.title;
-    request.fields['description'] = widget.description;
-    request.fields['price'] = price;
-    request.fields['weight'] = formattedWeight;
-    request.fields['locationName'] = locationName ?? "Meru, Kenya";
-    request.fields['latitude'] = (latitude ?? 0.1231765).toString();
-    request.fields['longitude'] = (longitude ?? 37.7211678).toString();
-    request.fields['sellerId'] = sellerId.toString();
-
-    //Attach image file if selected
-    if (widget.imageFile != null) {
-      request.files.add(await http.MultipartFile.fromPath(
-        'image',
-        widget.imageFile!.path,
-      ));
+    try {
+      final cached = await getCachedLocation();
+      setState(() {
+        selectedLatitude = cached['latitude'];
+        selectedLongitude = cached['longitude'];
+        selectedLocationName = cached['locationName'];
+      });
+      Util.toast("Current location selected ✅");
+    } catch (e) {
+      Util.toast("No GPS location saved yet");
     }
 
-    // Send the request
-    var streamedResponse = await request.send();
-    var response = await http.Response.fromStream(streamedResponse);
+    setState(() => locationLoading = false);
+  }
 
-    setState(() => isLoading = false);
+  void _changeLocationDialog() {
+    final controller = TextEditingController();
 
-    if (response.statusCode == 201) {
-        Util.toast("Listing uploaded successfully!");
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Change Location"),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            hintText: "Enter town or area name",
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: const Text("Cancel")),
+          ElevatedButton(
+            onPressed: () async {
+              final name = controller.text.trim();
+              if (name.isEmpty) return;
+
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setString('locationName', name);
+
+              setState(() {
+                selectedLocationName = name;
+                selectedLatitude ??= 0.0;
+                selectedLongitude ??= 0.0;
+              });
+
+              Get.back();
+            },
+            child: const Text("Save"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _submitListing() async {
+    final price = _priceController.text.trim();
+    final double? weight = double.tryParse(_weightController.text.trim());
+
+    if (price.isEmpty || weight == null) {
+      Util.toast("Enter valid price and weight");
+      return;
+    }
+
+    final formattedWeight = weight.toStringAsFixed(2);
+
+    setState(() => isLoading = true);
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final storedUser = prefs.getString('user');
+
+    if (token == null || storedUser == null) {
+      Util.toast("Login expired");
+      return;
+    }
+
+    final user = jsonDecode(storedUser);
+    final sellerId = user['_id'];
+    final url = Uri.parse('${kBaseApiUrl}v1/listings/');
+
+    try {
+      var request = http.MultipartRequest('POST', url);
+      request.headers['Authorization'] = 'Bearer $token';
+
+      request.fields['title'] = widget.title;
+      request.fields['description'] = widget.description;
+      request.fields['price'] = price;
+      request.fields['weight'] = formattedWeight;
+      request.fields['locationName'] = selectedLocationName;
+      request.fields['latitude'] = selectedLatitude.toString();
+      request.fields['longitude'] = selectedLongitude.toString();
+      request.fields['sellerId'] = sellerId.toString();
+
+      if (widget.imageFile != null) {
+        request.files.add(
+          await http.MultipartFile.fromPath('image', widget.imageFile!.path),
+        );
+      }
+
+      var response = await request.send();
+      var body = await http.Response.fromStream(response);
+
+      setState(() => isLoading = false);
+
+      if (body.statusCode == 201) {
+        Util.toast("Listing uploaded ✅");
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => AllListingsScreen()),
         );
-    } else {
-        Util.toast("Failed to upload listing.");
-        print("Failed response: ${response.body}");
+      } else {
+        Util.toast("Upload failed");
+        print(body.body);
+      }
+    } catch (e) {
+      setState(() => isLoading = false);
+      Util.toast("Error uploading listing");
+      print(e);
     }
-  } catch (e) {
-    setState(() => isLoading = false);
-    Util.toast("An error occurred while uploading listing!");
-    print("Error uploading: $e");
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -148,9 +205,9 @@ final formattedWeight = weight.toStringAsFixed(2);
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
         title: const Text(
-            "Step 2: Pricing & Location",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-            ),
+          "Step 2: Pricing & Location",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Palette.primary,
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
@@ -163,6 +220,8 @@ final formattedWeight = weight.toStringAsFixed(2);
             _buildTextField(_priceController, "Price (Ksh)", Icons.monetization_on),
             const SizedBox(height: 15),
             _buildTextField(_weightController, "Weight (kg)", Icons.scale, allowDecimal: true),
+            const SizedBox(height: 20),
+            _buildLocationSection(),
             const Spacer(),
             SizedBox(
               width: double.infinity,
@@ -175,10 +234,7 @@ final formattedWeight = weight.toStringAsFixed(2);
                     : const Text("Upload Listing", style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.primary,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  textStyle: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
             ),
@@ -188,44 +244,63 @@ final formattedWeight = weight.toStringAsFixed(2);
     );
   }
 
- Widget _buildTextField(
-    TextEditingController controller,
-    String label,
-    IconData icon, {
-    bool allowDecimal = false,
-  }) {
-  return TextField(
-    controller: controller,
-    keyboardType:
-        allowDecimal ? const TextInputType.numberWithOptions(decimal: true) : TextInputType.number,
-    inputFormatters: allowDecimal
-        ? [
-            FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
-          ]
-        : [
-            FilteringTextInputFormatter.digitsOnly,
-          ],
-    decoration: InputDecoration(
-      prefixIcon: Icon(icon, color: Palette.primary),
-      label: Text(
-        label,
-        style: GoogleFonts.poppins(
-          color: Palette.primary,
-          fontWeight: FontWeight.w500,
+  Widget _buildLocationSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Listing Location",
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Palette.primary.withOpacity(0.4)),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.location_on, color: Colors.red),
+              const SizedBox(width: 8),
+              Expanded(child: Text(selectedLocationName)),
+              PopupMenuButton(
+                itemBuilder: (_) => const [
+                  PopupMenuItem(value: 'current', child: Text("Use Current Location")),
+                  PopupMenuItem(value: 'change', child: Text("Change Location")),
+                ],
+                onSelected: (value) {
+                  if (value == 'current') _useCurrentLocation();
+                  if (value == 'change') _changeLocationDialog();
+                },
+              )
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String label, IconData icon,
+      {bool allowDecimal = false}) {
+    return TextField(
+      controller: controller,
+      keyboardType: allowDecimal
+          ? const TextInputType.numberWithOptions(decimal: true)
+          : TextInputType.number,
+      inputFormatters: allowDecimal
+          ? [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}'))]
+          : [FilteringTextInputFormatter.digitsOnly],
+      decoration: InputDecoration(
+        prefixIcon: Icon(icon, color: Palette.primary),
+        labelText: label,
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Palette.primary),
         ),
       ),
-      filled: true,
-      fillColor: Colors.white,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Palette.primary),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Palette.primary, width: 1.5),
-      ),
-    ),
-  );
-}
-
+    );
+  }
 }

@@ -28,11 +28,13 @@ class Order {
 class Buyer {
   final String id;
   final String displayName;
-  Buyer({required this.id, required this.displayName});
+  final String phoneNumber;
+  Buyer({required this.id, required this.displayName, required this.phoneNumber,});
 
   factory Buyer.fromJson(Map<String, dynamic> json) => Buyer(
         id: json['_id'] ?? '',
         displayName: json['displayName'] ?? '',
+        phoneNumber: json['phoneNumber'] ?? '',
       );
 }
 
