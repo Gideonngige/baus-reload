@@ -169,63 +169,123 @@ class PurchaseSummaryScreen extends StatelessWidget {
     }
 
     Future<void> _generateReceipt({
-        required String itemName,
-        required double price,
-        required int quantity,
-        required double total,
-        required String date,
-        required String paymentMethod,
-        required BuildContext context,
+  required String itemName,
+  required double price,
+  required int quantity,
+  required double total,
+  required String date,
+  required String paymentMethod,
+  required BuildContext context,
+}) async {
+  final pdf = pw.Document();
 
-
-    }) async {
-        final pdf = pw.Document();
-
-        pdf.addPage(
-            pw.Page(
-                build: (pw.Context context) => pw.Padding(
-                    padding: const pw.EdgeInsets.all(20),
-                    child: pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
-                        children: [
-                            pw.Text(
-                                "BAUS TAKA RECEIPT",
-                                style:pw.TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: pw.FontWeight.bold,
-                                    color: PdfColors.green700
-                                )
-                                ),
-                            pw.SizedBox(height: 20),
-                            pw.Text("Item: $itemName"),
-                            pw.Text("Cost per unit: Ksh. ${price.toStringAsFixed(2)}"),
-                            pw.Text("Quantity: $quantity"),
-                            pw.Text("Payment Method: $paymentMethod"),
-                            pw.Text("Date: $date"),
-                            pw.Divider(),
-                            pw.Text("Total: Ksh. ${total.toStringAsFixed(2)}",
-                            style: pw.TextStyle(
-                                fontSize: 18,
-                                fontWeight: pw.FontWeight.bold,
-                                color: PdfColors.green800
-                            )
-                            ),
-                            pw.SizedBox(height: 30),
-                            pw.Text(
-                                "Thank you for using Baus Taka!",
-                                style: const pw.TextStyle(fontSize: 14),
-                            ),
-
-                        ],
-                    ),
+  pdf.addPage(
+    pw.Page(
+      pageFormat: PdfPageFormat.a4,
+      build: (pw.Context context) => pw.Padding(
+        padding: const pw.EdgeInsets.all(24),
+        child: pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            // Header
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Text(
+                  "BAUS TAKA",
+                  style: pw.TextStyle(
+                    fontSize: 26,
+                    fontWeight: pw.FontWeight.bold,
+                    color: PdfColors.green800,
+                  ),
                 ),
+                pw.Text(
+                  "RECEIPT",
+                  style: pw.TextStyle(
+                    fontSize: 22,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
-        );
+            pw.SizedBox(height: 12),
+            pw.Divider(thickness: 2, color: PdfColors.grey400),
+            pw.SizedBox(height: 16),
 
-        final dir = await getApplicationDocumentsDirectory();
-        final file = File("${dir.path}/receipt.pdf");
-        await file.writeAsBytes(await pdf.save());
+            // Item details
+            pw.Text("Purchase Details",
+                style: pw.TextStyle(
+                  fontSize: 18,
+                  fontWeight: pw.FontWeight.bold,
+                  color: PdfColors.green700,
+                )),
+            pw.SizedBox(height: 12),
 
-        await OpenFile.open(file.path);
-    }
+            _pdfRow("Item", itemName),
+            _pdfRow("Cost per unit", "Ksh. ${price.toStringAsFixed(2)}"),
+            _pdfRow("Quantity", quantity.toString()),
+            _pdfRow("Payment Method", paymentMethod),
+            _pdfRow("Date", date),
+            pw.Divider(thickness: 1.5, color: PdfColors.grey400),
+            pw.SizedBox(height: 6),
+            _pdfRow(
+              "Total Amount",
+              "Ksh. ${total.toStringAsFixed(2)}",
+              isBold: true,
+              valueColor: PdfColors.green800,
+            ),
+            pw.SizedBox(height: 30),
+
+            // Footer
+            pw.Divider(color: PdfColors.grey400),
+            pw.SizedBox(height: 12),
+            pw.Center(
+              child: pw.Text(
+                "Thank you for shopping with Baus Taka!",
+                style: pw.TextStyle(fontSize: 14),
+              ),
+            ),
+            pw.SizedBox(height: 4),
+            pw.Center(
+              child: pw.Text(
+                "Contact us: support@baustaka.com",
+                style: pw.TextStyle(fontSize: 12, color: PdfColors.grey700),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  final dir = await getApplicationDocumentsDirectory();
+  final file = File("${dir.path}/receipt.pdf");
+  await file.writeAsBytes(await pdf.save());
+
+  await OpenFile.open(file.path);
+}
+
+// Helper for PDF row
+pw.Widget _pdfRow(String label, String value,
+    {bool isBold = false, PdfColor? valueColor}) {
+  return pw.Padding(
+    padding: const pw.EdgeInsets.symmetric(vertical: 4),
+    child: pw.Row(
+      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+      children: [
+        pw.Text(label,
+            style: pw.TextStyle(fontSize: 14, color: PdfColors.grey800)),
+        pw.Text(
+          value,
+          style: pw.TextStyle(
+            fontSize: 14,
+            fontWeight: isBold ? pw.FontWeight.bold : pw.FontWeight.normal,
+            color: valueColor ?? PdfColors.black,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 }
