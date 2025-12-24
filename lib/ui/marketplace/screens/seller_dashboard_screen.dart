@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../widgets/message_pop.dart';
+import '../widgets/marketplace_drawer.dart';
 import 'package:baustaka/config/palette.dart';
 import 'package:baustaka/config/env.dart';
 import 'package:baustaka/helper/util.dart';
@@ -17,6 +19,8 @@ class SellerDashboardScreen extends StatefulWidget {
 
 class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
   Map<String, dynamic>? dashboardData;
+  Map<String, dynamic>? user;
+
   bool isLoading = true;
   String? sellerName;
 
@@ -37,15 +41,21 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
         return;
       }
 
-      final user = jsonDecode(userString);
-      final sellerId = user['_id'];
-      sellerName = user['displayName'];
+      final decodedUser = jsonDecode(userString);
+      final sellerId = decodedUser['_id'];
 
-      final url = Uri.parse("${kBaseApiUrl}v1/seller/dashboard/$sellerId/");
-
-      final response = await http.get(url, headers: {
-        'Authorization': 'Bearer $token',
+      setState(() {
+        user = decodedUser;
+        sellerName = decodedUser['displayName'];
       });
+
+      final url =
+          Uri.parse("${kBaseApiUrl}v1/seller/dashboard/$sellerId/");
+
+      final response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
 
       if (response.statusCode == 200) {
         setState(() {
@@ -53,13 +63,11 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
           isLoading = false;
         });
       } else {
-        setState(() => isLoading = false);
         Util.toast('Failed to fetch dashboard.');
-        print("Failed to fetch dashboard: ${response.body}");
+        setState(() => isLoading = false);
       }
     } catch (e) {
-      print("Error fetching dashboard: $e");
-      Util.toast('Error fetching dashboard: $e');
+      Util.toast('Error fetching dashboard');
       setState(() => isLoading = false);
     }
   }
@@ -68,6 +76,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
+
       appBar: AppBar(
         title: const Text(
           'Seller Dashboard',
@@ -82,8 +91,14 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
         backgroundColor: Palette.primary,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
+
+      // ✅ REUSABLE DRAWER
+      drawer: MarketplaceDrawer(user: user),
+
       body: isLoading
-          ? const Center(child: CircularProgressIndicator(color: Palette.primary))
+          ? const Center(
+              child: CircularProgressIndicator(color: Palette.primary),
+            )
           : dashboardData == null
               ? const Center(child: Text("No dashboard data available."))
               : SingleChildScrollView(
@@ -93,7 +108,8 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
     );
   }
 
-  //  Dashboard Content
+  // ================= DASHBOARD CONTENT =================
+
   Widget _buildDashboardContent() {
     final recentListings = dashboardData!["recentListings"] ?? [];
     final monthlySales = dashboardData!["monthlySales"] ?? [];
@@ -101,13 +117,11 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Welcome Section
         Text(
           'Hi, ${sellerName ?? 'User'} 👋',
           style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w700,
-            color: Colors.black87,
           ),
         ),
         const SizedBox(height: 6),
@@ -115,34 +129,34 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
           'Here’s your sales summary for this month.',
           style: TextStyle(color: Colors.grey, fontSize: 15),
         ),
+
         const SizedBox(height: 25),
 
-        // Top Stats
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _buildStatCard(
               title: "Total Sales",
               value: "Ksh. ${dashboardData!["totalSales"] ?? 0}",
-              icon: Icons.attach_money_rounded,
+              icon: Icons.attach_money,
               color: Colors.green,
             ),
             _buildStatCard(
               title: "Total KG Sold",
               value: "${dashboardData!["totalKgSold"] ?? 0} kg",
-              icon: Icons.scale_rounded,
+              icon: Icons.scale,
               color: Colors.orange,
             ),
           ],
         ),
+
         const SizedBox(height: 15),
+
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _buildStatCard(
               title: "Pending Orders",
               value: "${dashboardData!["pendingOrders"] ?? 0}",
-              icon: Icons.pending_actions_rounded,
+              icon: Icons.pending_actions,
               color: Colors.blue,
             ),
             _buildStatCard(
@@ -153,98 +167,111 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
             ),
           ],
         ),
+
         const SizedBox(height: 30),
 
-        // Bar Chart
         const Text(
           "Monthly Sales",
-          style: TextStyle(
-              fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black87),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 15),
-        Container(
-          height: 220,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  blurRadius: 6,
-                  offset: const Offset(0, 3))
-            ],
-          ),
-          child: BarChart(
-            BarChartData(
-              alignment: BarChartAlignment.spaceAround,
-              gridData: const FlGridData(show: false),
-              borderData: FlBorderData(show: false),
-              titlesData: FlTitlesData(
-                leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    reservedSize: 30,
-                    getTitlesWidget: (value, meta) {
-                      if (value.toInt() < monthlySales.length) {
-                        return Text(
-                          monthlySales[value.toInt()]["month"] ?? "",
-                          style: const TextStyle(color: Colors.grey, fontSize: 12),
-                        );
-                      }
-                      return const Text("");
-                    },
-                  ),
-                ),
-              ),
-              barGroups: monthlySales.asMap().entries.map((entry) {
-                final index = entry.key;
-                final sale = entry.value;
-                return BarChartGroupData(x: index, barRods: [
-                  BarChartRodData(
-                    toY: (sale["sales"] ?? 0).toDouble(),
-                    color: Colors.green,
-                    width: 18,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                ]);
-              }).toList().cast<BarChartGroupData>(),
-            ),
-          ),
-        ),
+
+        _buildBarChart(monthlySales),
+
         const SizedBox(height: 30),
 
-        // Recent Listings
         const Text(
           "Recent Listings",
-          style: TextStyle(
-              fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black87),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 15),
+
         if (recentListings.isEmpty)
           const Center(child: Text("No listings available"))
         else
           Column(
             children: recentListings.map<Widget>((item) {
               return _buildListingTile(
-                item["title"] ?? "Unknown",
-                "Ksh. ${item["price"] ?? 0}",
-                "${item["weight"] ?? 0} kg",
-                item["status"] ?? "N/A",
-                item["status"] == "available" ? Palette.primary : Colors.orange,
-                image: '$kBaseImageUrl${item['image']}' ?? 'https://via.placeholder.com/150',
+                name: item["title"] ?? "Unknown",
+                price: "Ksh. ${item["price"] ?? 0}",
+                weight: "${item["weight"] ?? 0} kg",
+                status: item["status"] ?? "N/A",
+                statusColor: item["status"] == "available"
+                    ? Palette.primary
+                    : Colors.orange,
+                image: item["image"] != null
+                    ? '$kBaseImageUrl${item["image"]}'
+                    : null,
               );
             }).toList(),
           ),
-        const SizedBox(height: 30),
       ],
     );
   }
 
-  // 🔹 Stat Card
+  // ================= WIDGETS =================
+
+  Widget _buildBarChart(List monthlySales) {
+    return Container(
+      height: 220,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          )
+        ],
+      ),
+      child: BarChart(
+        BarChartData(
+          alignment: BarChartAlignment.spaceAround,
+          gridData: const FlGridData(show: false),
+          borderData: FlBorderData(show: false),
+          titlesData: FlTitlesData(
+            leftTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  if (value.toInt() < monthlySales.length) {
+                    return Text(
+                      monthlySales[value.toInt()]["month"] ?? "",
+                      style:
+                          const TextStyle(color: Colors.grey, fontSize: 12),
+                    );
+                  }
+                  return const Text("");
+                },
+              ),
+            ),
+          ),
+          barGroups: monthlySales.asMap().entries.map((entry) {
+            return BarChartGroupData(
+              x: entry.key,
+              barRods: [
+                BarChartRodData(
+                  toY: (entry.value["sales"] ?? 0).toDouble(),
+                  color: Colors.green,
+                  width: 18,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ],
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
   Widget _buildStatCard({
     required String title,
     required String value,
@@ -262,7 +289,6 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
             BoxShadow(
               color: Colors.grey.withOpacity(0.1),
               blurRadius: 6,
-              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -275,27 +301,26 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
               child: Icon(icon, color: color, size: 20),
             ),
             const SizedBox(height: 10),
-            Text(
-              value,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-            Text(
-              title,
-              style: const TextStyle(color: Colors.grey, fontSize: 13),
-            ),
+            Text(value,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text(title,
+                style:
+                    const TextStyle(color: Colors.grey, fontSize: 13)),
           ],
         ),
       ),
     );
   }
 
-  // Listing Tile
-  Widget _buildListingTile(
-      String name, String price, String weight, String status, Color statusColor,
-      {String? image}) {
+  Widget _buildListingTile({
+    required String name,
+    required String price,
+    required String weight,
+    required String status,
+    required Color statusColor,
+    String? image,
+  }) {
     return Container(
       padding: const EdgeInsets.all(14),
       margin: const EdgeInsets.only(bottom: 10),
@@ -304,9 +329,9 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              blurRadius: 6,
-              offset: const Offset(0, 3))
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 6,
+          )
         ],
       ),
       child: Row(
@@ -322,8 +347,10 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
               ),
             )
           else
-            const Icon(Icons.image_not_supported, size: 70, color: Colors.grey),
+            const Icon(Icons.image_not_supported, size: 70),
+
           const SizedBox(width: 15),
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -336,21 +363,22 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
               ],
             ),
           ),
+
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(price,
                   style: const TextStyle(
-                      fontWeight: FontWeight.bold, color: Palette.primary)),
+                      fontWeight: FontWeight.bold,
+                      color: Palette.primary)),
               const SizedBox(height: 4),
               Row(
                 children: [
                   Icon(Icons.circle, size: 10, color: statusColor),
                   const SizedBox(width: 4),
-                  Text(
-                    status,
-                    style: TextStyle(color: statusColor, fontSize: 13),
-                  ),
+                  Text(status,
+                      style:
+                          TextStyle(color: statusColor, fontSize: 13)),
                 ],
               ),
             ],

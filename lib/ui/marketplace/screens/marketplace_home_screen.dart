@@ -18,6 +18,8 @@ import 'package:baustaka/config/palette.dart';
 import 'package:baustaka/helper/session.dart';
 import 'package:baustaka/config/env.dart';
 import 'package:baustaka/helper/util.dart';
+import '../widgets/marketplace_drawer.dart';
+
 
 class MarketplaceHomeScreen extends StatefulWidget {
   const MarketplaceHomeScreen({super.key});
@@ -196,103 +198,7 @@ location = locationName;
       ),
 
   // drawer
-  drawer: Drawer(
-    child: ListView(
-      padding: EdgeInsets.zero,
-      children: [
-        UserAccountsDrawerHeader(
-          accountName: Text(user?['displayName'] ?? 'Market User'),
-          accountEmail: Text(user?['email'] ?? 'marketuser@example.com'),
-          currentAccountPicture: CircleAvatar(
-            backgroundColor: Colors.white,
-            child: Icon(Icons.person, color: Palette.primary),
-          ),
-          decoration: BoxDecoration(
-            color: Palette.primary,
-          ),
-        ),
-        ListTile(
-          leading: const Icon(Icons.home),
-          title: const Text('Home'),
-          onTap: () {
-            Navigator.pop(context); // close drawer
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.list),
-          title: const Text('All Listings'),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AllListingsScreen()),
-            );
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.shopping_bag),
-          title: const Text('Sell'),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const CreateListingStep1()),
-            );
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.receipt_long),
-          title: const Text('My Orders'),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const BuyerOrdersScreen()),
-            );
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.dashboard),
-          title: const Text('Dashboard'),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const SellerDashboardScreen()),
-            );
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.chat),
-          title: const Text('Chat'),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ChatScreen()),
-            );
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.notifications),
-          title: const Text('Notifications'),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const NotificationsScreen()),
-            );
-          },
-        ),
-        const Divider(),
-        ListTile(
-          leading: const Icon(Icons.logout),
-          title: const Text('Logout'),
-          onTap: () async {
-            await Session.logout();
-            final prefs = await SharedPreferences.getInstance();
-            await prefs.clear();
-            Navigator.pop(context);
-            showBaustakaMessage(context, 'Logged out successfully.');
-          },
-        ),
-      ],
-    ),
-  ),
+  drawer: MarketplaceDrawer(user: user),
 
       body: SafeArea(
         child: isLoading
@@ -397,13 +303,42 @@ location = locationName;
 
                     const SizedBox(height: 25),
 
-                    // 📦 Recent Listings
-                    const Text(
-                      'Top Listings',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-                    ),
-                    const SizedBox(height: 15),
+                    // 📦 Top Listings Header with View All
+Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    const Text(
+      'Top Listings',
+      style: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.w700,
+      ),
+    ),
+
+    if (listings.isNotEmpty)
+      TextButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const AllListingsScreen(),
+            ),
+          );
+        },
+        child: const Text(
+          'View all',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Palette.primary,
+          ),
+        ),
+      ),
+  ],
+),
+
+const SizedBox(height: 15),
+
 
                     listings.isEmpty
                         ? const Center(
@@ -498,34 +433,6 @@ location = locationName;
 
                     const SizedBox(height: 20),
 
-                    // View All Button
-                    // View All Button (only show if listings exist)
-if (listings.isNotEmpty)
-  SizedBox(
-    width: double.infinity,
-    height: 50,
-    child: ElevatedButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => const AllListingsScreen()),
-        );
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Palette.primary,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10)),
-      ),
-      child: const Text(
-        'View All Listings',
-        style: TextStyle(
-            color: Colors.white,
-            fontSize: 17,
-            fontWeight: FontWeight.w600),
-      ),
-    ),
-  ),
 
                   ],
                 ),

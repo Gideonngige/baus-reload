@@ -183,11 +183,15 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
       setState(() => isLoading = false);
 
       if (body.statusCode == 201) {
-        Util.toast("Listing uploaded ✅");
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => AllListingsScreen()),
-        );
+        Util.toast("Listing uploaded");
+        Navigator.pushAndRemoveUntil(
+  context,
+  MaterialPageRoute(
+    builder: (_) => const AllListingsScreen(),
+  ),
+  (route) => false,
+);
+
       } else {
         Util.toast("Upload failed");
         print(body.body);
