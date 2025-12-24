@@ -6,6 +6,7 @@ import '../widgets/message_pop.dart';
 import 'package:baustaka/config/palette.dart';
 import 'package:baustaka/config/env.dart';
 import 'package:baustaka/helper/util.dart';
+import '../helper/format_date.dart';
 
 
 class ChatScreen extends StatefulWidget {
@@ -158,7 +159,7 @@ class _ChatScreenState extends State<ChatScreen> {
 final isMe = msg['senderId'] == userId;
 final text = msg['message'] ?? '';
 final response = msg['response'];
-final time = msg['createdAt']?.toString().substring(11, 16) ?? '';
+final time = formatDate(msg['createdAt'] ?? '');
 
 return Column(
   crossAxisAlignment:
