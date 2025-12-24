@@ -142,7 +142,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
             ),
             _buildStatCard(
               title: "Total KG Sold",
-              value: "${dashboardData!["totalKgSold"] ?? 0} kg",
+              value: "${(dashboardData!["totalKgSold"] ?? 0).toStringAsFixed(2)} kg",
               icon: Icons.scale,
               color: Colors.orange,
             ),
