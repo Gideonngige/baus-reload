@@ -17,6 +17,20 @@ class _CreateListingStep1State extends State<CreateListingStep1> {
   final _titleController = TextEditingController();
   final _descController = TextEditingController();
   File? _selectedImage;
+  final List<String> _categories = [
+  'Plastic',
+  'Metal',
+  'Glass',
+  'Paper',
+  'E-waste',
+  'Furniture',
+  'Construction',
+  'Food Waste',
+  'Other',
+];
+
+String? _selectedCategory;
+
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -32,6 +46,7 @@ class _CreateListingStep1State extends State<CreateListingStep1> {
           builder: (context) => CreateListingStep2(
             title: _titleController.text.trim(),
             description: _descController.text.trim(),
+            category: _selectedCategory!,
             imageFile: _selectedImage,
           ),
         ),
@@ -126,6 +141,55 @@ class _CreateListingStep1State extends State<CreateListingStep1> {
                       "Item Title",
                       Icons.label_outline_rounded,
                     ),
+
+                    const SizedBox(height: 15),
+
+DropdownButtonFormField<String>(
+  value: _selectedCategory,
+  validator: (value) =>
+      value == null ? 'Please select a category' : null,
+  style: GoogleFonts.poppins(
+    fontWeight: FontWeight.w600,
+    color: Colors.black,
+  ),
+  items: _categories
+      .map(
+        (category) => DropdownMenuItem<String>(
+          value: category,
+          child: Text(
+            category,
+            style: GoogleFonts.poppins(),
+          ),
+        ),
+      )
+      .toList(),
+  onChanged: (value) {
+    setState(() {
+      _selectedCategory = value;
+    });
+  },
+  decoration: InputDecoration(
+    filled: true,
+    fillColor: Colors.white,
+    prefixIcon: Icon(
+      Icons.category_outlined,
+      color: Colors.green[800],
+    ),
+    labelText: 'Category',
+    labelStyle: GoogleFonts.poppins(color: Palette.primary),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: Palette.primary),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: Palette.primary, width: 1.5),
+    ),
+  ),
+),
+
+
+
                     const SizedBox(height: 15),
                     _buildTextField(
                       _descController,

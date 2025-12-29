@@ -7,6 +7,7 @@ import 'package:baustaka/config/palette.dart';
 import 'package:baustaka/config/env.dart';
 import 'package:baustaka/helper/util.dart';
 import '../helper/format_date.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 
 class ChatScreen extends StatefulWidget {
@@ -33,13 +34,15 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _loadUserDataAndMessages() async {
   final prefs = await SharedPreferences.getInstance();
   final userString = prefs.getString('user');
-  final storedToken = prefs.getString('token');
+  // final storedToken = prefs.getString('token');
+  final firebaseUser = FirebaseAuth.instance.currentUser;
+  final new_token = await firebaseUser!.getIdToken(true);
 
-  if (userString != null && storedToken != null) {  // <- use storedToken here
+  if (userString != null && new_token != null) {  // <- use storedToken here
     final user = jsonDecode(userString);
     setState(() {
       userId = user['_id'];
-      token = storedToken; // assign token here
+      token = new_token; // assign token here
     });
     await _fetchMessages();
   } else {

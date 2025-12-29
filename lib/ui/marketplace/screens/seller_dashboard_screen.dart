@@ -9,6 +9,7 @@ import '../widgets/marketplace_drawer.dart';
 import 'package:baustaka/config/palette.dart';
 import 'package:baustaka/config/env.dart';
 import 'package:baustaka/helper/util.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SellerDashboardScreen extends StatefulWidget {
   const SellerDashboardScreen({super.key});
@@ -34,7 +35,10 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userString = prefs.getString('user');
-      final token = prefs.getString('token');
+      // final token = prefs.getString('token');
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+      final token = await firebaseUser!.getIdToken(true);
+      
 
       if (userString == null || token == null) {
         setState(() => isLoading = false);

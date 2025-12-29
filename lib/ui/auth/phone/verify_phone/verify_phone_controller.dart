@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:baustaka/config/routes.dart';
 import 'package:baustaka/helper/session.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:baustaka/config/env.dart';
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class VerifyPhoneController extends GetxController {
   var isVerifying = false.obs;
@@ -195,6 +197,14 @@ class VerifyPhoneController extends GetxController {
       );
       
       final data = response.data;
+      final prefs = await SharedPreferences.getInstance();
+      if (token != null && data != null) {
+        await prefs.setString('token', token);
+        prefs.setString('user', jsonEncode(data['user']));
+      } else {
+        print("Token or data are null — skipping cache save");
+      }
+
       print('Phone auth server user: ${data['user']}');
     } catch (e) {
       print('Error syncing with server: $e');

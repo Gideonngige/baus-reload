@@ -7,6 +7,7 @@ import '../widgets/message_pop.dart';
 import 'package:baustaka/config/palette.dart';
 import 'package:baustaka/config/env.dart';
 import 'package:baustaka/helper/util.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 
 class BuyerOrdersScreen extends StatefulWidget {
@@ -31,7 +32,9 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
   Future<void> _fetchOrders() async {
     try{
       final prefs = await SharedPreferences.getInstance();
-      final storedToken = prefs.getString('token');
+      // final storedToken = prefs.getString('token');
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+      final storedToken = await firebaseUser!.getIdToken(true);
       final storedUser = prefs.getString('user');
 
       // print('Stored Token: $storedToken');

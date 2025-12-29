@@ -10,16 +10,21 @@ import 'all_listings_screen.dart';
 import 'package:get/get.dart';
 import 'package:baustaka/config/env.dart';
 import 'package:baustaka/helper/util.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import './marketplace_home_screen.dart';
 
 class CreateListingStep2 extends StatefulWidget {
   final String title;
   final String description;
+  final String category;
   final File? imageFile;
 
   const CreateListingStep2({
     super.key,
     required this.title,
     required this.description,
+    required this.category,
     this.imageFile,
   });
 
@@ -146,7 +151,9 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
     setState(() => isLoading = true);
 
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
+    // final token = prefs.getString('token');
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    final token = await firebaseUser!.getIdToken(true);
     final storedUser = prefs.getString('user');
 
     if (token == null || storedUser == null) {
@@ -164,6 +171,7 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
 
       request.fields['title'] = widget.title;
       request.fields['description'] = widget.description;
+      request.fields['category'] = widget.category;
       request.fields['price'] = price;
       request.fields['weight'] = formattedWeight;
       request.fields['locationName'] = selectedLocationName;
@@ -186,9 +194,7 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
         Util.toast("Listing uploaded");
         Navigator.pushAndRemoveUntil(
   context,
-  MaterialPageRoute(
-    builder: (_) => const AllListingsScreen(),
-  ),
+  MaterialPageRoute(builder: (_) => const MarketplaceHomeScreen()),
   (route) => false,
 );
 

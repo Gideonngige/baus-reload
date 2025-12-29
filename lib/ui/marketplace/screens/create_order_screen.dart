@@ -8,6 +8,14 @@ import '../widgets/message_pop.dart';
 import 'package:baustaka/helper/util.dart';
 import 'package:baustaka/config/palette.dart';
 import 'package:baustaka/config/env.dart';
+import '../helper/location_util.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+enum DeliveryMethod {
+  baustaka,
+  selfArrangement,
+  pickup,
+}
 
 class CreateOrderScreen extends StatefulWidget {
   final Map<String, dynamic> item;
@@ -20,6 +28,9 @@ class CreateOrderScreen extends StatefulWidget {
 class _CreateOrderScreenState extends State<CreateOrderScreen> {
   final TextEditingController _quantityController = TextEditingController();
 
+DeliveryMethod _deliveryMethod = DeliveryMethod.baustaka;
+
+
   bool isLoading = false;
   bool loadingShipment = false;
 
@@ -31,11 +42,23 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
   double? userLng;
   String? locationName;
 
+  void _recalculateOrder() {
+  final q = double.tryParse(_quantityController.text);
+  if (q == null || q <= 0) return;
+
+  calculateShipment(q);
+}
+
+
   @override
   void dispose() {
     _quantityController.dispose();
     super.dispose();
   }
+
+bool isBulky = false;
+bool requiresQuote = false;
+String? deliveryNote;
 
 
 @override
@@ -59,135 +82,177 @@ Future<void> loadLocation() async {
   // ============================
 
   Future<void> calculateShipment(double quantity) async {
-    setState(() => loadingShipment = true);
+  final price = double.parse(widget.item["price"].toString());
+  itemTotal = price * quantity;
 
-    final item = widget.item;
+  final bool bulky = widget.item["isBulky"] == true || quantity > 30;
 
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final storedUser = prefs.getString("user");
+  // 1️⃣ NOT Baustaka → free delivery
+  if (_deliveryMethod != DeliveryMethod.baustaka) {
+    setState(() {
+      shipmentCost = 0;
+      finalTotal = itemTotal;
+      requiresQuote = false;
+      deliveryNote = _deliveryMethod == DeliveryMethod.pickup
+          ? "Pickup location and instructions will be shared after order confirmation."
+          : "Delivery will be arranged directly between buyer and seller.";
+    });
+    return;
+  }
 
-      if (storedUser == null) {
-        Util.toast("Login required");
-        return;
-      }
+  // 2️⃣ Baustaka + bulky → quote on request
+  if (bulky) {
+    setState(() {
+      shipmentCost = 0;
+      finalTotal = itemTotal;
+      requiresQuote = true;
+      deliveryNote = "Delivery: Quote on request";
+    });
+    return;
+  }
 
-      final user = jsonDecode(storedUser);
+  // 3️⃣ Baustaka + NOT bulky → auto pricing
+  if (userLat == null || userLng == null) {
+    Util.toast("User location not available");
+    return;
+  }
 
-      final response = await http.post(
-        Uri.parse("${kBaseApiUrl}v1/shipment/calculate/"),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "buyer_lat": userLat,
-          "buyer_lng": userLng,
-          "seller_lat": item["latitude"],
-          "seller_lng": item["longitude"],
-          "weight": quantity,
-          "vehicleType": "truck"
-        }),
-      );
+  setState(() {
+    loadingShipment = true;
+    requiresQuote = false;
+    deliveryNote = null;
+  });
 
-      final data = jsonDecode(response.body);
+  final sellerLat = widget.item["latitude"];
+  final sellerLng = widget.item["longitude"];
+  final distanceKm = calculateDistanceKm(userLat!, userLng!, sellerLat, sellerLng);
+  final zone = getDeliveryZone(distanceKm);
 
-      shipmentCost = data["data"]["cost"].toDouble();
-      itemTotal = (double.parse(item["price"].toString()) * quantity);
-      finalTotal = itemTotal + shipmentCost;
+  // Update delivery note with zone
+  setState(() => deliveryNote = "Zone $zone delivery");
 
-    } catch (e) {
-      Util.toast("Failed to calculate shipment");
-    }
+  try {
+    final response = await http.post(
+      Uri.parse("${kBaseApiUrl}v1/shipment/calculate/"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "buyer_lat": userLat,
+        "buyer_lng": userLng,
+        "seller_lat": sellerLat,
+        "seller_lng": sellerLng,
+        "weight": quantity,
+        "zone": zone, // send zone to backend
+      }),
+    );
 
+    if (response.statusCode != 200) throw "Shipment API failed";
+
+    final data = jsonDecode(response.body);
+    shipmentCost = data["data"]["cost"].toDouble();
+    finalTotal = itemTotal + shipmentCost;
+  } catch (e) {
+    Util.toast("Failed to calculate shipment");
+    shipmentCost = 0;
+    finalTotal = itemTotal;
+  } finally {
     setState(() => loadingShipment = false);
   }
+}
+
+
+
+
 
   // ============================
   // PLACE ORDER
   // ============================
 
   Future<void> _handleBuyNow() async {
-    final qtyText = _quantityController.text.trim();
+  final qtyText = _quantityController.text.trim();
 
-    if (qtyText.isEmpty || double.tryParse(qtyText) == null) {
-      Util.toast("Enter valid quantity");
-      return;
-    }
-
-    if (shipmentCost <= 0) {
-      Util.toast("Calculating shipping, please wait...");
-      return;
-    }
-
-    final quantity = double.parse(qtyText);
-    final item = widget.item;
-
-    setState(() => isLoading = true);
-
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      final storedUser = prefs.getString('user');
-
-      if (token == null || storedUser == null) {
-        Util.toast("Please sign in again");
-        return;
-      }
-
-      final user = jsonDecode(storedUser);
-      var phone = user['phoneNumber'];
-      if (phone.startsWith('+')) phone = phone.substring(1);
-      if (phone.startsWith('0')) {
-        phone = '254' + phone.substring(1);
-      }
-
-      final buyer = user['_id'];
-      final listing = item['_id'];
-
-      final url = Uri.parse("${kBaseApiUrl}v1/mpesa/stkpush/");
-
-      final response = await http.post(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'phone': phone,
-          'quantity': quantity,
-          'totalPrice': finalTotal,
-          'shipmentCost': shipmentCost,
-          'paymentMethod': 'mpesa',
-          'buyer': buyer,
-          'listing': listing,
-          'latitude': userLat,
-          'longitude': userLng,
-          'locationName': locationName,
-        }),
-      );
-
-      setState(() => isLoading = false);
-
-      if (response.statusCode != 200) {
-        Util.toast("Payment initiation failed.");
-        return;
-      }
-
-      final data = jsonDecode(response.body);
-      final checkoutRequestID = data['CheckoutRequestID'];
-
-      if (checkoutRequestID == null) {
-        Util.toast("Invalid payment response.");
-        return;
-      }
-
-      Util.toast("Enter M-Pesa PIN");
-
-      _pollPaymentStatus(checkoutRequestID, quantity, item);
-
-    } catch (e) {
-      setState(() => isLoading = false);
-      Util.toast("Order Failed");
-    }
+  if (qtyText.isEmpty || double.tryParse(qtyText) == null) {
+    Util.toast("Enter valid quantity");
+    return;
   }
+
+  final quantity = double.parse(qtyText);
+  final item = widget.item;
+
+  // Determine the shipment cost for payment
+  final double shipmentToPay = requiresQuote ? 0 : shipmentCost;
+  final double totalToPay = itemTotal + shipmentToPay;
+
+  setState(() => isLoading = true);
+
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    // final token = prefs.getString('token');
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    final token = await firebaseUser!.getIdToken(true);
+    final storedUser = prefs.getString('user');
+
+    if (token == null || storedUser == null) {
+      Util.toast("Please sign in again");
+      setState(() => isLoading = false);
+      return;
+    }
+
+    final user = jsonDecode(storedUser);
+    var phone = user['phoneNumber'].toString().trim();
+
+    if (phone.startsWith('+')) phone = phone.substring(1);
+    if (phone.startsWith('0')) phone = '254' + phone.substring(1);
+
+    final buyer = user['_id'];
+    final listing = item['_id'];
+
+    final url = Uri.parse("${kBaseApiUrl}v1/mpesa/stkpush/");
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'phone': phone,
+        'quantity': quantity,
+        'totalPrice': totalToPay,
+        'shipmentCost': shipmentToPay,
+        'deliveryMethod': _deliveryMethod.name,
+        'paymentMethod': 'mpesa',
+        'buyer': buyer,
+        'listing': listing,
+        'latitude': userLat,
+        'longitude': userLng,
+        'locationName': locationName,
+      }),
+    );
+
+    setState(() => isLoading = false);
+
+    if (response.statusCode != 200) {
+      Util.toast("Payment initiation failed.");
+      return;
+    }
+
+    final data = jsonDecode(response.body);
+    final checkoutRequestID = data['CheckoutRequestID'];
+
+    if (checkoutRequestID == null) {
+      Util.toast("Invalid payment response.");
+      return;
+    }
+
+    Util.toast("Enter M-Pesa PIN");
+
+    _pollPaymentStatus(checkoutRequestID, quantity, item);
+  } catch (e) {
+    setState(() => isLoading = false);
+    Util.toast("Order Failed");
+  }
+}
+
 
   // ============================
   // MPESA STATUS POLL
@@ -198,7 +263,9 @@ Future<void> loadLocation() async {
 
     Timer.periodic(pollInterval, (timer) async {
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
+      // final token = prefs.getString('token');
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+      final token = await firebaseUser!.getIdToken(true);
 
       final url = Uri.parse("${kBaseApiUrl}v1/mpesa/stkpush/status");
 
@@ -223,6 +290,16 @@ Future<void> loadLocation() async {
       if (status == "paid") {
         Util.toast("Payment Successful");
 
+        // Seller info from the item
+      final sellerInfo = {
+        "name": item['seller']?['displayName'] ?? "N/A",
+        "phone": item['seller']?['phoneNumber'] ?? "N/A",
+        "location": item['locationName'] ?? "N/A",
+      };
+
+      // Note if shipment was quote-on-request
+      final shipmentNote = requiresQuote ? "Delivery cost will be confirmed before dispatch." : null;
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -231,6 +308,8 @@ Future<void> loadLocation() async {
               price: finalTotal,
               quantity: quantity.toInt(),
               paymentMethod: 'M-Pesa',
+              sellerInfo: sellerInfo,      // passing seller info
+              shipmentNote: shipmentNote, 
             ),
           ),
         );
@@ -304,7 +383,7 @@ Future<void> loadLocation() async {
       return;
     }
 
-    calculateShipment(q);
+    _recalculateOrder();
   },
   decoration: const InputDecoration(
     labelText: "Quantity",
@@ -312,6 +391,103 @@ Future<void> loadLocation() async {
     border: OutlineInputBorder(),
   ),
 ),
+
+const SizedBox(height: 20),
+
+Align(
+  alignment: Alignment.centerLeft,
+  child: Text(
+    "Delivery Method",
+    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+  ),
+),
+
+const SizedBox(height: 10),
+
+Card(
+  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+  child: Column(
+    children: [
+
+      RadioListTile<DeliveryMethod>(
+        value: DeliveryMethod.baustaka,
+        groupValue: _deliveryMethod,
+        title: const Text("Deliver by Baustaka"),
+        subtitle: const Text("Baustaka arranges transport"),
+        onChanged: (value) {
+          setState(() {
+            _deliveryMethod = value!;
+            shipmentCost = 0;
+            finalTotal = 0;
+          });
+
+          // Recalculate shipment if quantity exists
+          final q = double.tryParse(_quantityController.text);
+          if (q != null && q > 0) {
+            _recalculateOrder();
+          }
+        },
+      ),
+
+      RadioListTile<DeliveryMethod>(
+        value: DeliveryMethod.selfArrangement,
+        groupValue: _deliveryMethod,
+        title: const Text("Self arrangement with seller"),
+        subtitle: const Text("You arrange delivery directly"),
+        onChanged: (value) {
+          setState(() {
+            _deliveryMethod = value!;
+            shipmentCost = 0;
+            finalTotal = itemTotal;
+          });
+          _recalculateOrder();
+        },
+      ),
+
+      RadioListTile<DeliveryMethod>(
+        value: DeliveryMethod.pickup,
+        groupValue: _deliveryMethod,
+        title: const Text("Pick from seller"),
+        subtitle: const Text("Collect the item yourself"),
+        onChanged: (value) {
+          setState(() {
+            _deliveryMethod = value!;
+            shipmentCost = 0;
+            finalTotal = itemTotal;
+          });
+          _recalculateOrder();
+        },
+      ),
+
+    ],
+  ),
+),
+
+
+if (deliveryNote != null)
+  Container(
+    margin: const EdgeInsets.only(top: 12),
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: Colors.orange.shade50,
+      borderRadius: BorderRadius.circular(8),
+      border: Border.all(color: Colors.orange),
+    ),
+    child: Row(
+      children: [
+        const Icon(Icons.info_outline, color: Colors.orange),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            deliveryNote!,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+        ),
+      ],
+    ),
+  ),
+
+
 
 
             const SizedBox(height: 20),
@@ -326,7 +502,7 @@ Future<void> loadLocation() async {
 
                     _priceRow("Item Total", "Ksh ${itemTotal.toStringAsFixed(0)}"),
 
-                    _priceRow("Shipment",
+                    _priceRow("Shipment",requiresQuote ? "Quote on request" :
                         loadingShipment ? "Calculating..." : "Ksh ${shipmentCost.toStringAsFixed(0)}"),
 
                     const Divider(),

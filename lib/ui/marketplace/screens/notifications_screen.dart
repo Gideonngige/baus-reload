@@ -7,6 +7,7 @@ import 'package:baustaka/config/palette.dart';
 import '../helper/format_date.dart';
 import 'package:baustaka/config/env.dart';
 import 'package:baustaka/helper/util.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -29,7 +30,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Future<void> fetchNotifications() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      token = prefs.getString('token');
+      // token = prefs.getString('token');
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+      final token = await firebaseUser!.getIdToken(true);
       final userString = prefs.getString('user');
 
       if (userString == null || token == null) {

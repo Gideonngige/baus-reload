@@ -19,6 +19,8 @@ import 'package:baustaka/helper/session.dart';
 import 'package:baustaka/config/env.dart';
 import 'package:baustaka/helper/util.dart';
 import '../widgets/marketplace_drawer.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 
 class MarketplaceHomeScreen extends StatefulWidget {
@@ -57,16 +59,16 @@ class _MarketplaceHomeScreenState extends State<MarketplaceHomeScreen> {
 
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
-    final storedToken = prefs.getString('token');
+    // final storedToken = prefs.getString('token');
     final storedUser = prefs.getString('user');
     print("Stored user: $storedUser");
    
 
 
-    if ( storedToken != null && storedUser != null) {
+    if (storedUser != null) {
       setState(() {
         user = jsonDecode(storedUser);
-        token = storedToken;
+        // token = storedToken;
       });
       await _fetchListings(); //fetch listings after user is loaded
     }
@@ -75,6 +77,9 @@ class _MarketplaceHomeScreenState extends State<MarketplaceHomeScreen> {
   Future<void> _fetchListings() async {
     try {
       final headers = await Session.headers();
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+      final token = await firebaseUser!.getIdToken(true);
+
       final response = await http.get(
         Uri.parse('${kBaseApiUrl}v1/listings/'),
         headers: {

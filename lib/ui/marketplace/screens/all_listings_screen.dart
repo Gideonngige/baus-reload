@@ -7,6 +7,9 @@ import '../widgets/message_pop.dart';
 import 'package:baustaka/config/palette.dart';
 import 'package:baustaka/config/env.dart';
 import 'package:baustaka/helper/util.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import './create_listing_step1.dart';
 
 class AllListingsScreen extends StatefulWidget {
   const AllListingsScreen({super.key});
@@ -32,7 +35,9 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
 
     try {
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
+      // final token = prefs.getString('token');
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+      final token = await firebaseUser!.getIdToken(true);
 
       final response = await http.get(
         Uri.parse('${kBaseApiUrl}v1/listings/'),
@@ -80,6 +85,21 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
+
+      floatingActionButton: FloatingActionButton(
+    backgroundColor: Palette.primary,
+    child: const Icon(Icons.add, color: Colors.white, size: 28),
+    onPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const CreateListingStep1(),
+        ),
+      );
+    },
+  ),
+
+
       body: isLoading
           ? Center(child: CircularProgressIndicator(color: Palette.primary))
           : Padding(
