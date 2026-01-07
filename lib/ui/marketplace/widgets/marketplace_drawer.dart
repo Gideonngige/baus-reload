@@ -137,7 +137,7 @@ class MarketplaceDrawer extends StatelessWidget {
           _drawerItem(
             context,
             icon: Icons.logout,
-            title: 'Logout',
+            title: 'Back to Main App',
             onTap: () async {
               await Session.logout();
               final prefs = await SharedPreferences.getInstance();

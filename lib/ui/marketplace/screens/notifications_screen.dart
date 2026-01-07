@@ -69,6 +69,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   Future<void> markAsRead(String id) async {
     try {
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+      final token = await firebaseUser!.getIdToken(true);
       final url = Uri.parse('${kBaseApiUrl}v1/notifications/read/$id');
       final response = await http.put(
         url,

@@ -20,6 +20,7 @@ import 'package:baustaka/config/env.dart';
 import 'package:baustaka/helper/util.dart';
 import '../widgets/marketplace_drawer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import './create_listing_step1.dart';
 
 
 
@@ -200,6 +201,22 @@ location = locationName;
         ),
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
+
+    // create listing button
+    actions: [
+      IconButton(
+        icon: const Icon(Icons.add_circle_outline, color: Colors.white, size: 28),
+        tooltip: "Create Listing",
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const CreateListingStep1(),
+            ),
+          );
+        },
+      ),
+    ],
       ),
 
   // drawer
