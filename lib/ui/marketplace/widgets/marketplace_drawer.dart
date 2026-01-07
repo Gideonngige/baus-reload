@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get/get.dart';
 
 import '../screens/notifications_screen.dart';
 import '../screens/all_listings_screen.dart';
@@ -14,6 +15,7 @@ import '../widgets/message_pop.dart';
 import 'package:baustaka/helper/session.dart';
 import 'package:baustaka/config/palette.dart';
 import 'package:baustaka/helper/session.dart';
+import 'package:baustaka/ui/main/main_widget.dart';
 
 class MarketplaceDrawer extends StatelessWidget {
   final Map<String, dynamic>? user;
@@ -136,14 +138,12 @@ class MarketplaceDrawer extends StatelessWidget {
 
           _drawerItem(
             context,
-            icon: Icons.logout,
+            icon: Icons.apps,
             title: 'Back to Main App',
             onTap: () async {
-              await Session.logout();
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.clear();
               Navigator.pop(context);
-              showBaustakaMessage(context, 'Logged out successfully.');
+              // Go back to main app shell
+              Get.offAll(() => MainWidget());
             },
           ),
         ],
