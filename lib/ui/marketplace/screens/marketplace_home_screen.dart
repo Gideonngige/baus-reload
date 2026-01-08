@@ -102,7 +102,7 @@ class _MarketplaceHomeScreenState extends State<MarketplaceHomeScreen> {
       }
     } catch (e) {
       print('Error fetching listings: $e');
-      Util.toast('An error occured while fetching listings');
+      Util.toast('An error occured while fetching listings!.');
       setState(() => isLoading = false);
     }
   }
@@ -129,6 +129,7 @@ class _MarketplaceHomeScreenState extends State<MarketplaceHomeScreen> {
   // Check if location services are enabled
   serviceEnabled = await Geolocator.isLocationServiceEnabled();
   if (!serviceEnabled) {
+    Util.toast("Location services are disabled!.");
     print('Location services are disabled.');
     return;
   }
@@ -138,12 +139,14 @@ class _MarketplaceHomeScreenState extends State<MarketplaceHomeScreen> {
   if (permission == LocationPermission.denied) {
     permission = await Geolocator.requestPermission();
     if (permission == LocationPermission.denied) {
+      Util.toast("Location permissions are denied!.");
       print('Location permissions are denied.');
       return;
     }
   }
 
   if (permission == LocationPermission.deniedForever) {
+    Util.toast("Location permissions are permanently denied!.");
     print('Location permissions are permanently denied.');
     return;
   }

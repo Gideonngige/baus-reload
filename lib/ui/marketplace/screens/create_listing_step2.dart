@@ -91,7 +91,7 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
         selectedLongitude = cached['longitude'];
         selectedLocationName = cached['locationName'];
       });
-      Util.toast("Current location selected ✅");
+      Util.toast("Current location selected");
     } catch (e) {
       Util.toast("No GPS location saved yet");
     }
@@ -190,8 +190,8 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
 
       setState(() => isLoading = false);
 
-      if (body.statusCode == 201) {
-        Util.toast("Listing uploaded");
+      if (body.statusCode == 201 || body.statusCode == 200) {
+        Util.toast("Listing uploaded successfully");
         Navigator.pushAndRemoveUntil(
   context,
   MaterialPageRoute(builder: (_) => const MarketplaceHomeScreen()),
@@ -199,7 +199,7 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
 );
 
       } else {
-        Util.toast("Upload failed");
+        Util.toast("Upload failed! Try again");
         print(body.body);
       }
     } catch (e) {

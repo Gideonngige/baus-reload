@@ -18,15 +18,18 @@ class _CreateListingStep1State extends State<CreateListingStep1> {
   final _descController = TextEditingController();
   File? _selectedImage;
   final List<String> _categories = [
-  'Plastic',
-  'Metal',
-  'Glass',
-  'Paper',
+  'Plastic waste',
+  'Recycled products',
+  'Upcycled products',
+  'Circular products',
+  'Metal waste',
+  'Glass waste',
+  'Paper waste',
   'E-waste',
-  'Furniture',
-  'Construction',
+  'Furniture waste',
+  'Construction waste',
   'Food Waste',
-  'Other',
+  'Other waste',
 ];
 
 String? _selectedCategory;
