@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:open_file/open_file.dart';
 import 'package:baustaka/config/palette.dart';
+import 'package:get/get.dart';
 
 
 class PurchaseSummaryScreen extends StatelessWidget {
@@ -34,8 +35,8 @@ class PurchaseSummaryScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Purchase Summary",
+        title: Text(
+          "purchase_summary".tr,
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
@@ -54,9 +55,9 @@ class PurchaseSummaryScreen extends StatelessWidget {
                     color: Palette.primary, size: 100),
               ),
               const SizedBox(height: 15),
-              const Center(
+              Center(
                 child: Text(
-                  "Purchase Successful!",
+                  "purchase_successful".tr,
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -81,19 +82,19 @@ class PurchaseSummaryScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildRow("Item Purchased:", itemName),
+                    _buildRow("item_purchased".tr, itemName),
                     const Divider(),
-                    _buildRow("Cost per Unit:", "Ksh. ${price.toStringAsFixed(2)}"),
+                    _buildRow("cost_per_unit".tr, "Ksh. ${price.toStringAsFixed(2)}"),
                     const Divider(),
-                    _buildRow("Quantity:", quantity.toString()),
+                    _buildRow("quantity".tr, quantity.toString()),
                     const Divider(),
-                    _buildRow("Payment Method:", paymentMethod),
+                    _buildRow("payment_method".tr, paymentMethod),
                     const Divider(),
-                    _buildRow("Date:", formattedDate),
+                    _buildRow("date".tr, formattedDate),
                     if (sellerInfo != null) ...[
                       const Divider(),
-                      _buildRow("Seller Name:", sellerInfo!['name'] ?? "N/A"),
-                      _buildRow("Seller Phone:", sellerInfo!['phone'] ?? "N/A"),
+                      _buildRow("seller_name".tr, sellerInfo!['name'] ?? "N/A"),
+                      _buildRow("seller_phone".tr, sellerInfo!['phone'] ?? "N/A"),
                       Padding(
   padding: const EdgeInsets.symmetric(vertical: 6),
   child: Row(
@@ -102,7 +103,7 @@ class PurchaseSummaryScreen extends StatelessWidget {
       SizedBox(
         width: 120, // fixed width for the label
         child: Text(
-          "Seller Location:",
+          "seller_location".tr,
           style: const TextStyle(fontSize: 15, color: Colors.black54),
         ),
       ),
@@ -121,11 +122,11 @@ class PurchaseSummaryScreen extends StatelessWidget {
                     ],
                     if (shipmentNote != null) ...[
                       const Divider(),
-                      _buildRow("Note:", shipmentNote!, valueColor: Colors.orange[800]),
+                      _buildRow("note".tr, shipmentNote!, valueColor: Colors.orange[800]),
                     ],
                     const Divider(thickness: 1.5),
                     _buildRow(
-                      "Total Amount:",
+                      "total_amount".tr,
                       "Ksh. ${price.toStringAsFixed(2)}",
                       isBold: true,
                       valueColor: Colors.green[800],
@@ -152,8 +153,8 @@ class PurchaseSummaryScreen extends StatelessWidget {
                     );
                   },
                   icon: const Icon(Icons.download_rounded, color: Colors.white),
-                  label: const Text(
-                    "Download Receipt",
+                  label: Text(
+                    "download_receipt".tr,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 17,

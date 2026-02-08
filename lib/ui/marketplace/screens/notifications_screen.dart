@@ -8,6 +8,7 @@ import '../helper/format_date.dart';
 import 'package:baustaka/config/env.dart';
 import 'package:baustaka/helper/util.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -109,8 +110,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        title: const Text(
-          'Notifications',
+        title: Text(
+          'notifications'.tr,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -122,8 +123,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         actions: [
           TextButton(
             onPressed: markAllAsRead,
-            child: const Text(
-              'Mark all as read',
+            child: Text(
+              'mark_as_read'.tr,
               style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
             ),
           ),
@@ -133,9 +134,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       body: isLoading
           ? Center(child: CircularProgressIndicator(color: Palette.primary))
           : notifications.isEmpty
-              ? const Center(
+              ? Center(
                   child: Text(
-                    'No notifications yet',
+                    'no_notifications'.tr,
                     style: TextStyle(color: Colors.grey, fontSize: 16),
                   ),
                 )

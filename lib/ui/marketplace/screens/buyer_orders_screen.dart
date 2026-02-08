@@ -8,6 +8,8 @@ import 'package:baustaka/config/palette.dart';
 import 'package:baustaka/config/env.dart';
 import 'package:baustaka/helper/util.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
+
 
 
 class BuyerOrdersScreen extends StatefulWidget {
@@ -96,8 +98,8 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-        title: const Text(
-            "My Orders",
+        title: Text(
+            "my_orders".tr,
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
         backgroundColor: Palette.primary,
@@ -107,8 +109,8 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
       body: isLoading
     ? const Center(child: CircularProgressIndicator(color: Palette.primary))
     : orders.isEmpty
-        ? const Center(
-            child: Text('No orders yet',
+        ? Center(
+            child: Text('no_orders_found'.tr,
                 style: TextStyle(color: Colors.grey, fontSize: 16)),
           )
         : ListView.builder(
@@ -203,7 +205,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('Track',
+            child: Text('track'.tr,
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 14,

@@ -10,6 +10,7 @@ import 'package:baustaka/config/palette.dart';
 import 'package:baustaka/config/env.dart';
 import '../helper/location_util.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
 
 enum DeliveryMethod {
   baustaka,
@@ -94,8 +95,8 @@ Future<void> loadLocation() async {
       finalTotal = itemTotal;
       requiresQuote = false;
       deliveryNote = _deliveryMethod == DeliveryMethod.pickup
-          ? "Pickup location and instructions will be shared after order confirmation."
-          : "Delivery will be arranged directly between buyer and seller.";
+          ? "delivery_pick_alert".tr
+          : "delivery_self_alert".tr;
     });
     return;
   }
@@ -129,7 +130,7 @@ Future<void> loadLocation() async {
   final zone = getDeliveryZone(distanceKm);
 
   // Update delivery note with zone
-  setState(() => deliveryNote = "Zone $zone delivery");
+  setState(() => deliveryNote = "delivery_note".tr + ' $zone');
 
   try {
     final response = await http.post(
@@ -336,7 +337,7 @@ Future<void> loadLocation() async {
       appBar: AppBar(
         backgroundColor: Palette.primary,
         leading: BackButton(color: Colors.white),
-        title: const Text("Create Order", style: TextStyle(color: Colors.white)),
+        title: Text("create_order".tr, style: TextStyle(color: Colors.white)),
         centerTitle: true,
       ),
 
@@ -355,16 +356,16 @@ Future<void> loadLocation() async {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 6),
-            Text("Location: ${item['locationName']}",
+            Text("location".tr + ": ${item['locationName']}",
                 style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 16)),
 
             const SizedBox(height: 6),
-            Text("Price: Ksh ${item['price']}/kg",
+            Text("price".tr + ": Ksh ${item['price']}/kg",
                 style: TextStyle(color: Palette.primary, fontWeight: FontWeight.w600)),
 
             const SizedBox(height: 6),
 
-            Text("Available: Kg ${item['weight']}",
+            Text("available".tr + ": ${item['weight']} Kg",
                 style: TextStyle(color: Palette.primary, fontWeight: FontWeight.w600)),
 
             const SizedBox(height: 20),
@@ -385,8 +386,8 @@ Future<void> loadLocation() async {
 
     _recalculateOrder();
   },
-  decoration: const InputDecoration(
-    labelText: "Quantity",
+  decoration: InputDecoration(
+    labelText: "quantity".tr,
     filled: true,
     border: OutlineInputBorder(),
   ),
@@ -397,7 +398,7 @@ const SizedBox(height: 20),
 Align(
   alignment: Alignment.centerLeft,
   child: Text(
-    "Delivery Method",
+    "delivery_method".tr,
     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
   ),
 ),
@@ -412,8 +413,8 @@ Card(
       RadioListTile<DeliveryMethod>(
         value: DeliveryMethod.baustaka,
         groupValue: _deliveryMethod,
-        title: const Text("Deliver by Baustaka"),
-        subtitle: const Text("Baustaka arranges transport"),
+        title: Text("delivery_by_baustaka".tr),
+        subtitle: Text("delivery_sub_tittle_baustaka".tr),
         onChanged: (value) {
           setState(() {
             _deliveryMethod = value!;
@@ -432,8 +433,8 @@ Card(
       RadioListTile<DeliveryMethod>(
         value: DeliveryMethod.selfArrangement,
         groupValue: _deliveryMethod,
-        title: const Text("Self arrangement with seller"),
-        subtitle: const Text("You arrange delivery directly"),
+        title: Text("delivery_by_self_arragement_with_seller".tr),
+        subtitle: Text("delivery_sub_tittle_self_arragement_with_seller".tr),
         onChanged: (value) {
           setState(() {
             _deliveryMethod = value!;
@@ -447,8 +448,8 @@ Card(
       RadioListTile<DeliveryMethod>(
         value: DeliveryMethod.pickup,
         groupValue: _deliveryMethod,
-        title: const Text("Pick from seller"),
-        subtitle: const Text("Collect the item yourself"),
+        title: Text("delivery_pick_from_seller".tr),
+        subtitle: Text("delivery_sub_tittle_pick_from_seller".tr),
         onChanged: (value) {
           setState(() {
             _deliveryMethod = value!;
@@ -500,14 +501,14 @@ if (deliveryNote != null)
                 child: Column(
                   children: [
 
-                    _priceRow("Item Total", "Ksh ${itemTotal.toStringAsFixed(0)}"),
+                    _priceRow("item_total".tr, "Ksh ${itemTotal.toStringAsFixed(0)}"),
 
-                    _priceRow("Shipment",requiresQuote ? "Quote on request" :
+                    _priceRow("shipment_cost".tr,requiresQuote ? "Quote on request" :
                         loadingShipment ? "Calculating..." : "Ksh ${shipmentCost.toStringAsFixed(0)}"),
 
                     const Divider(),
 
-                    _priceRow("Total Payable",
+                    _priceRow("total_payable".tr,
                         "Ksh ${finalTotal.toStringAsFixed(0)}", isBold: true),
 
                   ],
@@ -531,7 +532,7 @@ if (deliveryNote != null)
                       )
                     : const Icon(Icons.shopping_cart_checkout, color: Colors.white),
                 label: Text(
-                  isLoading ? "Processing..." : "Pay Now",
+                  isLoading ? "Processing..." : "pay".tr,
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
                 style: ElevatedButton.styleFrom(

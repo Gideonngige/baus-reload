@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'create_listing_step2.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:baustaka/config/palette.dart';
+import 'package:get/get.dart';
 
 class CreateListingStep1 extends StatefulWidget {
   const CreateListingStep1({super.key});
@@ -66,9 +67,10 @@ String? _selectedCategory;
         elevation: 1,
         centerTitle: true,
         title: Text(
-          "Step 1: Item Details",
+          "step_header".tr,
           style: GoogleFonts.poppins(
             color: Colors.white,
+            fontSize:20,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -81,7 +83,7 @@ String? _selectedCategory;
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Sell Your Item",
+                "sell_your_item".tr,
                 style: GoogleFonts.poppins(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
@@ -90,7 +92,7 @@ String? _selectedCategory;
               ),
               const SizedBox(height: 6),
               Text(
-                "Step 1 of 2: Add basic details",
+                "step_details".tr,
                 style: GoogleFonts.poppins(color: Colors.grey[700]),
               ),
               const SizedBox(height: 20),
@@ -114,7 +116,7 @@ String? _selectedCategory;
                                 size: 60, color: Palette.primary),
                             const SizedBox(height: 10),
                             Text(
-                              "Tap to upload image",
+                              "tap_to_upload_image".tr,
                               style: GoogleFonts.poppins(
                                   color: Palette.primary,
                                   fontWeight: FontWeight.w500),
@@ -141,7 +143,7 @@ String? _selectedCategory;
                   children: [
                     _buildTextField(
                       _titleController,
-                      "Item Title",
+                      "item_title".tr,
                       Icons.label_outline_rounded,
                     ),
 
@@ -178,7 +180,7 @@ DropdownButtonFormField<String>(
       Icons.category_outlined,
       color: Colors.green[800],
     ),
-    labelText: 'Category',
+    labelText: 'category'.tr,
     labelStyle: GoogleFonts.poppins(color: Palette.primary),
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
@@ -196,7 +198,7 @@ DropdownButtonFormField<String>(
                     const SizedBox(height: 15),
                     _buildTextField(
                       _descController,
-                      "Description",
+                      "description".tr,
                       Icons.description_outlined,
                       maxLines: 3,
                     ),
@@ -252,7 +254,7 @@ DropdownButtonFormField<String>(
           elevation: 0,
         ),
         child: Text(
-          "Next",
+          "next".tr,
           style: GoogleFonts.poppins(
             color: Colors.white,
             fontSize: 18,

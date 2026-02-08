@@ -6,6 +6,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:baustaka/config/palette.dart';
 import '../widgets/message_pop.dart';
+import 'package:get/get.dart';
+
 
 class TrackingScreen extends StatefulWidget {
   final Map<String, dynamic> order; // receives order from BuyerOrdersScreen
@@ -77,8 +79,8 @@ class _TrackingScreenState extends State<TrackingScreen> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Tracking',
+        title: Text(
+          'tracking'.tr,
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w700,
@@ -106,7 +108,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Truck Number',
+                          Text('truck_number'.tr,
                               style:
                                   TextStyle(fontSize: 14, color: Colors.black54)),
                           const SizedBox(height: 4),
@@ -114,7 +116,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                               style: const TextStyle(
                                   fontWeight: FontWeight.w700, fontSize: 16)),
                           const SizedBox(height: 10),
-                          const Text('Driver Name',
+                          Text('driver_name'.tr,
                               style:
                                   TextStyle(fontSize: 14, color: Colors.black54)),
                           const SizedBox(height: 4),
@@ -126,7 +128,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          const Text('Status',
+                          Text('status'.tr,
                               style:
                                   TextStyle(fontSize: 14, color: Colors.black54)),
                           Text(order["deliveryStatus"] ?? "Pending",

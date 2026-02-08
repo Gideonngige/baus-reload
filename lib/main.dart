@@ -18,6 +18,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'firebase_options.dart';
 import 'package:baustaka/db/type_id.dart';
 import 'package:baustaka/model/settings.dart';
+import 'package:baustaka/helper/messages.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -183,6 +184,13 @@ void main() async {
 
   runApp(
     GetMaterialApp(
+      // for language translation
+      translations: Messages(),
+      locale: const Locale('en', 'US'),
+      fallbackLocale: const Locale('en', 'US'),
+      // end
+
+
       initialRoute: Routes.kSplash,
       unknownRoute: GetPage(
         name: Routes.kUnknown,

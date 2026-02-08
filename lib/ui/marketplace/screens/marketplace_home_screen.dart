@@ -21,6 +21,8 @@ import 'package:baustaka/helper/util.dart';
 import '../widgets/marketplace_drawer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import './create_listing_step1.dart';
+import 'package:get/get.dart';
+
 
 
 
@@ -195,8 +197,8 @@ location = locationName;
       appBar: AppBar(
         backgroundColor: Palette.primary,
         elevation: 0,
-        title: const Text(
-          'Marketplace',
+        title: Text(
+          'marketplace'.tr,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -271,7 +273,7 @@ location = locationName;
 
                     // 👋 Greeting
                     Text(
-                      'Hi, ${user?['displayName'] ?? 'User'}',
+                      'hi'.tr + ', ${user?['displayName'] ?? 'User'}',
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -332,8 +334,8 @@ location = locationName;
 Row(
   mainAxisAlignment: MainAxisAlignment.spaceBetween,
   children: [
-    const Text(
-      'Top Listings',
+    Text(
+      'top_listings'.tr,
       style: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w700,
@@ -350,8 +352,8 @@ Row(
             ),
           );
         },
-        child: const Text(
-          'View all',
+        child: Text(
+          'view_all'.tr,
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,

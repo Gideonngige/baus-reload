@@ -4,55 +4,81 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../widgets/message_pop.dart';
 import '../widgets/marketplace_drawer.dart';
 import 'package:baustaka/config/palette.dart';
 import 'package:baustaka/config/env.dart';
 import 'package:baustaka/helper/util.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
 
 class SellerDashboardScreen extends StatefulWidget {
   const SellerDashboardScreen({super.key});
 
   @override
-  State<SellerDashboardScreen> createState() => _SellerDashboardScreenState();
+  State<SellerDashboardScreen> createState() =>
+      _SellerDashboardScreenState();
 }
 
 class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
+
+  // ================== REUSABLE VARIABLES ==================
+
   Map<String, dynamic>? dashboardData;
+  Map<String, dynamic>? walletData;
   Map<String, dynamic>? user;
 
   bool isLoading = true;
-  String? sellerName;
+
+  String sellerName = "";
+  String sellerId = "";
+  String token = "";
+  String phoneNumber = "";
+
+  // ========================================================
 
   @override
   void initState() {
     super.initState();
-    fetchDashboardData();
+    _initializeData();
   }
 
-  Future<void> fetchDashboardData() async {
+  /// Load user + token ONCE
+  Future<void> _initializeData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userString = prefs.getString('user');
-      // final token = prefs.getString('token');
-      final firebaseUser = FirebaseAuth.instance.currentUser;
-      final token = await firebaseUser!.getIdToken(true);
-      
+      print(userString);
 
-      if (userString == null || token == null) {
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+
+      if (userString == null || firebaseUser == null) {
         setState(() => isLoading = false);
         return;
       }
 
-      final decodedUser = jsonDecode(userString);
-      final sellerId = decodedUser['_id'];
+      token = (await firebaseUser.getIdToken(true)) ?? "";
 
-      setState(() {
-        user = decodedUser;
-        sellerName = decodedUser['displayName'];
-      });
+      user = jsonDecode(userString);
+      sellerId = user!['_id'];
+      sellerName = user!['displayName'] ?? "Seller";
+      // phoneNumber = user!['phoneNumber'] ?? "";
 
+      await Future.wait([
+        fetchDashboardData(),
+        fetchWalletData(),
+      ]);
+
+    } catch (e) {
+      Util.toast("Initialization error");
+    }
+
+    setState(() => isLoading = false);
+  }
+
+  // ================= FETCH DASHBOARD =================
+
+  Future<void> fetchDashboardData() async {
+    try {
       final url =
           Uri.parse("${kBaseApiUrl}v1/seller/dashboard/$sellerId/");
 
@@ -62,19 +88,102 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
       );
 
       if (response.statusCode == 200) {
-        setState(() {
-          dashboardData = jsonDecode(response.body);
-          isLoading = false;
-        });
+        dashboardData = jsonDecode(response.body);
       } else {
         Util.toast('Failed to fetch dashboard.');
-        setState(() => isLoading = false);
       }
     } catch (e) {
       Util.toast('Error fetching dashboard');
-      setState(() => isLoading = false);
     }
   }
+
+  // ================= FETCH WALLET =================
+
+  Future<void> fetchWalletData() async {
+    try {
+      final url =
+          Uri.parse("${kBaseApiUrl}v1/withdraw/wallet/$sellerId/");
+
+      final response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        walletData = jsonDecode(response.body);
+      } else {
+        Util.toast('Failed to fetch wallet.');
+      }
+    } catch (e) {
+      Util.toast('Error fetching wallet');
+    }
+  }
+
+  // ================= WITHDRAW =================
+
+  Future<void> _withdraw() async {
+    if(walletData?["data"]?["balance_amount"] <= 100){
+      Util.toast("Insufficient balance to withdraw");
+      return;
+
+    }
+    try {
+
+      final url =
+          Uri.parse("${kBaseApiUrl}v1/withdraw/");
+
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          "Content-Type": "application/json"
+        },
+        body: jsonEncode({
+          "userId": sellerId,
+          "phoneNumber": user!['phoneNumber'] ?? "",
+          "amount": walletData?["data"]?["balance_amount"] ?? 0,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+
+        Util.toast("Withdrawal successful!");
+
+        await fetchWalletData();
+        setState(() {});
+
+      } else {
+        Util.toast("Withdraw failed");
+      }
+    } catch (e) {
+      Util.toast("Withdraw error");
+    }
+  }
+
+  void _handleWithdraw() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text("withdraw".tr),
+        content: Text("withdraw_text".tr),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("cancel".tr),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await _withdraw();
+            },
+            child: Text("confirm".tr),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ========================================================
 
   @override
   Widget build(BuildContext context) {
@@ -82,13 +191,12 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
       backgroundColor: Colors.grey.shade50,
 
       appBar: AppBar(
-        title: const Text(
-          'Seller Dashboard',
+        title: Text(
+          'dashboard'.tr,
           style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-            color: Colors.white,
-          ),
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              color: Colors.white),
         ),
         centerTitle: true,
         elevation: 0,
@@ -96,7 +204,6 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
 
-      // ✅ REUSABLE DRAWER
       drawer: MarketplaceDrawer(user: user),
 
       body: isLoading
@@ -112,41 +219,49 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
     );
   }
 
-  // ================= DASHBOARD CONTENT =================
+  // ================= DASHBOARD =================
 
   Widget _buildDashboardContent() {
-    final recentListings = dashboardData!["recentListings"] ?? [];
-    final monthlySales = dashboardData!["monthlySales"] ?? [];
+
+    final recentListings = dashboardData?["recentListings"] ?? [];
+    final monthlySales = dashboardData?["monthlySales"] ?? [];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+
         Text(
-          'Hi, ${sellerName ?? 'User'} 👋',
+          'hi'.tr + ', $sellerName 👋',
           style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-          ),
+              fontSize: 20,
+              fontWeight: FontWeight.w700),
         ),
-        const SizedBox(height: 6),
-        const Text(
-          'Here’s your sales summary for this month.',
+
+        const SizedBox(height: 20),
+
+        _buildEarningsCard(),
+
+        const SizedBox(height: 25),
+
+        Text(
+          'summary_text'.tr,
           style: TextStyle(color: Colors.grey, fontSize: 15),
         ),
 
-        const SizedBox(height: 25),
+        const SizedBox(height: 15),
 
         Row(
           children: [
             _buildStatCard(
-              title: "Total Sales",
-              value: "Ksh. ${dashboardData!["totalSales"] ?? 0}",
+              title: "total_sales".tr,
+              value: "Ksh. ${dashboardData?["totalSales"] ?? 0}",
               icon: Icons.attach_money,
               color: Colors.green,
             ),
             _buildStatCard(
-              title: "Total KG Sold",
-              value: "${(dashboardData!["totalKgSold"] ?? 0).toStringAsFixed(2)} kg",
+              title: "total_kg_sold".tr,
+              value:
+                  "${(dashboardData?["totalKgSold"] ?? 0).toString()} kg",
               icon: Icons.scale,
               color: Colors.orange,
             ),
@@ -158,14 +273,14 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
         Row(
           children: [
             _buildStatCard(
-              title: "Pending Orders",
-              value: "${dashboardData!["pendingOrders"] ?? 0}",
+              title: "pending_orders".tr,
+              value: "${dashboardData?["pendingOrders"] ?? 0}",
               icon: Icons.pending_actions,
               color: Colors.blue,
             ),
             _buildStatCard(
-              title: "Completed",
-              value: "${dashboardData!["completedOrders"] ?? 0}",
+              title: "completed_orders".tr,
+              value: "${dashboardData?["completedOrders"] ?? 0}",
               icon: Icons.check_circle_outline,
               color: Colors.purple,
             ),
@@ -174,20 +289,24 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
 
         const SizedBox(height: 30),
 
-        const Text(
-          "Monthly Sales",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        Text(
+          "monthl_sales".tr,
+          style:
+              TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
+
         const SizedBox(height: 15),
 
         _buildBarChart(monthlySales),
 
         const SizedBox(height: 30),
 
-        const Text(
-          "Recent Listings",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        Text(
+          "recent_listings".tr,
+          style:
+              TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
+
         const SizedBox(height: 15),
 
         if (recentListings.isEmpty)
@@ -213,68 +332,76 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
     );
   }
 
-  // ================= WIDGETS =================
+  // ================= EARNINGS CARD =================
 
-  Widget _buildBarChart(List monthlySales) {
+  Widget _buildEarningsCard() {
+
+    final totalAmount = walletData?["data"]?["total_amount"] ?? 0;
+    final balanceAmount = walletData?["data"]?["balance_amount"] ?? 0;
+
     return Container(
-      height: 220,
-      padding: const EdgeInsets.all(12),
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          )
-        ],
+        gradient: LinearGradient(
+          colors: [
+            Palette.primary,
+            Palette.primary.withOpacity(0.85),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: BarChart(
-        BarChartData(
-          alignment: BarChartAlignment.spaceAround,
-          gridData: const FlGridData(show: false),
-          borderData: FlBorderData(show: false),
-          titlesData: FlTitlesData(
-            leftTitles:
-                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles:
-                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            topTitles:
-                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (value, meta) {
-                  if (value.toInt() < monthlySales.length) {
-                    return Text(
-                      monthlySales[value.toInt()]["month"] ?? "",
-                      style:
-                          const TextStyle(color: Colors.grey, fontSize: 12),
-                    );
-                  }
-                  return const Text("");
-                },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          Text(
+            "total_earnings".tr,
+            style: TextStyle(color: Colors.white70),
+          ),
+
+          const SizedBox(height: 8),
+
+          Text(
+            "Ksh. $totalAmount",
+            style: const TextStyle(
+                color: Colors.white,
+                fontSize: 26,
+                fontWeight: FontWeight.bold),
+          ),
+
+          const SizedBox(height: 6),
+
+          Text(
+            "available_balance".tr + ": Ksh. $balanceAmount",
+            style: const TextStyle(color: Colors.white70),
+          ),
+
+          const SizedBox(height: 16),
+
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: balanceAmount == 0
+                  ? null
+                  : _handleWithdraw,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Palette.primary,
+              ),
+              child: Text(
+                "withdraw_earnings".tr,
+                style:
+                    TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
           ),
-          barGroups: monthlySales.asMap().entries.map((entry) {
-            return BarChartGroupData(
-              x: entry.key,
-              barRods: [
-                BarChartRodData(
-                  toY: (entry.value["sales"] ?? 0).toDouble(),
-                  color: Colors.green,
-                  width: 18,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-              ],
-            );
-          }).toList(),
-        ),
+        ],
       ),
     );
   }
+
+  // ================= SMALL WIDGETS =================
 
   Widget _buildStatCard({
     required String title,
@@ -289,29 +416,57 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              blurRadius: 6,
-            ),
-          ],
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
           children: [
             CircleAvatar(
               radius: 18,
-              backgroundColor: color.withOpacity(0.1),
-              child: Icon(icon, color: color, size: 20),
+              backgroundColor:
+                  color.withOpacity(0.1),
+              child: Icon(icon,
+                  color: color, size: 20),
             ),
             const SizedBox(height: 10),
             Text(value,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold)),
             Text(title,
-                style:
-                    const TextStyle(color: Colors.grey, fontSize: 13)),
+                style: const TextStyle(
+                    color: Colors.grey)),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBarChart(List monthlySales) {
+    return SizedBox(
+      height: 220,
+      child: BarChart(
+        BarChartData(
+          gridData:
+              const FlGridData(show: false),
+          borderData:
+              FlBorderData(show: false),
+          titlesData:
+              const FlTitlesData(show: false),
+          barGroups:
+              monthlySales.asMap().entries.map((e) {
+            return BarChartGroupData(
+              x: e.key,
+              barRods: [
+                BarChartRodData(
+                  toY:
+                      (e.value["sales"] ?? 0)
+                          .toDouble(),
+                  color: Colors.green,
+                  width: 18,
+                )
+              ],
+            );
+          }).toList(),
         ),
       ),
     );
@@ -325,68 +480,32 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
     required Color statusColor,
     String? image,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 6,
-          )
-        ],
-      ),
-      child: Row(
+    return ListTile(
+      contentPadding:
+          const EdgeInsets.symmetric(
+              vertical: 8),
+      leading: image != null
+          ? Image.network(image,
+              width: 60,
+              fit: BoxFit.cover)
+          : const Icon(Icons.image),
+      title: Text(name),
+      subtitle: Text(weight),
+      trailing: Column(
+        mainAxisAlignment:
+            MainAxisAlignment.center,
+        crossAxisAlignment:
+            CrossAxisAlignment.end,
         children: [
-          if (image != null)
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                image,
-                width: 70,
-                height: 70,
-                fit: BoxFit.cover,
-              ),
-            )
-          else
-            const Icon(Icons.image_not_supported, size: 70),
-
-          const SizedBox(width: 15),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(name,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w600, fontSize: 16)),
-                const SizedBox(height: 4),
-                Text(weight, style: const TextStyle(color: Colors.grey)),
-              ],
-            ),
-          ),
-
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(price,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Palette.primary)),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Icon(Icons.circle, size: 10, color: statusColor),
-                  const SizedBox(width: 4),
-                  Text(status,
-                      style:
-                          TextStyle(color: statusColor, fontSize: 13)),
-                ],
-              ),
-            ],
-          ),
+          Text(price,
+              style: const TextStyle(
+                  fontWeight:
+                      FontWeight.bold,
+                  color:
+                      Palette.primary)),
+          Text(status,
+              style: TextStyle(
+                  color: statusColor)),
         ],
       ),
     );

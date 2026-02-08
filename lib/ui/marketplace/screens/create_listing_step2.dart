@@ -42,6 +42,13 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
   String selectedLocationName = "Detecting location...";
   double? selectedLatitude;
   double? selectedLongitude;
+  final List<String> allowedLocations = [
+  'Nairobi',
+  'Mombasa',
+  'Kwale',
+  'Kilifi',
+];
+
 
   // get cached location
   Future<Map<String, dynamic>> getCachedLocation() async {
@@ -99,47 +106,106 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
     setState(() => locationLoading = false);
   }
 
+  // void _changeLocationDialog() {
+  //   final controller = TextEditingController();
+
+  //   showDialog(
+  //     context: context,
+  //     builder: (_) => AlertDialog(
+  //       title: const Text("Change Location"),
+  //       content: TextField(
+  //         controller: controller,
+  //         decoration: const InputDecoration(
+  //           hintText: "Enter town or area name",
+  //         ),
+  //       ),
+  //       actions: [
+  //         TextButton(onPressed: () => Get.back(), child: const Text("Cancel")),
+  //         ElevatedButton(
+  //           onPressed: () async {
+  //             final name = controller.text.trim();
+  //             if (name.isEmpty) return;
+
+  //             final prefs = await SharedPreferences.getInstance();
+  //             await prefs.setString('locationName', name);
+
+  //             setState(() {
+  //               selectedLocationName = name;
+  //               selectedLatitude ??= 0.0;
+  //               selectedLongitude ??= 0.0;
+  //             });
+
+  //             Get.back();
+  //           },
+  //           child: const Text("Save"),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
   void _changeLocationDialog() {
-    final controller = TextEditingController();
+  String tempLocation = allowedLocations.first;
 
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Change Location"),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(
-            hintText: "Enter town or area name",
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text("Cancel")),
-          ElevatedButton(
-            onPressed: () async {
-              final name = controller.text.trim();
-              if (name.isEmpty) return;
-
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.setString('locationName', name);
-
-              setState(() {
-                selectedLocationName = name;
-                selectedLatitude ??= 0.0;
-                selectedLongitude ??= 0.0;
+  showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: const Text("Select Location"),
+      content: StatefulBuilder(
+        builder: (context, setDialogState) {
+          return DropdownButtonFormField<String>(
+            value: tempLocation,
+            items: allowedLocations.map((loc) {
+              return DropdownMenuItem(
+                value: loc,
+                child: Text(loc),
+              );
+            }).toList(),
+            onChanged: (value) {
+              setDialogState(() {
+                tempLocation = value!;
               });
-
-              Get.back();
             },
-            child: const Text("Save"),
-          ),
-        ],
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+            ),
+          );
+        },
       ),
-    );
-  }
+      actions: [
+        TextButton(
+          onPressed: () => Get.back(),
+          child: const Text("Cancel"),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setString('locationName', tempLocation);
+
+            setState(() {
+              selectedLocationName = tempLocation;
+              selectedLatitude ??= 0.0;
+              selectedLongitude ??= 0.0;
+            });
+
+            Get.back();
+          },
+          child: const Text("Save"),
+        ),
+      ],
+    ),
+  );
+}
+
 
   Future<void> _submitListing() async {
     final price = _priceController.text.trim();
     final double? weight = double.tryParse(_weightController.text.trim());
+    if (!allowedLocations.contains(selectedLocationName)) {
+        Util.toast("Invalid location selected");
+        return;
+    }
+
 
     if (price.isEmpty || weight == null) {
       Util.toast("Enter valid price and weight");
@@ -214,8 +280,8 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text(
-          "Step 2: Pricing & Location",
+        title: Text(
+          "step_2_header".tr,
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Palette.primary,
@@ -227,9 +293,9 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            _buildTextField(_priceController, "Price (Ksh)", Icons.monetization_on),
+            _buildTextField(_priceController, "price".tr, Icons.monetization_on),
             const SizedBox(height: 15),
-            _buildTextField(_weightController, "Weight (kg)", Icons.scale, allowDecimal: true),
+            _buildTextField(_weightController, "weight".tr, Icons.scale, allowDecimal: true),
             const SizedBox(height: 20),
             _buildLocationSection(),
             const Spacer(),
@@ -241,7 +307,7 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
                 icon: const Icon(Icons.cloud_upload_rounded, color: Colors.white),
                 label: isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text("Upload Listing", style: TextStyle(color: Colors.white)),
+                    : Text("upload_listing".tr, style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.primary,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -258,7 +324,7 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Listing Location",
+        Text("listing_location".tr,
             style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
         const SizedBox(height: 8),
         Container(

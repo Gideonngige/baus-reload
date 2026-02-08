@@ -8,6 +8,7 @@ import 'package:baustaka/config/env.dart';
 import 'package:baustaka/helper/util.dart';
 import '../helper/format_date.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
 
 
 class ChatScreen extends StatefulWidget {
@@ -56,6 +57,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _fetchMessages() async {
     if (userId == null) return;
+    print("Fetching messages for userId: $userId with token: $token");
 
     try {
       final response = await http.get(
@@ -134,8 +136,8 @@ class _ChatScreenState extends State<ChatScreen> {
               child: const Icon(Icons.support_agent, color: Colors.green, size: 22),
             ),
             const SizedBox(width: 10),
-            const Text(
-              "Baus Taka Support",
+            Text(
+              "baustaka_support".tr,
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
@@ -266,8 +268,8 @@ return Column(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
                       child: TextField(
                         controller: _messageController,
-                        decoration: const InputDecoration(
-                          hintText: "Type a message...",
+                        decoration: InputDecoration(
+                          hintText: "type_message".tr,
                           border: InputBorder.none,
                         ),
                       ),

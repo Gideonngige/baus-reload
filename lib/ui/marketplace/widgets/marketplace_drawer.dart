@@ -43,7 +43,7 @@ class MarketplaceDrawer extends StatelessWidget {
           _drawerItem(
   context,
   icon: Icons.home,
-  title: 'Home',
+  title: 'home'.tr,
   onTap: () {
     Navigator.pop(context); // close drawer
     Navigator.pushAndRemoveUntil(
@@ -60,7 +60,7 @@ class MarketplaceDrawer extends StatelessWidget {
           _drawerItem(
             context,
             icon: Icons.list,
-            title: 'All Listings',
+            title: 'all_listings'.tr,
             onTap: () {
               Navigator.push(
                 context,
@@ -73,7 +73,7 @@ class MarketplaceDrawer extends StatelessWidget {
           _drawerItem(
             context,
             icon: Icons.shopping_bag,
-            title: 'Sell',
+            title: 'sell'.tr,
             onTap: () {
               Navigator.push(
                 context,
@@ -86,7 +86,7 @@ class MarketplaceDrawer extends StatelessWidget {
           _drawerItem(
             context,
             icon: Icons.receipt_long,
-            title: 'My Orders',
+            title: 'my_orders'.tr,
             onTap: () {
               Navigator.push(
                 context,
@@ -99,7 +99,7 @@ class MarketplaceDrawer extends StatelessWidget {
           _drawerItem(
             context,
             icon: Icons.dashboard,
-            title: 'Dashboard',
+            title: 'dashboard'.tr,
             onTap: () {
               Navigator.push(
                 context,
@@ -112,7 +112,7 @@ class MarketplaceDrawer extends StatelessWidget {
           _drawerItem(
             context,
             icon: Icons.chat,
-            title: 'Chat',
+            title: 'chat'.tr,
             onTap: () {
               Navigator.push(
                 context,
@@ -124,7 +124,7 @@ class MarketplaceDrawer extends StatelessWidget {
           _drawerItem(
             context,
             icon: Icons.notifications,
-            title: 'Notifications',
+            title: 'notifications'.tr,
             onTap: () {
               Navigator.push(
                 context,
@@ -134,12 +134,26 @@ class MarketplaceDrawer extends StatelessWidget {
             },
           ),
 
+          _drawerItem(
+            context,
+            icon: Icons.language,
+            title: Get.locale?.languageCode == 'sw' ? 'Switch to English' : 'Badili kwenda Kiswahili',
+            onTap: (){
+              if(Get.locale?.languageCode == 'en'){
+                Get.updateLocale(const Locale('sw', 'KE'));
+              }else{
+                Get.updateLocale(const Locale('en', 'US'));
+              }
+              Navigator.pop(context);
+            },
+          ),
+
           const Divider(),
 
           _drawerItem(
             context,
             icon: Icons.apps,
-            title: 'Back to Main App',
+            title: 'back_to_main'.tr,
             onTap: () async {
               Navigator.pop(context);
               // Go back to main app shell

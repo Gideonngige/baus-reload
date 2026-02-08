@@ -10,6 +10,7 @@ import 'package:baustaka/helper/util.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import './create_listing_step1.dart';
+import 'package:get/get.dart';
 
 class AllListingsScreen extends StatefulWidget {
   const AllListingsScreen({super.key});
@@ -74,8 +75,8 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        title: const Text(
-          'All Listings',
+        title: Text(
+          'all_listings'.tr,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -114,7 +115,7 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
                           controller: _searchController,
                           decoration: InputDecoration(
                             prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                            hintText: 'Search listings...',
+                            hintText: 'search_listings'.tr,
                             filled: true,
                             fillColor: Colors.white,
                             contentPadding:
