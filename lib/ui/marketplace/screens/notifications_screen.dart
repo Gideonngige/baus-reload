@@ -58,12 +58,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         });
       } else {
         setState(() => isLoading = false);
-        Util.toast('Failed to load notifications.');
+        Util.toast('failed_to_load_notifications'.tr);
         print('Failed to load notifications: ${response.body}');
       }
     } catch (e) {
       setState(() => isLoading = false);
-      Util.toast('An error occurred while fetching notifications.');
+      Util.toast('error_occurred'.tr);
       print('Error fetching notifications: $e');
     }
   }
@@ -86,13 +86,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           final index = notifications.indexWhere((n) => n['_id'] == id);
           if (index != -1) notifications[index]['isRead'] = true;
         });
-        Util.toast('Notification marked as read');
+        Util.toast('marked_as_read'.tr);
       } else {
-        Util.toast('Failed to mark notification as read');
+        Util.toast('failed_to_mark_as_read'.tr);
         print('Failed to mark notification as read');
       }
     } catch (e) {
-        Util.toast('An error occurred while marking notification as read.');
+        Util.toast('error_occurred'.tr);
         print('Error marking as read: $e');
     }
   }

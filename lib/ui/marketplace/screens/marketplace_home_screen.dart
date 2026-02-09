@@ -99,12 +99,12 @@ class _MarketplaceHomeScreenState extends State<MarketplaceHomeScreen> {
         });
       } else {
         print('Failed to load listings: ${response.body}');
-        Util.toast('Failed to load listings.');
+        Util.toast('failed_to_load_listings'.tr);
         setState(() => isLoading = false);
       }
     } catch (e) {
       print('Error fetching listings: $e');
-      Util.toast('An error occured while fetching listings!.');
+      Util.toast('error_fetching_listing'.tr);
       setState(() => isLoading = false);
     }
   }

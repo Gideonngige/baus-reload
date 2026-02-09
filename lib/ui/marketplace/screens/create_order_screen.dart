@@ -114,7 +114,7 @@ Future<void> loadLocation() async {
 
   // 3️⃣ Baustaka + NOT bulky → auto pricing
   if (userLat == null || userLng == null) {
-    Util.toast("User location not available");
+    Util.toast("user_location_not_available".tr);
     return;
   }
 
@@ -152,7 +152,7 @@ Future<void> loadLocation() async {
     shipmentCost = data["data"]["cost"].toDouble();
     finalTotal = itemTotal + shipmentCost;
   } catch (e) {
-    Util.toast("Failed to calculate shipment");
+    Util.toast("failed_to_calculate_shipment".tr);
     shipmentCost = 0;
     finalTotal = itemTotal;
   } finally {
@@ -172,7 +172,7 @@ Future<void> loadLocation() async {
   final qtyText = _quantityController.text.trim();
 
   if (qtyText.isEmpty || double.tryParse(qtyText) == null) {
-    Util.toast("Enter valid quantity");
+    Util.toast("enter_valid_quantity".tr);
     return;
   }
 
@@ -193,7 +193,7 @@ Future<void> loadLocation() async {
     final storedUser = prefs.getString('user');
 
     if (token == null || storedUser == null) {
-      Util.toast("Please sign in again");
+      Util.toast("please_siginin_again".tr);
       setState(() => isLoading = false);
       return;
     }
@@ -233,7 +233,7 @@ Future<void> loadLocation() async {
     setState(() => isLoading = false);
 
     if (response.statusCode != 200) {
-      Util.toast("Payment initiation failed.");
+      Util.toast("payment_initiation_failed".tr);
       return;
     }
 
@@ -241,16 +241,16 @@ Future<void> loadLocation() async {
     final checkoutRequestID = data['CheckoutRequestID'];
 
     if (checkoutRequestID == null) {
-      Util.toast("Invalid payment response.");
+      Util.toast("invalid_payment_response".tr);
       return;
     }
 
-    Util.toast("Enter M-Pesa PIN");
+    Util.toast("enter_mpesa_pin".tr);
 
     _pollPaymentStatus(checkoutRequestID, quantity, item);
   } catch (e) {
     setState(() => isLoading = false);
-    Util.toast("Order Failed");
+    Util.toast("order_failed".tr);
   }
 }
 
@@ -289,7 +289,7 @@ Future<void> loadLocation() async {
       timer.cancel();
 
       if (status == "paid") {
-        Util.toast("Payment Successful");
+        Util.toast("payment_successful".tr);
 
         // Seller info from the item
       final sellerInfo = {
@@ -316,7 +316,7 @@ Future<void> loadLocation() async {
         );
 
       } else {
-        Util.toast("Payment Failed");
+        Util.toast("payment_failed".tr);
       }
     });
   }

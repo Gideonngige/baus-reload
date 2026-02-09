@@ -324,7 +324,7 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("listing_location".tr,
+        Text("choose_location".tr,
             style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
         const SizedBox(height: 8),
         Container(

@@ -54,10 +54,10 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
           listings = data;
         });
       } else {
-        Util.toast('Failed to load listings.');
+        Util.toast('failed_to_load_listings'.tr);
       }
     } catch (e) {
-        Util.toast('An error occurred while fetching listings.');
+        Util.toast('error_fetching_listing'.tr);
     } finally {
       setState(() => isLoading = false);
     }

@@ -69,13 +69,13 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
         });
       }else{
         setState(() => isLoading = false);
-        Util.toast('Failed to load orders.');
+        Util.toast('failed_to_load_orders'.tr);
         print('Failed to load orders: ${response.body}');
       }
 
     }catch(e){
       print('Error fetching orders: $e');
-      Util.toast('Error fetching orders.$e');
+      Util.toast('error_fetching_orders'.tr);
       setState(() => isLoading = false);
     }
   }

@@ -42,6 +42,7 @@ class Messages extends Translations {
           'current_location_selected':'Current location selected',
           'no_gps_location_saved_yet':'No GPS location saved yet.',
           'change_location':'Change location',
+          'choose_location':'Choose location',
           'enter_town_or_area':'Enter town or area name',
           'save':'Save',
           'enter_valid_price_and_weight':'Enter valid price and weight!.',
@@ -82,12 +83,15 @@ class Messages extends Translations {
           'enter_mpesa_pin':'Enter M-Pesa PIN',
           'order_failed':'Order failed!.',
           'payment_successful':'Payment Successful!',
+          'payment_failed':'Payment Failed!.',
         //   chat screen
            'type_message':'Type a message...',
            'baustaka_support': 'Baus Taka Support',
            'error_fetching_messages':"Error fetching messages",
            'failed_to_load_messages':'Failed to load messages',
            'no_messages_found':'No messages yet',
+           'message_not_sent':'Message not send!.',
+           'failed_to_send_message':'Failed to send message',
         //    my orders screen
             'track':"Track",
         // dashboard
@@ -99,8 +103,9 @@ class Messages extends Translations {
             'total_kg_sold':'Total Kg sold',
             'pending_orders':'Pending Orders',
             'completed_orders':'Completed',
-            'monthl_sales':'Monthly Sales',
+            'monthly_sales':'Monthly Sales',
             'recent_listings':'Recent Listings',
+            'no_listings':'No listings available',
             'initialization_error':'Initialization error!.',
             'failed_to_load_dashboard':'Failed to load dashboard!.',
             'error_fetching_dashboard':'Error fetching dashboard!.',
@@ -130,7 +135,12 @@ class Messages extends Translations {
            'download_receipt':'Download Receipt',
            //    notifications
            'mark_as_read': 'Mark all as read',
+           'marked_as_read':'Notification marked as read',
            'no_notifications':'No notification yet.',
+           'failed_to_load_notifications':'Failed to load notifications',
+           'failed_to_mark_as_read':'Failed to mark notification as read',
+           'error_occurred':'An error occurred',
+
         //    track screen
            'tracking':'Tracking',
            'truck_number':'Truck Number',
@@ -177,6 +187,7 @@ class Messages extends Translations {
           'current_location_selected':'Eneo la sasa limechaguliwa',
           'no_gps_location_saved_yet':'Hakuna eneo la GPS lililohifadhiwa bado.',
           'change_location':'Badilisha eneo',
+          'choose_location':'Chagua eneo',
           'enter_town_or_area':'Weka jina la mji au eneo',
           'save':'Hifadhi',
           'enter_valid_price_and_weight':'Weka bei na uzito sahihi!',
@@ -218,12 +229,15 @@ class Messages extends Translations {
           'enter_mpesa_pin':'Weka PIN ya M-Pesa',
           'order_failed':'Oda imeshindikana!.',
           'payment_successful':'Malipo yamefanikiwa!.',
+          'payment_failed':'Malipo yameshindika kwa sasa. Jaribu tena!.',
         //   chat screen
           'type_message':'Andika ujumbe...',
           'baustaka_support': 'Uliza Baustaka',
           'error_fetching_messages':"Hitilafu imetokea wakati wa kutafuta jumbe!.",
           'failed_to_load_messages':'Imeshindikana kutafuta jumbe!.',
           'no_messages_found':'Hakuna ujumbe wowote.',
+          'message_not_sent':'Ujumbe hujaenda!.',
+          'failed_to_send_message':'Imeshindikana kutuma ujunbe. Jaribu tena!.',
         //    my orders screen
           'track':"Fuatilia",
         //   dashboard
@@ -235,8 +249,9 @@ class Messages extends Translations {
           'total_kg_sold':'Kilo ulizouza',
           'pending_orders':'Oda zinazo subiri',
           'completed_orders':'Oda Zilizotimizwa',
-          'monthl_sales':'Mauzo ya Mwezi',
+          'monthly_sales':'Mauzo ya Mwezi',
           'recent_listings':'Bidhaa ulizo orodhesha',
+          'no_listings':'Hujaorodhesha chochote',
           'initialization_error':'Tatizo la kuanzisha!.',
           'failed_to_load_dashboard':'Imeshindikana kupakia dashibodi!.',
           'error_fetching_dashboard':'Hitilafu imetokea wakati wa kutafuta dashibodi!.',
@@ -266,7 +281,11 @@ class Messages extends Translations {
            'download_receipt':'Risiti',
         //    notifications
             'mark_as_read': 'Weka kama imesomwa',
+            'marked_as_read':'Imewekwa kama iliyo somwa',
             'no_notifications':'Hakuna ujumbe',
+            'failed_to_load_notifications':'Imeshindikana kutafutaka jumbe!.',
+           'failed_to_mark_as_read':'Imeshindikana kuweka kama iliyo somwa',
+           'error_occurred':'Hitilafu imetokea',
         // track screen
             'tracking':'Fuatilia',
             'truck_number':'Namba ya gari',

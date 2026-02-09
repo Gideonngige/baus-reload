@@ -69,7 +69,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
       ]);
 
     } catch (e) {
-      Util.toast("Initialization error");
+      Util.toast("initialization_error".tr);
     }
 
     setState(() => isLoading = false);
@@ -90,10 +90,10 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
       if (response.statusCode == 200) {
         dashboardData = jsonDecode(response.body);
       } else {
-        Util.toast('Failed to fetch dashboard.');
+        Util.toast('failed_to_load_dashboard'.tr);
       }
     } catch (e) {
-      Util.toast('Error fetching dashboard');
+      Util.toast('error_fetching_dashboard'.tr);
     }
   }
 
@@ -112,10 +112,10 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
       if (response.statusCode == 200) {
         walletData = jsonDecode(response.body);
       } else {
-        Util.toast('Failed to fetch wallet.');
+        Util.toast('failed_to_fetch_wallet'.tr);
       }
     } catch (e) {
-      Util.toast('Error fetching wallet');
+      Util.toast('error_fetching_wallet'.tr);
     }
   }
 
@@ -123,7 +123,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
 
   Future<void> _withdraw() async {
     if(walletData?["data"]?["balance_amount"] <= 100){
-      Util.toast("Insufficient balance to withdraw");
+      Util.toast("insufficient_balance".tr);
       return;
 
     }
@@ -147,16 +147,16 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
 
       if (response.statusCode == 200) {
 
-        Util.toast("Withdrawal successful!");
+        Util.toast("withdraw_successful".tr);
 
         await fetchWalletData();
         setState(() {});
 
       } else {
-        Util.toast("Withdraw failed");
+        Util.toast("withdraw_failed".tr);
       }
     } catch (e) {
-      Util.toast("Withdraw error");
+      Util.toast("withdraw_error".tr);
     }
   }
 
@@ -290,7 +290,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
         const SizedBox(height: 30),
 
         Text(
-          "monthl_sales".tr,
+          "monthly_sales".tr,
           style:
               TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
@@ -310,7 +310,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
         const SizedBox(height: 15),
 
         if (recentListings.isEmpty)
-          const Center(child: Text("No listings available"))
+          const Center(child: Text("no_listings".tr))
         else
           Column(
             children: recentListings.map<Widget>((item) {

@@ -75,12 +75,12 @@ class _ChatScreenState extends State<ChatScreen> {
           _isLoading = false;
         });
       } else {
-        Util.toast('Failed to load messages');
+        Util.toast('failed_to_load_messages'.tr);
         print('Failed to load messages: ${response.body}');
         setState(() => _isLoading = false);
       }
     } catch (e) {
-        Util.toast('Error fetching messages: $e');
+        Util.toast('error_fetching_messages'.tr);
         print('Error fetching messages: $e');
         setState(() => _isLoading = false);
     }
@@ -111,11 +111,11 @@ class _ChatScreenState extends State<ChatScreen> {
           _messageController.clear();
         });
       } else {
-        Util.toast('Message not sent: ${response.body}.');
+        Util.toast('message_not_sent'.tr);
         print("Failed to send message: ${response.body}");
       }
     } catch (e) {
-        Util.toast('Error sending message: $e.');
+        Util.toast('failed_to_send_message'.tr);
         print("Error sending message: $e");
     }
   }
@@ -155,7 +155,7 @@ class _ChatScreenState extends State<ChatScreen> {
             child: _isLoading
                 ? Center(child: CircularProgressIndicator(color: Palette.primary))
                 : _messages.isEmpty
-                    ? const Center(child: Text("No messages yet"))
+                    ? const Center(child: Text("no_messages_found".tr))
                     : ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                         itemCount: _messages.length,
