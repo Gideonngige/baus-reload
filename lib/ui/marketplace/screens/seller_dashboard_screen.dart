@@ -310,7 +310,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
         const SizedBox(height: 15),
 
         if (recentListings.isEmpty)
-          const Center(child: Text("no_listings".tr))
+          Center(child: Text("no_listings".tr))
         else
           Column(
             children: recentListings.map<Widget>((item) {
@@ -441,36 +441,70 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
     );
   }
 
-  Widget _buildBarChart(List monthlySales) {
-    return SizedBox(
-      height: 220,
-      child: BarChart(
-        BarChartData(
-          gridData:
-              const FlGridData(show: false),
-          borderData:
-              FlBorderData(show: false),
-          titlesData:
-              const FlTitlesData(show: false),
-          barGroups:
-              monthlySales.asMap().entries.map((e) {
-            return BarChartGroupData(
-              x: e.key,
-              barRods: [
-                BarChartRodData(
-                  toY:
-                      (e.value["sales"] ?? 0)
-                          .toDouble(),
-                  color: Colors.green,
-                  width: 18,
-                )
-              ],
-            );
-          }).toList(),
+ Widget _buildBarChart(List monthlySales) {
+  return SizedBox(
+    height: 220,
+    child: BarChart(
+      BarChartData(
+        gridData: const FlGridData(show: false),
+        borderData: FlBorderData(show: false),
+
+        titlesData: FlTitlesData(
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          leftTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+
+          /// ✅ Bottom Month Names
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 28,
+              getTitlesWidget: (value, meta) {
+                int index = value.toInt();
+
+                if (index >= monthlySales.length) {
+                  return const SizedBox();
+                }
+
+                return Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text(
+                    monthlySales[index]["month"], // ⭐ FROM BACKEND
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
         ),
+
+        barGroups: monthlySales.asMap().entries.map((e) {
+          return BarChartGroupData(
+            x: e.key,
+            barRods: [
+              BarChartRodData(
+                toY: (e.value["sales"] ?? 0).toDouble(),
+                color: Colors.green,
+                width: 18,
+                borderRadius: BorderRadius.circular(6),
+              ),
+            ],
+          );
+        }).toList(),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildListingTile({
     required String name,

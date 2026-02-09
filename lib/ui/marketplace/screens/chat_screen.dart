@@ -155,7 +155,7 @@ class _ChatScreenState extends State<ChatScreen> {
             child: _isLoading
                 ? Center(child: CircularProgressIndicator(color: Palette.primary))
                 : _messages.isEmpty
-                    ? const Center(child: Text("no_messages_found".tr))
+                    ? Center(child: Text("no_messages_found".tr))
                     : ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                         itemCount: _messages.length,
