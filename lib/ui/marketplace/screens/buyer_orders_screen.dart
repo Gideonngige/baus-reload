@@ -9,6 +9,8 @@ import 'package:baustaka/config/env.dart';
 import 'package:baustaka/helper/util.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import './complete_order_screen.dart';
+
 
 
 
@@ -190,13 +192,29 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
         if (order['deliveryStatus'] != 'Delivered')
           ElevatedButton(
             onPressed: () {
-              print("Navigating with order: $order");
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => TrackingScreen(order: order)),
-              );
-            },
+
+  final method = order['deliveryMethod']?.toString().toLowerCase();
+
+  if (method == 'selfarrangement' || method == 'pickup') {
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CompleteOrderScreen(order: order),
+      ),
+    );
+
+  } else {
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TrackingScreen(order: order),
+      ),
+    );
+
+  }
+},
             style: ElevatedButton.styleFrom(
               backgroundColor: Palette.primary,
               padding:

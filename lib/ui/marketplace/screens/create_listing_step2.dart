@@ -65,7 +65,7 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
         'locationName': locationName,
       };
     } else {
-      throw Exception("No cached location found");
+      throw Exception("no_cached_location".tr);
     }
   }
 
@@ -98,9 +98,9 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
         selectedLongitude = cached['longitude'];
         selectedLocationName = cached['locationName'];
       });
-      Util.toast("Current location selected");
+      Util.toast("current_location_selected".tr);
     } catch (e) {
-      Util.toast("No GPS location saved yet");
+      Util.toast("no_gps_location_saved_yet".tr);
     }
 
     setState(() => locationLoading = false);
@@ -150,7 +150,7 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
   showDialog(
     context: context,
     builder: (_) => AlertDialog(
-      title: const Text("Select Location"),
+      title: Text("choose_location".tr),
       content: StatefulBuilder(
         builder: (context, setDialogState) {
           return DropdownButtonFormField<String>(
@@ -175,7 +175,7 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
       actions: [
         TextButton(
           onPressed: () => Get.back(),
-          child: const Text("Cancel"),
+          child: Text("cancel".tr),
         ),
         ElevatedButton(
           onPressed: () async {
@@ -190,7 +190,7 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
 
             Get.back();
           },
-          child: const Text("Save"),
+          child: Text("save".tr),
         ),
       ],
     ),
@@ -202,13 +202,13 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
     final price = _priceController.text.trim();
     final double? weight = double.tryParse(_weightController.text.trim());
     if (!allowedLocations.contains(selectedLocationName)) {
-        Util.toast("Invalid location selected");
+        Util.toast("invalid_location_selected".tr);
         return;
     }
 
 
     if (price.isEmpty || weight == null) {
-      Util.toast("Enter valid price and weight");
+      Util.toast("enter_valid_price_and_weight".tr);
       return;
     }
 
@@ -223,7 +223,7 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
     final storedUser = prefs.getString('user');
 
     if (token == null || storedUser == null) {
-      Util.toast("Login expired");
+      Util.toast("login_expired".tr);
       return;
     }
 
@@ -257,7 +257,7 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
       setState(() => isLoading = false);
 
       if (body.statusCode == 201 || body.statusCode == 200) {
-        Util.toast("Listing uploaded successfully");
+        Util.toast("listing_uploaded_successfully".tr);
         Navigator.pushAndRemoveUntil(
   context,
   MaterialPageRoute(builder: (_) => const MarketplaceHomeScreen()),
@@ -265,12 +265,12 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
 );
 
       } else {
-        Util.toast("Upload failed! Try again");
+        Util.toast("upload_failed".tr);
         print(body.body);
       }
     } catch (e) {
       setState(() => isLoading = false);
-      Util.toast("Error uploading listing");
+      Util.toast("error_uploading_listing".tr);
       print(e);
     }
   }

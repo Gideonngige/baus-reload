@@ -259,7 +259,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
               color: Colors.green,
             ),
             _buildStatCard(
-              title: "total_kg_sold".tr,
+              title: "total_kg_listed".tr,
               value:
                   "${(dashboardData?["totalKgSold"] ?? 0).toString()} kg",
               icon: Icons.scale,
@@ -460,7 +460,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
             sideTitles: SideTitles(showTitles: false),
           ),
 
-          /// ✅ Bottom Month Names
+          /// Bottom Month Names
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
@@ -475,7 +475,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
                 return Padding(
                   padding: const EdgeInsets.only(top: 6),
                   child: Text(
-                    monthlySales[index]["month"], // ⭐ FROM BACKEND
+                    monthlySales[index]["month"], // FROM BACKEND
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
