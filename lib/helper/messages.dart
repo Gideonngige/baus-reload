@@ -97,6 +97,7 @@ class Messages extends Translations {
         //    my orders screen
             'track':"Track",
         // dashboard
+            'no_dashboard_data_available':'No dashboard data available',
             'total_earnings':'Total Earnings',
             'available_balance':'Available',
             'withdraw_earnings':'Withdraw Earnings',
@@ -150,13 +151,17 @@ class Messages extends Translations {
            'status':'Status',
            // complte order screen
             'enter_verification_code':'Enter verification code.',
+            'verification_code':'Verification code',
+            'verify':'Verify',
             'user_not_found':'User not found!.',
             'order_completed':'Order completed.',
             'verification_failed':'Verification failed!.',
             'something_went_wrong':'Something went wrong',
             'complete_order':'Complete Order',
-            'enter_verification_code':'Enter verification code',
             'mark_as_complete':'Mark as Complete',
+            // OTP
+            'request_otp':'Request OTP',
+            'please_enter_otp':'Please enter OTP',
 
         },
         'sw_KE': {
@@ -254,6 +259,7 @@ class Messages extends Translations {
         //    my orders screen
           'track':"Fuatilia",
         //   dashboard
+          'no_dashboard_data_available':'Lo!, hauna kitu kwa sasa',
           'total_earnings':'Jumla ya Mapato',
           'available_balance':'Salio',
           'withdraw_earnings':'Toa Mapato',
@@ -305,14 +311,18 @@ class Messages extends Translations {
             'driver_name':'Jina la Dereva',
             'status':'Hali',
             // complte order screen
-            'enter_verification_code':'Andika msimbo wa uthibitisho.',
+            'enter_verification_code':'Tafadhali, andika nambari wa uthibitisho.',
+            'verification_code':'Nambari ya udhibitisho',
+            'verify':'Thibitisha',
             'user_not_found':'Mtumizi hapatikani!.',
             'order_completed':'Ahsante kwa kukamilisha oda.',
             'verification_failed':'Uthibitisho umeshindikana!.',
             'something_went_wrong':'Ooops.Kuna hitilafu imefanyika!.',
             'complete_order':'Kamalisha Oda',
-            'enter_verification_code':'Tafadhali, andika msimbo wa udhibitisho',
             'mark_as_complete':'Weka kuwa imekamilika',
+            // OTP
+            'request_otp':'Itisha OTP',
+            'please_enter_otp':'Tafadhali, weka OTP.',
 
         },
       };

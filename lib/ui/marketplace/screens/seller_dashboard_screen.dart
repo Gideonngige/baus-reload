@@ -10,6 +10,7 @@ import 'package:baustaka/config/env.dart';
 import 'package:baustaka/helper/util.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import './withdraw_otp_screen.dart';
 
 class SellerDashboardScreen extends StatefulWidget {
   const SellerDashboardScreen({super.key});
@@ -33,6 +34,8 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
   String sellerId = "";
   String token = "";
   String phoneNumber = "";
+  bool _isRequestingOtp = false;
+
 
   // ========================================================
 
@@ -121,46 +124,114 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
 
   // ================= WITHDRAW =================
 
-  Future<void> _withdraw() async {
+  // Future<void> _withdraw() async {
+  //   if(walletData?["data"]?["balance_amount"] <= 100){
+  //     Util.toast("insufficient_balance".tr);
+  //     return;
+
+  //   }
+  //   try {
+
+  //     final url =
+  //         Uri.parse("${kBaseApiUrl}v1/withdraw/");
+
+  //     final response = await http.post(
+  //       url,
+  //       headers: {
+  //         'Authorization': 'Bearer $token',
+  //         "Content-Type": "application/json"
+  //       },
+  //       body: jsonEncode({
+  //         "userId": sellerId,
+  //         "phoneNumber": user!['phoneNumber'] ?? "",
+  //         "amount": walletData?["data"]?["balance_amount"] ?? 0,
+  //       }),
+  //     );
+
+  //     if (response.statusCode == 200) {
+
+  //       Util.toast("withdraw_successful".tr);
+
+  //       await fetchWalletData();
+  //       setState(() {});
+
+  //     } else {
+  //       Util.toast("withdraw_failed".tr);
+  //     }
+  //   } catch (e) {
+  //     Util.toast("withdraw_error".tr);
+  //   }
+  // }
+
+  Future<void> _requestOtp() async {
+
+  if (_isRequestingOtp) return; // prevents spam clicks
+
+  if (user == null || user!['phoneNumber'] == null) {
+    Util.toast("Phone number missing");
+    return;
+  }
+
+  setState(() {
+    _isRequestingOtp = true;
+  });
+
+  final url = Uri.parse("${kBaseApiUrl}v1/auth/phone-check/");
+
+  try {
+
+    final response = await http.post(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({
+        "phoneNumber": user!['phoneNumber'],
+      }),
+    );
+
+    final data = jsonDecode(response.body);
+
+    if (response.statusCode == 200 && data["exists"] == true) {
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => WithdrawOtpScreen(
+            sellerId: sellerId,
+            amount: walletData?["data"]?["balance_amount"],
+            otpToken: data["token"], // IMPORTANT for verification
+            phoneNumber: user!['phoneNumber'] ?? "",
+            token: token,
+          ),
+        ),
+      );
+
+    } else {
+      Util.toast(data["message"] ?? "Failed to send verification code");
+    }
+
+  } catch (e) {
+    print(e);
+
+    Util.toast("OTP request failed. Check your internet connection.");
+
+  } finally {
+
+    setState(() {
+      _isRequestingOtp = false;
+    });
+
+  }
+}
+
+
+
+  void _handleWithdraw() {
     if(walletData?["data"]?["balance_amount"] <= 100){
       Util.toast("insufficient_balance".tr);
       return;
-
     }
-    try {
-
-      final url =
-          Uri.parse("${kBaseApiUrl}v1/withdraw/");
-
-      final response = await http.post(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          "Content-Type": "application/json"
-        },
-        body: jsonEncode({
-          "userId": sellerId,
-          "phoneNumber": user!['phoneNumber'] ?? "",
-          "amount": walletData?["data"]?["balance_amount"] ?? 0,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-
-        Util.toast("withdraw_successful".tr);
-
-        await fetchWalletData();
-        setState(() {});
-
-      } else {
-        Util.toast("withdraw_failed".tr);
-      }
-    } catch (e) {
-      Util.toast("withdraw_error".tr);
-    }
-  }
-
-  void _handleWithdraw() {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -171,13 +242,20 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
             onPressed: () => Navigator.pop(context),
             child: Text("cancel".tr),
           ),
+          // ElevatedButton(
+          //   onPressed: () async {
+          //     Navigator.pop(context);
+          //     await _withdraw();
+          //   },
+          //   child: Text("confirm".tr),
+          // ),
           ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await _withdraw();
-            },
-            child: Text("confirm".tr),
-          ),
+  onPressed: _isRequestingOtp ? null : _requestOtp,
+  child: _isRequestingOtp
+      ? const CircularProgressIndicator(color: Colors.white)
+      : Text("request_otp".tr),
+)
+
         ],
       ),
     );
@@ -211,7 +289,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
               child: CircularProgressIndicator(color: Palette.primary),
             )
           : dashboardData == null
-              ? const Center(child: Text("No dashboard data available."))
+              ? Center(child: Text("no_dashboard_data_available".tr))
               : SingleChildScrollView(
                   padding: const EdgeInsets.all(20),
                   child: _buildDashboardContent(),
@@ -336,8 +414,10 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
 
   Widget _buildEarningsCard() {
 
-    final totalAmount = walletData?["data"]?["total_amount"] ?? 0;
-    final balanceAmount = walletData?["data"]?["balance_amount"] ?? 0;
+    final totalAmount1 = walletData?["data"]?["total_amount"] ?? 0;
+    final totalAmount = totalAmount1.toStringAsFixed(2);
+    final balanceAmount1 = walletData?["data"]?["balance_amount"] ?? 0;
+    final balanceAmount = balanceAmount1.toStringAsFixed(2); 
 
     return Container(
       width: double.infinity,

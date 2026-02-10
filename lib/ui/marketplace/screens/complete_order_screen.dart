@@ -166,7 +166,7 @@ class _CompleteOrderScreenState extends State<CompleteOrderScreen> {
               controller: tokenController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                labelText: "enter_verification_code".tr,
+                labelText: "verification_code".tr,
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
