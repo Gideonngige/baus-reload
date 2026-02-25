@@ -22,6 +22,7 @@ import '../widgets/marketplace_drawer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import './create_listing_step1.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 
 
@@ -64,7 +65,7 @@ class _MarketplaceHomeScreenState extends State<MarketplaceHomeScreen> {
     final prefs = await SharedPreferences.getInstance();
     // final storedToken = prefs.getString('token');
     final storedUser = prefs.getString('user');
-    print("Stored user: $storedUser");
+    // print("Stored user: $storedUser");
    
 
 
@@ -202,6 +203,7 @@ location = locationName;
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
+            fontFamily: 'Poppins',
           ),
         ),
         centerTitle: true,
@@ -250,6 +252,7 @@ location = locationName;
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
+                                fontFamily: 'Poppins',
                               ),
                             ),
                           ],
@@ -278,6 +281,7 @@ location = locationName;
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
+                        fontFamily: 'Poppins',
                       ),
                     ),
 
@@ -339,6 +343,7 @@ Row(
       style: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w700,
+        fontFamily: 'Poppins',
       ),
     ),
 
@@ -358,6 +363,7 @@ Row(
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: Palette.primary,
+            fontFamily: 'Poppins',
           ),
         ),
       ),
@@ -369,7 +375,7 @@ const SizedBox(height: 15),
 
                     listings.isEmpty
                         ? const Center(
-                            child: Text('No listings available.'),
+                            child: Text('No listings available.', style: TextStyle(fontSize: 16, color: Colors.grey, fontFamily: 'Poppins')),
                           )
                         : ListView.builder(
                             shrinkWrap: true,
@@ -422,7 +428,10 @@ const SizedBox(height: 15),
                                               item['title'] ?? 'No title',
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.w700,
-                                                  fontSize: 16),
+                                                  fontSize: 16,
+                                                  fontFamily: 'Poppins',
+                                                  ),
+                                                  
                                             ),
                                             const SizedBox(height: 6),
                                             Text(
@@ -430,7 +439,10 @@ const SizedBox(height: 15),
                                               style: TextStyle(
                                                   color: Palette.primary,
                                                   fontWeight: FontWeight.w600,
-                                                  fontSize: 15),
+                                                  fontSize: 15,
+                                                  fontFamily: 'Poppins',
+                                                  ),
+                                                  
                                             ),
                                             const SizedBox(height: 6),
                                             Text(
@@ -438,7 +450,9 @@ const SizedBox(height: 15),
                                               style: const TextStyle(
                                                   color: Colors.grey,
                                                   fontWeight: FontWeight.w600,
-                                                  fontSize: 15),
+                                                  fontSize: 15,
+                                                  fontFamily: 'Poppins',
+                                                  ),
 
                                             ),
                                           ],

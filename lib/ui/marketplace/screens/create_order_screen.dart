@@ -11,6 +11,7 @@ import 'package:baustaka/config/env.dart';
 import '../helper/location_util.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 enum DeliveryMethod {
   baustaka,
@@ -337,7 +338,7 @@ Future<void> loadLocation() async {
       appBar: AppBar(
         backgroundColor: Palette.primary,
         leading: BackButton(color: Colors.white),
-        title: Text("create_order".tr, style: TextStyle(color: Colors.white)),
+        title: Text("create_order".tr, style: TextStyle(color: Colors.white, fontFamily: 'Poppins',)),
         centerTitle: true,
       ),
 
@@ -352,21 +353,21 @@ Future<void> loadLocation() async {
 
             Text(
               item["title"],
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, fontFamily: 'Poppins',),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 6),
             Text("location".tr + ": ${item['locationName']}",
-                style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 16)),
+                style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 16, fontFamily: 'Poppins',)),
 
             const SizedBox(height: 6),
             Text("price".tr + ": Ksh ${item['price']}/kg",
-                style: TextStyle(color: Palette.primary, fontWeight: FontWeight.w600)),
+                style: TextStyle(color: Palette.primary, fontWeight: FontWeight.w600, fontFamily: 'Poppins',)),
 
             const SizedBox(height: 6),
 
             Text("available".tr + ": ${item['weight']} Kg",
-                style: TextStyle(color: Palette.primary, fontWeight: FontWeight.w600)),
+                style: TextStyle(color: Palette.primary, fontWeight: FontWeight.w600, fontFamily: 'Poppins',)),
 
             const SizedBox(height: 20),
 
@@ -399,7 +400,7 @@ Align(
   alignment: Alignment.centerLeft,
   child: Text(
     "delivery_method".tr,
-    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, fontFamily: 'Poppins',),
   ),
 ),
 
@@ -413,8 +414,8 @@ Card(
       RadioListTile<DeliveryMethod>(
         value: DeliveryMethod.baustaka,
         groupValue: _deliveryMethod,
-        title: Text("delivery_by_baustaka".tr),
-        subtitle: Text("delivery_sub_tittle_baustaka".tr),
+        title: Text("delivery_by_baustaka".tr, style: TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Poppins',)),
+        subtitle: Text("delivery_sub_tittle_baustaka".tr, style: TextStyle(fontFamily: 'Poppins',)),
         onChanged: (value) {
           setState(() {
             _deliveryMethod = value!;
@@ -433,8 +434,8 @@ Card(
       RadioListTile<DeliveryMethod>(
         value: DeliveryMethod.selfArrangement,
         groupValue: _deliveryMethod,
-        title: Text("delivery_by_self_arragement_with_seller".tr),
-        subtitle: Text("delivery_sub_tittle_self_arragement_with_seller".tr),
+        title: Text("delivery_by_self_arragement_with_seller".tr, style: TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Poppins',)),
+        subtitle: Text("delivery_sub_tittle_self_arragement_with_seller".tr, style: TextStyle(fontFamily: 'Poppins',)),
         onChanged: (value) {
           setState(() {
             _deliveryMethod = value!;
@@ -448,8 +449,8 @@ Card(
       RadioListTile<DeliveryMethod>(
         value: DeliveryMethod.pickup,
         groupValue: _deliveryMethod,
-        title: Text("delivery_pick_from_seller".tr),
-        subtitle: Text("delivery_sub_tittle_pick_from_seller".tr),
+        title: Text("delivery_pick_from_seller".tr, style: TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Poppins',)),
+        subtitle: Text("delivery_sub_tittle_pick_from_seller".tr, style: TextStyle(fontFamily: 'Poppins',)),
         onChanged: (value) {
           setState(() {
             _deliveryMethod = value!;
@@ -533,7 +534,7 @@ if (deliveryNote != null)
                     : const Icon(Icons.shopping_cart_checkout, color: Colors.white),
                 label: Text(
                   isLoading ? "Processing..." : "pay".tr,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, fontFamily: 'Poppins',),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.primary,
@@ -554,9 +555,9 @@ if (deliveryNote != null)
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label,
-              style: TextStyle(fontSize: 15, fontWeight: isBold ? FontWeight.w700 : FontWeight.w500)),
+              style: TextStyle(fontSize: 15, fontWeight: isBold ? FontWeight.w700 : FontWeight.w500, fontFamily: 'Poppins',)),
           Text(value,
-              style: TextStyle(fontSize: 15, fontWeight: isBold ? FontWeight.w700 : FontWeight.w500)),
+              style: TextStyle(fontSize: 15, fontWeight: isBold ? FontWeight.w700 : FontWeight.w500, fontFamily: 'Poppins',)),
         ],
       ),
     );

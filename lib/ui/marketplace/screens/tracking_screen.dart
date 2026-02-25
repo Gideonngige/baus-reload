@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:baustaka/config/palette.dart';
 import '../widgets/message_pop.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 
 class TrackingScreen extends StatefulWidget {
@@ -84,6 +85,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w700,
+            fontFamily: 'Poppins',
           ),
         ),
         centerTitle: true,
@@ -110,19 +112,19 @@ class _TrackingScreenState extends State<TrackingScreen> {
                         children: [
                           Text('truck_number'.tr,
                               style:
-                                  TextStyle(fontSize: 14, color: Colors.black54)),
+                                  TextStyle(fontSize: 14, color: Colors.black54, fontFamily: 'Poppins',)),
                           const SizedBox(height: 4),
                           Text(driver?["truckNumber"] ?? "N/A",
                               style: const TextStyle(
-                                  fontWeight: FontWeight.w700, fontSize: 16)),
+                                  fontWeight: FontWeight.w700, fontSize: 16, fontFamily: 'Poppins',)),
                           const SizedBox(height: 10),
                           Text('driver_name'.tr,
                               style:
-                                  TextStyle(fontSize: 14, color: Colors.black54)),
+                                  TextStyle(fontSize: 14, color: Colors.black54, fontFamily: 'Poppins',)),
                           const SizedBox(height: 4),
                           Text(driver?["name"] ?? "Not Assigned",
                               style: const TextStyle(
-                                  fontWeight: FontWeight.w700, fontSize: 16)),
+                                  fontWeight: FontWeight.w700, fontSize: 16, fontFamily: 'Poppins',)),
                         ],
                       ),
                       Column(
@@ -130,13 +132,15 @@ class _TrackingScreenState extends State<TrackingScreen> {
                         children: [
                           Text('status'.tr,
                               style:
-                                  TextStyle(fontSize: 14, color: Colors.black54)),
+                                  TextStyle(fontSize: 14, color: Colors.black54, fontFamily: 'Poppins',)),
                           Text(order["deliveryStatus"] ?? "Pending",
                               style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 16,
                                   color: _getStatusColor(
-                                      order["deliveryStatus"]))),
+                                      order["deliveryStatus"]),
+                                  fontFamily: 'Poppins',
+                                  )),
                         ],
                       ),
                     ],
@@ -175,10 +179,10 @@ class _TrackingScreenState extends State<TrackingScreen> {
                           children: [
                             Text(driver?["name"] ?? "Not Assigned",
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.w700, fontSize: 16)),
+                                    fontWeight: FontWeight.w700, fontSize: 16, fontFamily: 'Poppins',)),
                             const Text('Truck Driver',
                                 style: TextStyle(
-                                    color: Colors.black54, fontSize: 14)),
+                                    color: Colors.black54, fontSize: 14, fontFamily: 'Poppins',)),
                           ],
                         ),
                       ),

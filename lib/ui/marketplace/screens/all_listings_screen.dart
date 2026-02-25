@@ -11,6 +11,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import './create_listing_step1.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AllListingsScreen extends StatefulWidget {
   const AllListingsScreen({super.key});
@@ -80,6 +81,7 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
+            fontFamily: 'Poppins',
             ),
         ),
         backgroundColor: Palette.primary,
@@ -154,7 +156,7 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
                         ? const Center(
                             child: Text(
                               'No listings found',
-                              style: TextStyle(color: Colors.grey, fontSize: 16),
+                              style: TextStyle(color: Colors.grey, fontSize: 16, fontFamily: 'Poppins',),
                             ),
                           )
                         : GridView.builder(
@@ -225,6 +227,7 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.w600,
                                                   fontSize: 15,
+                                                  fontFamily: 'Poppins',
                                                 ),
                                                 overflow: TextOverflow.ellipsis,
                                               ),
@@ -234,6 +237,7 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
                                                   color: Palette.primary,
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 15,
+                                                  fontFamily: 'Poppins',
                                                 ),
                                               ),
                                               Row(
@@ -248,6 +252,7 @@ class _AllListingsScreenState extends State<AllListingsScreen> {
                                                       style: const TextStyle(
                                                         color: Colors.grey,
                                                         fontSize: 13,
+                                                        fontFamily: 'Poppins',
                                                       ),
                                                     ),
                                                   ),

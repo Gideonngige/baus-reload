@@ -12,7 +12,7 @@ class Messages extends Translations {
           'chat': 'Chat',
           'notifications': 'Notifications',
           'back_to_main': 'Back to Main App',
-          'switch_lang': 'Badili kwenda Kiswahili',
+          'switch_lang': 'Tumia Kiswahili',
         //   marketplace home screen
           'hi':'Hi',
           'marketplace': 'Marketplace',
@@ -318,7 +318,7 @@ class Messages extends Translations {
             'order_completed':'Ahsante kwa kukamilisha oda.',
             'verification_failed':'Uthibitisho umeshindikana!.',
             'something_went_wrong':'Ooops.Kuna hitilafu imefanyika!.',
-            'complete_order':'Kamalisha Oda',
+            'complete_order':'Kamilisha Oda',
             'mark_as_complete':'Weka kuwa imekamilika',
             // OTP
             'request_otp':'Itisha OTP',

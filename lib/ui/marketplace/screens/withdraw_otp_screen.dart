@@ -5,6 +5,7 @@ import 'package:baustaka/config/env.dart';
 import 'package:baustaka/helper/util.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class WithdrawOtpScreen extends StatefulWidget {
 
@@ -126,7 +127,7 @@ class _WithdrawOtpScreenState extends State<WithdrawOtpScreen> {
               onPressed: isLoading ? null : verifyOtp,
               child: isLoading
                   ? CircularProgressIndicator()
-                  : Text("confirm".tr),
+                  : Text("confirm".tr, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Poppins',),),
             )
           ],
         ),

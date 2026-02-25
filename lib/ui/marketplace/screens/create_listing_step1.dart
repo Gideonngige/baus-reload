@@ -5,6 +5,7 @@ import 'create_listing_step2.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:baustaka/config/palette.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CreateListingStep1 extends StatefulWidget {
   const CreateListingStep1({super.key});

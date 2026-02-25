@@ -282,7 +282,7 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
       appBar: AppBar(
         title: Text(
           "step_2_header".tr,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'Poppins',),
         ),
         backgroundColor: Palette.primary,
         centerTitle: true,
@@ -307,7 +307,7 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
                 icon: const Icon(Icons.cloud_upload_rounded, color: Colors.white),
                 label: isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : Text("upload_listing".tr, style: TextStyle(color: Colors.white)),
+                    : Text("upload_listing".tr, style: TextStyle(color: Colors.white, fontFamily: 'Poppins',)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Palette.primary,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -341,8 +341,8 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
               Expanded(child: Text(selectedLocationName)),
               PopupMenuButton(
                 itemBuilder: (_) => const [
-                  PopupMenuItem(value: 'current', child: Text("Use Current Location")),
-                  PopupMenuItem(value: 'change', child: Text("Change Location")),
+                  PopupMenuItem(value: 'current', child: Text("Use Current Location", style: TextStyle(fontFamily: 'Poppins',))),
+                  PopupMenuItem(value: 'change', child: Text("Change Location", style: TextStyle(fontFamily: 'Poppins',))),
                 ],
                 onSelected: (value) {
                   if (value == 'current') _useCurrentLocation();

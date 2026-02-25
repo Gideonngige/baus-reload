@@ -11,6 +11,7 @@ import 'package:baustaka/helper/util.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import './withdraw_otp_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SellerDashboardScreen extends StatefulWidget {
   const SellerDashboardScreen({super.key});
@@ -253,7 +254,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
   onPressed: _isRequestingOtp ? null : _requestOtp,
   child: _isRequestingOtp
       ? const CircularProgressIndicator(color: Colors.white)
-      : Text("request_otp".tr),
+      : Text("request_otp".tr, style: TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Poppins',)),
 )
 
         ],
@@ -274,6 +275,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
           style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 20,
+              fontFamily: 'Poppins',
               color: Colors.white),
         ),
         centerTitle: true,
@@ -289,7 +291,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
               child: CircularProgressIndicator(color: Palette.primary),
             )
           : dashboardData == null
-              ? Center(child: Text("no_dashboard_data_available".tr))
+              ? Center(child: Text("no_dashboard_data_available".tr, style: TextStyle(color: Colors.grey, fontSize: 16, fontFamily: 'Poppins',)))
               : SingleChildScrollView(
                   padding: const EdgeInsets.all(20),
                   child: _buildDashboardContent(),
@@ -312,7 +314,8 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
           'hi'.tr + ', $sellerName 👋',
           style: const TextStyle(
               fontSize: 20,
-              fontWeight: FontWeight.w700),
+              fontWeight: FontWeight.w700,
+              fontFamily: 'Poppins'),
         ),
 
         const SizedBox(height: 20),
@@ -323,7 +326,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
 
         Text(
           'summary_text'.tr,
-          style: TextStyle(color: Colors.grey, fontSize: 15),
+          style: TextStyle(color: Colors.grey, fontSize: 15, fontFamily: 'Poppins',),
         ),
 
         const SizedBox(height: 15),
@@ -370,7 +373,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
         Text(
           "monthly_sales".tr,
           style:
-              TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              TextStyle(fontSize: 18, fontWeight: FontWeight.w600, fontFamily: 'Poppins',),
         ),
 
         const SizedBox(height: 15),
@@ -382,13 +385,13 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
         Text(
           "recent_listings".tr,
           style:
-              TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              TextStyle(fontSize: 18, fontWeight: FontWeight.w600, fontFamily: 'Poppins',),
         ),
 
         const SizedBox(height: 15),
 
         if (recentListings.isEmpty)
-          Center(child: Text("no_listings".tr))
+          Center(child: Text("no_listings".tr, style: TextStyle(color: Colors.grey, fontSize: 16, fontFamily: 'Poppins',)))
         else
           Column(
             children: recentListings.map<Widget>((item) {
@@ -437,7 +440,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
 
           Text(
             "total_earnings".tr,
-            style: TextStyle(color: Colors.white70),
+            style: TextStyle(color: Colors.white70, fontFamily: 'Poppins',),
           ),
 
           const SizedBox(height: 8),
@@ -447,14 +450,16 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
             style: const TextStyle(
                 color: Colors.white,
                 fontSize: 26,
-                fontWeight: FontWeight.bold),
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Poppins',
+                ),
           ),
 
           const SizedBox(height: 6),
 
           Text(
             "available_balance".tr + ": Ksh. $balanceAmount",
-            style: const TextStyle(color: Colors.white70),
+            style: const TextStyle(color: Colors.white70, fontFamily: 'Poppins',),
           ),
 
           const SizedBox(height: 16),
@@ -472,7 +477,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
               child: Text(
                 "withdraw_earnings".tr,
                 style:
-                    TextStyle(fontWeight: FontWeight.bold),
+                    TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Poppins',),
               ),
             ),
           ),
@@ -511,10 +516,10 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
             const SizedBox(height: 10),
             Text(value,
                 style: const TextStyle(
-                    fontWeight: FontWeight.bold)),
+                    fontWeight: FontWeight.bold, fontFamily: 'Poppins',)),
             Text(title,
                 style: const TextStyle(
-                    color: Colors.grey)),
+                    color: Colors.grey, fontFamily: 'Poppins',)),
           ],
         ),
       ),
@@ -559,6 +564,7 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
+                      fontFamily: 'Poppins',
                     ),
                   ),
                 );

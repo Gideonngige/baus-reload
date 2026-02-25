@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:open_file/open_file.dart';
 import 'package:baustaka/config/palette.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 
 class PurchaseSummaryScreen extends StatelessWidget {
@@ -37,7 +38,7 @@ class PurchaseSummaryScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           "purchase_summary".tr,
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'Poppins',),
         ),
         centerTitle: true,
         backgroundColor: Palette.primary,
@@ -62,6 +63,7 @@ class PurchaseSummaryScreen extends StatelessWidget {
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
+                    fontFamily: 'Poppins',
                   ),
                 ),
               ),
@@ -104,14 +106,14 @@ class PurchaseSummaryScreen extends StatelessWidget {
         width: 120, // fixed width for the label
         child: Text(
           "seller_location".tr,
-          style: const TextStyle(fontSize: 15, color: Colors.black54),
+          style: const TextStyle(fontSize: 15, color: Colors.black54, fontFamily: 'Poppins',),
         ),
       ),
       const SizedBox(width: 8),
       Expanded(
         child: Text(
           sellerInfo!['location'] ?? "N/A",
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, fontFamily: 'Poppins',),
           softWrap: true,
         ),
       ),

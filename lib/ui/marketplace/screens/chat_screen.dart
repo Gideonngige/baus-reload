@@ -9,6 +9,7 @@ import 'package:baustaka/helper/util.dart';
 import '../helper/format_date.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 
 class ChatScreen extends StatefulWidget {
@@ -142,6 +143,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
                 fontSize: 17,
+                fontFamily: 'Poppins',
               ),
             ),
           ],
@@ -155,7 +157,7 @@ class _ChatScreenState extends State<ChatScreen> {
             child: _isLoading
                 ? Center(child: CircularProgressIndicator(color: Palette.primary))
                 : _messages.isEmpty
-                    ? Center(child: Text("no_messages_found".tr))
+                    ? Center(child: Text("no_messages_found".tr, style: TextStyle(fontFamily: 'Poppins',)))
                     : ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                         itemCount: _messages.length,
@@ -192,12 +194,12 @@ return Column(
           children: [
             Text(
               text,
-              style: const TextStyle(color: Colors.white, fontSize: 15),
+              style: const TextStyle(color: Colors.white, fontSize: 15, fontFamily: 'Poppins',),
             ),
             const SizedBox(height: 5),
             Text(
               time,
-              style: const TextStyle(color: Colors.white70, fontSize: 12),
+              style: const TextStyle(color: Colors.white70, fontSize: 12, fontFamily: 'Poppins',),
             ),
           ],
         ),
@@ -231,7 +233,7 @@ return Column(
           ),
           child: Text(
             response,
-            style: const TextStyle(color: Colors.black87, fontSize: 15),
+            style: const TextStyle(color: Colors.black87, fontSize: 15, fontFamily: 'Poppins',),
           ),
         ),
       ),

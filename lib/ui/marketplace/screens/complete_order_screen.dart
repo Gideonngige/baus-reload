@@ -8,6 +8,7 @@ import 'package:baustaka/config/env.dart';
 import 'package:baustaka/config/palette.dart';
 import 'package:baustaka/helper/util.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CompleteOrderScreen extends StatefulWidget {
   final Map<String, dynamic> order;
@@ -117,7 +118,7 @@ class _CompleteOrderScreenState extends State<CompleteOrderScreen> {
                 Text(
                   listing['title'] ?? "Item",
                   style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold),
+                      fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Poppins',),
                 ),
 
                 const SizedBox(height: 6),
@@ -126,14 +127,16 @@ class _CompleteOrderScreenState extends State<CompleteOrderScreen> {
                   "Ksh ${widget.order['totalPrice']}",
                   style: const TextStyle(
                       color: Palette.primary,
-                      fontWeight: FontWeight.w600),
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'Poppins',
+                      ),
                 ),
 
                 const SizedBox(height: 6),
 
                 Text(
                   "Qty: ${widget.order['quantity'] ?? 1}",
-                  style: const TextStyle(color: Colors.grey),
+                  style: const TextStyle(color: Colors.grey, fontFamily: 'Poppins',),
                 ),
               ],
             ),
@@ -147,7 +150,7 @@ class _CompleteOrderScreenState extends State<CompleteOrderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("complete_order".tr,style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold), ),
+        title: Text("complete_order".tr,style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'Poppins',), ),
         backgroundColor: Palette.primary,
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
@@ -195,7 +198,8 @@ class _CompleteOrderScreenState extends State<CompleteOrderScreen> {
                     : Text(
                         "mark_as_complete".tr,
                         style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                            fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Poppins',
+                            ),
                       ),
               ),
             ),

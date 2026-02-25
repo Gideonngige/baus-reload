@@ -10,6 +10,7 @@ import 'package:baustaka/helper/util.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import './complete_order_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 
 
@@ -102,7 +103,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
         appBar: AppBar(
         title: Text(
             "my_orders".tr,
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'Poppins',),
             ),
         backgroundColor: Palette.primary,
         centerTitle: true,
@@ -113,7 +114,7 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
     : orders.isEmpty
         ? Center(
             child: Text('no_orders_found'.tr,
-                style: TextStyle(color: Colors.grey, fontSize: 16)),
+                style: TextStyle(color: Colors.grey, fontSize: 16, fontFamily: 'Poppins',)),
           )
         : ListView.builder(
             padding: const EdgeInsets.all(16),
@@ -162,11 +163,11 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
             children: [
               Text(order['listing']['title'] ?? 'Unknown Item',
                   style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w700)),
+                      fontSize: 16, fontWeight: FontWeight.w700, fontFamily: 'Poppins',)),
               const SizedBox(height: 5),
               Text("Ksh. ${order['totalPrice'] ?? '0'}",
                   style: const TextStyle(
-                      color: Palette.primary, fontWeight: FontWeight.w600)),
+                      color: Palette.primary, fontWeight: FontWeight.w600, fontFamily: 'Poppins',)),
               const SizedBox(height: 8),
               Row(
                 children: [
@@ -183,7 +184,9 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
                       style: TextStyle(
                           color: _getStatusColor(order['deliveryStatus']),
                           fontSize: 14,
-                          fontWeight: FontWeight.w500)),
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'Poppins',
+                          )),
                 ],
               ),
             ],
@@ -227,7 +230,9 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 14,
-                    fontWeight: FontWeight.w600)),
+                    fontWeight: FontWeight.w600, 
+                    fontFamily: 'Poppins',
+                    )),
           ),
       ],
     ),

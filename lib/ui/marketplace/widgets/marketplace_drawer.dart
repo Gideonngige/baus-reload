@@ -16,6 +16,7 @@ import 'package:baustaka/helper/session.dart';
 import 'package:baustaka/config/palette.dart';
 import 'package:baustaka/helper/session.dart';
 import 'package:baustaka/ui/main/main_widget.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MarketplaceDrawer extends StatelessWidget {
   final Map<String, dynamic>? user;
@@ -29,8 +30,8 @@ class MarketplaceDrawer extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           UserAccountsDrawerHeader(
-            accountName: Text(user?['displayName'] ?? 'Market User'),
-            accountEmail: Text(user?['email'] ?? 'marketuser@example.com'),
+            accountName: Text(user?['displayName'] ?? 'Market User', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18)),
+            accountEmail: Text(user?['email'] ?? 'marketuser@example.com', style: GoogleFonts.poppins(fontSize: 14)),
             currentAccountPicture: CircleAvatar(
               backgroundColor: Colors.white,
               child: Icon(Icons.person, color: Palette.primary),
@@ -173,7 +174,7 @@ class MarketplaceDrawer extends StatelessWidget {
   }) {
     return ListTile(
       leading: Icon(icon),
-      title: Text(title),
+      title: Text(title, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500)),
       onTap: onTap,
     );
   }

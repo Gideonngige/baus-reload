@@ -9,6 +9,7 @@ import 'package:baustaka/config/env.dart';
 import 'package:baustaka/helper/util.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -115,6 +116,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
+            fontFamily: 'Poppins',
           ),
         ),
         centerTitle: true,
@@ -125,7 +127,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             onPressed: markAllAsRead,
             child: Text(
               'mark_as_read'.tr,
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontFamily: 'Poppins'),
             ),
           ),
         ],
@@ -137,7 +139,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ? Center(
                   child: Text(
                     'no_notifications'.tr,
-                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                    style: TextStyle(color: Colors.grey, fontSize: 16, fontFamily: 'Poppins',),
                   ),
                 )
               : ListView.builder(
@@ -169,6 +171,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           n['title'] ?? 'No title',
           style: TextStyle(
             fontWeight: FontWeight.bold,
+            fontFamily: 'Poppins',
             color: n['isRead'] == true ? Colors.black87 : Palette.primary,
           ),
         ),
@@ -179,12 +182,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             const SizedBox(height: 4),
             Text(
               n['message'] ?? 'No message',
-              style: const TextStyle(color: Colors.black),
+              style: const TextStyle(color: Colors.black, fontFamily: 'Poppins',),
             ),
             const SizedBox(height: 6),
             Text(
               formatDate(n['createdAt']),
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
+              style: const TextStyle(fontSize: 12, color: Colors.grey, fontFamily: 'Poppins',),
             ),
           ],
         ),
