@@ -288,35 +288,58 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            _buildTextField(_priceController, "price".tr, Icons.monetization_on),
-            const SizedBox(height: 15),
-            _buildTextField(_weightController, "weight".tr, Icons.scale, allowDecimal: true),
-            const SizedBox(height: 20),
-            _buildLocationSection(),
-            const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              height: 55,
-              child: ElevatedButton.icon(
-                onPressed: isLoading ? null : _submitListing,
-                icon: const Icon(Icons.cloud_upload_rounded, color: Colors.white),
-                label: isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : Text("upload_listing".tr, style: TextStyle(color: Colors.white, fontFamily: 'Poppins',)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.primary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
+      body: SingleChildScrollView(
+  child: Padding(
+    padding: const EdgeInsets.all(20),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 20),
+
+        _buildTextField(_priceController, "price".tr, Icons.monetization_on),
+
+        const SizedBox(height: 15),
+
+        _buildTextField(
+          _weightController,
+          "weight".tr,
+          Icons.scale,
+          allowDecimal: true,
+        ),
+
+        const SizedBox(height: 20),
+
+        _buildLocationSection(),
+
+        const SizedBox(height: 30), // ✅ replace Spacer()
+
+        SizedBox(
+          width: double.infinity,
+          height: 55,
+          child: ElevatedButton.icon(
+            onPressed: isLoading ? null : _submitListing,
+            icon: const Icon(Icons.cloud_upload_rounded, color: Colors.white),
+            label: isLoading
+                ? const CircularProgressIndicator(color: Colors.white)
+                : Text(
+                    "upload_listing".tr,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Palette.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
-          ],
+          ),
         ),
-      ),
+      ],
+    ),
+  ),
+),
     );
   }
 
@@ -352,6 +375,18 @@ class _CreateListingStep2State extends State<CreateListingStep2> {
             ],
           ),
         ),
+        Padding(
+  padding: const EdgeInsets.only(top: 8),
+  child: Text(
+    "Note: We are currently operating in Nairobi, Mombasa, Kwale and Kilifi.",
+    style: TextStyle(
+      fontFamily: 'Poppins',
+      color: Colors.orange,
+      fontWeight: FontWeight.w500,
+      fontSize: 13,
+    ),
+  ),
+),
       ],
     );
   }
