@@ -281,7 +281,7 @@ class HomeWidget extends ResponsiveWidget<HomeController> {
                   ),
                   _drawerListTile(
                     icon: Icons.storefront,
-                    label: 'Marketplace',
+                    label: 'Loop-X Marketplace',
                     onTap: () async {
                       await Get.to(() => MarketplaceHomeScreen());
                     },
@@ -553,6 +553,18 @@ class PanelWidget extends StatelessWidget {
               ),
               const SizedBox(
                 height: 32,
+              ),
+              Item(
+                title: 'Loop-X Marketplace',
+                subtitle: 'Buy and sell recyclable materials & products',
+                onTap: () async => await Get.to(
+                    () => MarketplaceHomeScreen(),
+                ),
+                asset: 'assets/images/marketplace.png', // add your icon
+                color: Palette.primary,
+              ),
+              const SizedBox(
+                height: 16,
               ),
               Item(
                 title: 'Upcoming Pickups',

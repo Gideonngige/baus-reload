@@ -527,70 +527,187 @@ class _SellerDashboardScreenState extends State<SellerDashboardScreen> {
   }
 
  Widget _buildBarChart(List monthlySales) {
-  return SizedBox(
-    height: 220,
-    child: BarChart(
-      BarChartData(
-        gridData: const FlGridData(show: false),
-        borderData: FlBorderData(show: false),
+  // Calculate a clean interval based on data
+  final maxY = monthlySales.isEmpty
+      ? 1000.0
+      : (monthlySales
+              .map((e) => (e["sales"] ?? 0).toDouble())
+              .reduce((a, b) => a > b ? a : b) *
+          1.2);
 
-        titlesData: FlTitlesData(
-          topTitles: const AxisTitles(
-            sideTitles: SideTitles(showTitles: false),
+  final interval = (maxY / 4).ceilToDouble();
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      /// Y-Axis Label
+      const Padding(
+        padding: EdgeInsets.only(left: 8.0, bottom: 4),
+        child: Text(
+          'Sales (KES)',
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            fontFamily: 'Poppins',
+            color: Colors.black54,
+            letterSpacing: 0.3,
           ),
-          rightTitles: const AxisTitles(
-            sideTitles: SideTitles(showTitles: false),
-          ),
-          leftTitles: const AxisTitles(
-            sideTitles: SideTitles(showTitles: false),
-          ),
+        ),
+      ),
 
-          /// Bottom Month Names
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: 28,
-              getTitlesWidget: (value, meta) {
-                int index = value.toInt();
+      SizedBox(
+        height: 220,
+        child: BarChart(
+          BarChartData(
+            maxY: maxY,
+            gridData: FlGridData(
+              show: true,
+              drawVerticalLine: false,
+              horizontalInterval: interval,
+              getDrawingHorizontalLine: (value) => FlLine(
+                color: Colors.grey.withOpacity(0.15),
+                strokeWidth: 1,
+                dashArray: [4, 4],
+              ),
+            ),
+            borderData: FlBorderData(
+              show: true,
+              border: Border(
+                bottom: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1),
+                left: BorderSide(color: Colors.grey.withOpacity(0.3), width: 1),
+              ),
+            ),
+            titlesData: FlTitlesData(
+              topTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              rightTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
 
-                if (index >= monthlySales.length) {
-                  return const SizedBox();
-                }
+              /// Y-Axis (Left) — value ticks
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 52,
+                  interval: interval,
+                  getTitlesWidget: (value, meta) {
+                    if (value == 0) return const SizedBox();
+                    String label;
+                    if (value >= 1000) {
+                      label = '${(value / 1000).toStringAsFixed(value % 1000 == 0 ? 0 : 1)}k';
+                    } else {
+                      label = value.toInt().toString();
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: Text(
+                        label,
+                        textAlign: TextAlign.right,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontFamily: 'Poppins',
+                          color: Colors.black54,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
 
-                return Padding(
-                  padding: const EdgeInsets.only(top: 6),
-                  child: Text(
-                    monthlySales[index]["month"], // FROM BACKEND
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: 'Poppins',
+              /// X-Axis (Bottom) — month names
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 32,
+                  getTitlesWidget: (value, meta) {
+                    final index = value.toInt();
+                    if (index >= monthlySales.length) return const SizedBox();
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        monthlySales[index]["month"],
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'Poppins',
+                          color: Colors.black87,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+
+            barGroups: monthlySales.asMap().entries.map((e) {
+              return BarChartGroupData(
+                x: e.key,
+                barRods: [
+                  BarChartRodData(
+                    toY: (e.value["sales"] ?? 0).toDouble(),
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF00C853), Color(0xFF69F0AE)],
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                    ),
+                    width: 20,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(6),
+                    ),
+                    backDrawRodData: BackgroundBarChartRodData(
+                      show: true,
+                      toY: maxY,
+                      color: Colors.grey.withOpacity(0.06),
                     ),
                   ),
-                );
-              },
+                ],
+              );
+            }).toList(),
+
+            barTouchData: BarTouchData(
+              touchTooltipData: BarTouchTooltipData(
+                getTooltipColor: (_) => Colors.black87,
+                tooltipRoundedRadius: 8,
+                getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                  final month = monthlySales[group.x]["month"];
+                  final sales = rod.toY.toStringAsFixed(0);
+                  return BarTooltipItem(
+                    '$month\nKES $sales',
+                    const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w500,
+                      height: 1.6,
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         ),
-
-        barGroups: monthlySales.asMap().entries.map((e) {
-          return BarChartGroupData(
-            x: e.key,
-            barRods: [
-              BarChartRodData(
-                toY: (e.value["sales"] ?? 0).toDouble(),
-                color: Colors.green,
-                width: 18,
-                borderRadius: BorderRadius.circular(6),
-              ),
-            ],
-          );
-        }).toList(),
       ),
-    ),
+
+      /// X-Axis Label
+      const Center(
+        child: Padding(
+          padding: EdgeInsets.only(top: 6),
+          child: Text(
+            'Month',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'Poppins',
+              color: Colors.black54,
+              letterSpacing: 0.3,
+            ),
+          ),
+        ),
+      ),
+    ],
   );
 }
-
 
   Widget _buildListingTile({
     required String name,

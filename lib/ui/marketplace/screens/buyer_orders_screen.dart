@@ -86,13 +86,14 @@ class _BuyerOrdersScreenState extends State<BuyerOrdersScreen> {
 
   Color _getStatusColor(String? status) {
   switch (status) {
-    case 'Delivered':
+    case 'delivered':
       return Colors.green;
-    case 'On Transit':
+    case 'in_progress':
       return Colors.orange;
-    case 'Pending':
+    case 'pending':
+      return Colors.orangeAccent;
     default:
-      return Colors.grey;
+      return Colors.red;
   }
 }
 

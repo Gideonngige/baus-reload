@@ -15,7 +15,7 @@ class Messages extends Translations {
           'switch_lang': 'Tumia Kiswahili',
         //   marketplace home screen
           'hi':'Hi',
-          'marketplace': 'Marketplace',
+          'marketplace': 'Loop-X',
           'view_all':'View All',
           'top_listings':'Top Listings',
           'failed_to_load_listings':'Failed to load listings',
@@ -176,7 +176,7 @@ class Messages extends Translations {
           'switch_lang': 'Switch to English',
         //   marketplace
           'hi':'Habari',
-          'marketplace': 'Soko',
+          'marketplace': 'Loop-X',
           'view_all':'Angalia Zote',
           'top_listings':'Orodha',
           'failed_to_load_listings':'Imeshindikana kutafuta bidhaa!.',
