@@ -69,7 +69,8 @@ dependencies:
   carousel_slider: 4.2.0
   open_file: ^3.3.2
   pdf: ^3.10.7
-  google_fonts: ^4.0.4
+  # google_fonts: ^4.0.4
+  google_fonts: ^6.2.1
   fl_chart: ^0.68.0
   http: ^0.13.6
   # mobile_scanner: ^5.0.0
@@ -108,3 +109,4 @@ flutter:
 
 dependency_overrides:
   intl: ^0.20.2
+  http: ^1.1.0
