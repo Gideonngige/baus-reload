@@ -72,7 +72,7 @@ dependencies:
   google_fonts: ^4.0.4
   fl_chart: ^0.68.0
   http: ^0.13.6
-  mobile_scanner: ^6.0.0
+  # mobile_scanner: ^5.0.0
 
   # localization
   flutter_localizations:
