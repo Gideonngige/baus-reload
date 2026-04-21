@@ -1,0 +1,37 @@
+workflows:
+  ios-release:
+    name: Baus Taka iOS Release
+    max_build_duration: 60
+    instance_type: mac_mini_m1
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Set up .env file
+        script: | 
+          # This handles the "No file found for asset: .env" error
+          # If you have .env.copy, we use it to create the expected .env
+          cp .env.copy .env || touch .env
+      
+      - name: Install dependencies
+        script: |
+          flutter pub get
+          
+      - name: iOS CocoaPods install
+        script: |
+          # This ensures the "Null check operator" doesn't happen due to stale configs
+          cd ios
+          rm -rf Pods
+          rm -f Podfile.lock
+          pod install
+          cd ..
+
+      - name: Build iOS IPA
+        script: |
+          # The --no-native-assets flag fixes the xcode_backend.dart:345 crash
+          # The --no-codesign allows the build to finish without Apple Certificates
+          flutter build ios --release --no-codesign --no-native-assets
+          
+    artifacts:
+      - build/ios/iphoneos/*.app
