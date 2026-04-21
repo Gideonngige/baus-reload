@@ -6,31 +6,36 @@ workflows:
     environment:
       flutter: stable
       xcode: latest
-      cocoapods: default
+      # Force these variables so the script doesn't find a 'null' value
+      vars:
+        FLUTTER_SUPPRESS_ANALYTICS: "true"
+        # The crash often happens because this is missing in the sub-shell
+        FLUTTER_BUILD_MODE: "release" 
     scripts:
-      - name: Handle .env Asset
+      - name: Set up .env and Assets
         script: |
-          # Creates a dummy .env from your copy so the asset bundler doesn't fail
           cp .env.copy .env || touch .env
-          
-      - name: Fetch Dart dependencies
+          # Ensure there are no empty asset folders that trip up the native bundler
+          find . -type d -empty -delete 
+
+      - name: Fetch dependencies
         script: |
           flutter pub get
 
-      - name: Clean and Install CocoaPods
+      - name: CocoaPods and Config Fix
         script: |
-          # This prevents stale iOS configs that cause the Null check error
           cd ios
           rm -rf Pods
           rm -f Podfile.lock
+          # Force refresh the xcconfig files
+          rm -f Flutter/Generated.xcconfig
+          rm -f Flutter/Release.xcconfig
           pod install
           cd ..
 
       - name: Build iOS IPA
         script: |
-          # --no-native-assets bypasses the specific crash at xcode_backend.dart:345
-          # --no-codesign is used for testing builds without Apple certs
-          flutter build ios --release --no-codesign --no-native-assets
-
+          # Added --no-native-assets AND --no-tree-shake-icons to reduce script complexity
+          flutter build ios --release --no-codesign --no-native-assets --no-tree-shake-icons
     artifacts:
       - build/ios/iphoneos/*.app
