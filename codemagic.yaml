@@ -15,7 +15,13 @@ workflows:
     scripts:
       - name: Verify Flutter config
         script: |
+          flutter clean
           flutter pub get
+          cd ios
+          rm -rf Pods Podfile.lock
+          pod install --repo-update
+          cd ..
+          flutter build ipa --release
           echo "=== Generated.xcconfig ==="
           cat ios/Flutter/Generated.xcconfig
           echo "==========================="
