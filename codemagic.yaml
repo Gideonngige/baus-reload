@@ -5,8 +5,8 @@ workflows:
     instance_type: mac_mini_m1
 
     environment:
-      flutter: 3.24.2
-      xcode: 16.2
+      flutter: 3.29.3
+      xcode: 16.3
       cocoapods: default
 
     # integrations:
