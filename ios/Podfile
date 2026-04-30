@@ -58,19 +58,42 @@ end
 # end
 
 
+# post_install do |installer|
+#   installer.pods_project.targets.each do |target|
+#     # This line is usually already there - KEEP IT
+#     flutter_additional_ios_build_settings(target)
+
+#     # This loop applies the fix to every dependency (like Firebase)
+#     target.build_configurations.each do |config|
+#       # Fix 1: Stop treating warnings as errors
+#       config.build_settings['GCC_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
+#       config.build_settings['SWIFT_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
+      
+#       # Fix 2: Ensure the deployment target is consistent (prevents other common errors)
+#       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+#     end
+#   end
+# end
+
+
 post_install do |installer|
   installer.pods_project.targets.each do |target|
-    # This line is usually already there - KEEP IT
     flutter_additional_ios_build_settings(target)
-
-    # This loop applies the fix to every dependency (like Firebase)
     target.build_configurations.each do |config|
-      # Fix 1: Stop treating warnings as errors
       config.build_settings['GCC_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
       config.build_settings['SWIFT_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
-      
-      # Fix 2: Ensure the deployment target is consistent (prevents other common errors)
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      # ADD THIS LINE:
+      config.build_settings['ARCHS'] = 'arm64'
+    end
+  end
+  
+  # Also fix the Runner project itself
+  installer.generated_projects.each do |project|
+    project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['ARCHS'] = 'arm64'
+      end
     end
   end
 end
