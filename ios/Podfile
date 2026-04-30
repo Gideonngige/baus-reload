@@ -85,6 +85,7 @@ post_install do |installer|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
       # ADD THIS LINE:
       config.build_settings['ARCHS'] = 'arm64'
+      config.build_settings['SWIFT_VERSION'] = '5.0'
     end
   end
   
