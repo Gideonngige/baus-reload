@@ -13,6 +13,12 @@ workflows:
       # app_store_connect: your_api_key_name   # set up in Codemagic UI first
 
     scripts:
+      - name: Verify Flutter config
+        script: |
+          flutter pub get
+          echo "=== Generated.xcconfig ==="
+          cat ios/Flutter/Generated.xcconfig
+          echo "==========================="
       - name: Prepare .env
         script: |
           cp .env.copy .env || touch .env
