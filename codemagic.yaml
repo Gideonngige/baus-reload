@@ -16,6 +16,7 @@ workflows:
       - name: Verify Flutter config
         script: |
           flutter clean
+          flutter pub upgrade
           flutter pub get
           cd ios
           rm -rf Pods Podfile.lock
