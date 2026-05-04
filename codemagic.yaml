@@ -14,20 +14,26 @@ workflows:
         script: |
           flutter clean
           rm -rf ios/Pods ios/Podfile.lock
+          rm -rf build
 
       - name: Get dependencies
         script: |
           flutter pub get
 
-      - name: Set iOS deployment target
+      - name: Force iOS 14 deployment target
         script: |
-          sed -i '' 's/platform :ios, .*/platform :ios, '\''14.0'\''/' ios/Podfile
+          sed -i '' "s/platform :ios,.*/platform :ios, '14.0'/" ios/Podfile
 
       - name: Install CocoaPods
         script: |
           cd ios
-          pod install --repo-update
+          pod repo update
+          pod install
           cd ..
+
+      - name: Analyze project (safe check)
+        script: |
+          flutter doctor -v
 
       - name: Build iOS (no codesign)
         script: |
