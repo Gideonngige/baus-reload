@@ -9,48 +9,30 @@ workflows:
       xcode: 16.3
       cocoapods: default
 
-    # integrations:
-      # app_store_connect: your_api_key_name   # set up in Codemagic UI first
-
     scripts:
-      - name: Verify Flutter config
+      - name: Clean project
         script: |
           flutter clean
+
+      - name: Get dependencies
+        script: |
           flutter pub upgrade
           flutter pub get
-          cd ios
-          rm -rf Pods Podfile.lock
-          pod install --repo-update
-          cd ..
-          flutter build ipa --release
-          echo "=== Generated.xcconfig ==="
-          cat ios/Flutter/Generated.xcconfig
-          echo "==========================="
-      - name: Prepare .env
-        script: |
-          cp .env.copy .env || touch .env
-
-      - name: Flutter pub get
-        script: flutter pub get
 
       - name: Install CocoaPods
         script: |
           cd ios
           rm -rf Pods Podfile.lock
-          pod install
+          pod install --repo-update
           cd ..
 
-      - name: Set build number
+      - name: Prepare env
         script: |
-          BUILD_NUMBER=$(($BUILD_NUMBER + 1))
-          cd ios
-          agvtool new-version -all $BUILD_NUMBER
-          cd ..
+          cp .env.copy .env || touch .env
 
       - name: Build IPA
         script: |
-          flutter build ipa --release \
-            --export-options-plist=/Users/builder/export_options.plist
+          flutter build ipa --release
 
     artifacts:
       - build/ios/ipa/*.ipa
