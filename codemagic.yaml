@@ -1,46 +1,33 @@
 workflows:
   ios-release:
-    name: Final iOS Fix
+    name: Baus Taka iOS Build
     max_build_duration: 60
     instance_type: mac_mini_m1
 
     environment:
-      flutter: 3.27.0   # stay on stable
-      xcode: 16.3
+      flutter: stable
+      xcode: latest
+      cocoapods: default
 
     scripts:
-      - name: FULL CLEAN
+      - name: Clean project
         script: |
           flutter clean
-          rm -rf ios/Pods ios/Podfile.lock ios/Flutter
-          rm -rf ~/Library/Developer/Xcode/DerivedData/*
 
-      - name: GET PACKAGES
+      - name: Get dependencies
         script: |
-          flutter pub upgrade
           flutter pub get
 
-      - name: PRECACHE IOS
-        script: flutter precache --ios
-
-      # 🔥 THIS STEP IS THE MOST IMPORTANT
-      - name: GENERATE IOS PROJECT FILES
-        script: flutter build ios --release --no-codesign
-
-      - name: INSTALL PODS (AFTER BUILD!)
+      - name: Install CocoaPods
         script: |
           cd ios
+          rm -rf Pods Podfile.lock
           pod install --repo-update
           cd ..
 
-      - name: VERIFY GENERATED CONFIG
+      - name: Build IPA
         script: |
-          echo "==== Generated.xcconfig ===="
-          cat ios/Flutter/Generated.xcconfig || echo "Missing!"
-          echo "============================"
-
-      - name: BUILD IPA
-        script: flutter build ipa --release
+          flutter build ipa --release --no-tree-shake-icons
 
     artifacts:
       - build/ios/ipa/*.ipa
