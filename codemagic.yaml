@@ -1,39 +1,45 @@
 workflows:
   ios-release:
-    name: Stable iOS Build
+    name: Final iOS Fix
     max_build_duration: 60
     instance_type: mac_mini_m1
 
     environment:
-      flutter: 3.27.0   # 👈 DOWNGRADE (important)
+      flutter: 3.27.0   # stay on stable
       xcode: 16.3
-      cocoapods: default
 
     scripts:
-      - name: Clean everything
+      - name: FULL CLEAN
         script: |
           flutter clean
           rm -rf ios/Pods ios/Podfile.lock ios/Flutter
+          rm -rf ~/Library/Developer/Xcode/DerivedData/*
 
-      - name: Get packages
+      - name: GET PACKAGES
         script: |
           flutter pub upgrade
           flutter pub get
 
-      - name: Precache iOS
+      - name: PRECACHE IOS
         script: flutter precache --ios
 
-      - name: Recreate iOS build files
-        script: |
-          flutter build ios --release --no-codesign
+      # 🔥 THIS STEP IS THE MOST IMPORTANT
+      - name: GENERATE IOS PROJECT FILES
+        script: flutter build ios --release --no-codesign
 
-      - name: Install CocoaPods
+      - name: INSTALL PODS (AFTER BUILD!)
         script: |
           cd ios
           pod install --repo-update
           cd ..
 
-      - name: Build IPA
+      - name: VERIFY GENERATED CONFIG
+        script: |
+          echo "==== Generated.xcconfig ===="
+          cat ios/Flutter/Generated.xcconfig || echo "Missing!"
+          echo "============================"
+
+      - name: BUILD IPA
         script: flutter build ipa --release
 
     artifacts:
